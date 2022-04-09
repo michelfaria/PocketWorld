@@ -1,0 +1,83 @@
+
+Poketest.png
+size: 128, 64
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+grass
+  rotate: false
+  xy: 72, 34
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+sand
+  rotate: false
+  xy: 54, 34
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+tree
+  rotate: false
+  xy: 2, 2
+  size: 32, 48
+  orig: 32, 48
+  offset: 0, 0
+  index: -1
+wall-bottom
+  rotate: false
+  xy: 36, 16
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+wall-bottomleft-corner
+  rotate: false
+  xy: 108, 34
+  size: 15, 16
+  orig: 15, 16
+  offset: 0, 0
+  index: -1
+wall-bottomleft-innercorner
+  rotate: false
+  xy: 90, 16
+  size: 15, 16
+  orig: 15, 16
+  offset: 0, 0
+  index: -1
+wall-bottomright-corner
+  rotate: false
+  xy: 54, 16
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+wall-bottomright-innercorner
+  rotate: false
+  xy: 90, 34
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+wall-left
+  rotate: false
+  xy: 107, 16
+  size: 15, 16
+  orig: 15, 16
+  offset: 0, 0
+  index: -1
+wall-right
+  rotate: false
+  xy: 36, 34
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+water
+  rotate: false
+  xy: 72, 16
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
