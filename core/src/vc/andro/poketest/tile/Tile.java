@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import vc.andro.poketest.Assets;
 import vc.andro.poketest.PokeTest;
+import vc.andro.poketest.util.AtlasUtil;
 
 import static vc.andro.poketest.PokeTest.TILE_SIZE;
 
@@ -27,7 +28,7 @@ public class Tile {
     }
 
     public void draw(SpriteBatch spriteBatch) {
-        TextureRegion region = PokeTest.assetManager.get(Assets.textureAtlas).findRegion(spriteId);
+        TextureRegion region = AtlasUtil.findRegion(PokeTest.assetManager.get(Assets.textureAtlas), spriteId);
         spriteBatch.draw(
                 region,
                 x * TILE_SIZE,

@@ -2,7 +2,7 @@ package vc.andro.poketest.tile;
 
 public enum TileType {
     GRASS("tile.grass", "grass"),
-    WALL("tile.wall", "wall-bottom"),
+    WALL("tile.wall", "wall-bottom-edge"),
     WATER("tile.water", "water"),
     SAND("tile.sand", "sand"),
     SLOPE("tile.slope", "grass");
