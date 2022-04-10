@@ -1,7 +1,8 @@
 package vc.andro.poketest.world;
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import vc.andro.poketest.DrawingContext;
+import vc.andro.poketest.Assets;
 import vc.andro.poketest.PokeTest;
 
 import static vc.andro.poketest.PokeTest.TILE_SIZE;
@@ -10,25 +11,19 @@ public class Entity {
     public float x;
     public float y;
     public final String typeName;
-    public final TextureRegion texture;
+    public final String spriteId;
 
-    public Entity(String typeName, TextureRegion texture) {
+    public Entity(String typeName, String spriteId) {
         this.typeName = typeName;
-        this.texture = texture;
+        this.spriteId = spriteId;
     }
 
-    public void draw(DrawingContext context) {
-        context.spriteBatch.draw(
-                texture,
+    public void draw(SpriteBatch spriteBatch) {
+        TextureRegion sprite = PokeTest.assetManager.get(Assets.textureAtlas).findRegion(spriteId);
+        spriteBatch.draw(
+                sprite,
                 x * TILE_SIZE,
-                y * TILE_SIZE,
-                0f,
-                0f,
-                texture.getRegionWidth(),
-                texture.getRegionHeight(),
-                1f,
-                1f,
-                -context.viewRotation.getValue()
+                y * TILE_SIZE
         );
     }
 }

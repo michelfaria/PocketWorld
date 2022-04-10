@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.ObjectFloatMap;
 public class Timers {
 
     public enum Id {
-        CAMERA_ROTATION(0.2f);
+        ;
 
         public final float startTime;
 

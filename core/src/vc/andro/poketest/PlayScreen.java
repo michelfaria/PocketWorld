@@ -3,15 +3,15 @@ package vc.andro.poketest;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import vc.andro.poketest.font.HackFont;
 import vc.andro.poketest.numbers.ViewRotation;
 import vc.andro.poketest.world.Entity;
 import vc.andro.poketest.world.Tile;
@@ -20,27 +20,27 @@ import vc.andro.poketest.worldgen.WorldBaseCreator;
 import vc.andro.poketest.worldgen.WorldCreationParams;
 import vc.andro.poketest.worldgen.WorldGenerator;
 
-import javax.swing.text.View;
-
 import static vc.andro.poketest.PokeTest.*;
 
 public class PlayScreen implements Screen {
 
     private final OrthographicCamera camera;
     private final FitViewport viewport;
-    private final HackFont hackFont;
+    private final BitmapFont bitmapFont;
     private final FPSLogger fpsLogger;
     private final World world;
-    private final DrawingContext drawingContext;
+    private final SpriteBatch spriteBatch;
     private final Timers timers;
+    private final TextureAtlas textureAtlas;
 
     public PlayScreen(WorldCreationParams worldCreationParams) {
         camera = new OrthographicCamera();
         viewport = new FitViewport(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, camera);
         world = new WorldGenerator(new WorldBaseCreator(worldCreationParams).createBase()).createWorld();
-        hackFont = HackFont.load();
+        bitmapFont = assetManager.get(Assets.hackFont8pt);
+        textureAtlas = assetManager.get(Assets.textureAtlas);
         fpsLogger = new FPSLogger();
-        drawingContext = new DrawingContext(new SpriteBatch(), new ViewRotation());
+        spriteBatch = new SpriteBatch();
         timers = new Timers();
     }
 
@@ -60,8 +60,6 @@ public class PlayScreen implements Screen {
     }
 
     private void renderDebugNumbers() {
-        final SpriteBatch spriteBatch = drawingContext.spriteBatch;
-
         spriteBatch.getProjectionMatrix().setToOrtho2D(0, 0, viewport.getScreenWidth(), viewport.getScreenHeight());
         spriteBatch.begin();
         for (var y = 0; y < world.getHeight(); y++) {
@@ -78,8 +76,7 @@ public class PlayScreen implements Screen {
 
                 if (camera.zoom <= 0.5f) {
                     Vector3 tileScreenCoords = camera.project(new Vector3(nx, ny, 0));
-                    hackFont.getBitmapFont().draw(spriteBatch, Float.toString(tile.getAltitude()),
-                            tileScreenCoords.x, tileScreenCoords.y + 8);
+                    bitmapFont.draw(spriteBatch, Float.toString(tile.getAltitude()), tileScreenCoords.x, tileScreenCoords.y + 8);
                 }
             }
         }
@@ -87,8 +84,6 @@ public class PlayScreen implements Screen {
     }
 
     private void renderTiles() {
-        final SpriteBatch spriteBatch = drawingContext.spriteBatch;
-
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
         for (var y = 0; y < world.getHeight(); y++) {
@@ -102,15 +97,13 @@ public class PlayScreen implements Screen {
                 }
 
                 Tile tile = world.tiles[x][y];
-                tile.draw(drawingContext);
+                tile.draw(spriteBatch, textureAtlas);
             }
         }
         spriteBatch.end();
     }
 
     private void renderEntities() {
-        final SpriteBatch spriteBatch = drawingContext.spriteBatch;
-
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
         for (Entity entity : world.entities) {
@@ -119,7 +112,7 @@ public class PlayScreen implements Screen {
             if (isPosOutsideOfCameraView(nx, ny)) {
                 continue;
             }
-            entity.draw(drawingContext);
+            entity.draw(spriteBatch);
         }
         spriteBatch.end();
     }
@@ -130,7 +123,6 @@ public class PlayScreen implements Screen {
 
     private void update(float delta) {
         updateCameraPosition();
-        updateViewRotation();
         timers.tickTimers(delta);
 
         camera.update();
@@ -177,24 +169,6 @@ public class PlayScreen implements Screen {
         camera.zoom = Math.max(camera.zoom, 0.0f);
     }
 
-    private void updateViewRotation() {
-        final ViewRotation viewRotation = drawingContext.viewRotation;
-
-        if (!timers.isTimerExpired(Timers.Id.CAMERA_ROTATION)) {
-            return;
-        }
-        timers.resetTimer(Timers.Id.CAMERA_ROTATION);
-
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT_BRACKET)) {
-            viewRotation.rotate90CCW();
-            camera.rotate(-90f);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT_BRACKET)) {
-            viewRotation.rotate90CW();
-            camera.rotate(90f);
-        }
-    }
-
     private void clearScreen() {
         Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -222,7 +196,6 @@ public class PlayScreen implements Screen {
 
     @Override
     public void dispose() {
-        hackFont.dispose();
-        drawingContext.dispose();
+        spriteBatch.dispose();
     }
 }

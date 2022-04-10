@@ -29,25 +29,19 @@ public class PokeTest extends Game {
 			WORLD_SEED, WORLD_WIDTH, WORLD_HEIGHT, WORLD_DEPTH, WORLD_WATER_LEVEL, WORLD_TERRACES, WORLD_BEACH_ALTITUDE,
 			TREE_MAP_R_VALUE, ISLAND_MODE, VALLEY_FACTOR, SLOPE_CHANCE);
 
-	private static AssetManager assetManager;
-	private static TextureAtlas textureAtlas;
+	public static AssetManager assetManager;
 
 	@Override
 	public void create () {
 		assetManager = new AssetManager();
 		assetManager.load(Assets.textureAtlas);
+		assetManager.load(Assets.hackFont8pt);
 		assetManager.finishLoading();
-		textureAtlas = assetManager.get(Assets.textureAtlas);
 		setScreen(new PlayScreen(WORLD_CREATION_PARAMS));
 	}
 
 	@Override
 	public void dispose () {
 		assetManager.dispose();
-		textureAtlas.dispose();
-	}
-
-	public static TextureAtlas getTextureAtlas() {
-		return textureAtlas;
 	}
 }

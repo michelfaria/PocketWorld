@@ -1,7 +1,9 @@
 package vc.andro.poketest.world;
 
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import vc.andro.poketest.DrawingContext;
 import vc.andro.poketest.PokeTest;
 
 import static vc.andro.poketest.PokeTest.TILE_SIZE;
@@ -20,19 +22,12 @@ public class Tile {
         this.y = y;
     }
 
-    public void draw(DrawingContext context) {
-        TextureRegion region = PokeTest.getTextureAtlas().findRegion(type.spriteId);
-        context.spriteBatch.draw(
+    public void draw(SpriteBatch spriteBatch, TextureAtlas textureAtlas) {
+        TextureRegion region = textureAtlas.findRegion(type.spriteId);
+        spriteBatch.draw(
                 region,
                 x * TILE_SIZE,
-                y * TILE_SIZE,
-                0f,
-                0f,
-                region.getRegionWidth(),
-                region.getRegionHeight(),
-                1f,
-                1f,
-                context.viewRotation.getValue()
+                y * TILE_SIZE
         );
     }
 

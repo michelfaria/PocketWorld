@@ -1,7 +1,10 @@
 package vc.andro.poketest.worldgen;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import org.jetbrains.annotations.NotNull;
+import vc.andro.poketest.Assets;
+import vc.andro.poketest.PokeTest;
 import vc.andro.poketest.world.*;
 
 import java.util.Random;
