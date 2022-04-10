@@ -1,7 +1,8 @@
 package vc.andro.poketest.world;
 
 import com.badlogic.gdx.utils.Array;
-import vc.andro.poketest.worldgen.WorldBase;
+import vc.andro.poketest.entity.Entity;
+import vc.andro.poketest.tile.Tile;
 
 public class World {
     public final WorldBase worldBase;

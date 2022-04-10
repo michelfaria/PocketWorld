@@ -2,7 +2,7 @@ package vc.andro.poketest;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.assets.AssetManager;
-import vc.andro.poketest.worldgen.WorldCreationParams;
+import vc.andro.poketest.world.WorldCreationParams;
 
 import java.util.Random;
 

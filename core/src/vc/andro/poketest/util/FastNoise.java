@@ -1,6 +1,6 @@
 package vc.andro.poketest.util;
 
-import vc.andro.poketest.worldgen.NoiseGenerator;
+import vc.andro.poketest.world.NoiseGenerator;
 
 @SuppressWarnings("ALL")
 public class FastNoise implements NoiseGenerator {

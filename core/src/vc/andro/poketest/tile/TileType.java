@@ -1,4 +1,4 @@
-package vc.andro.poketest.world;
+package vc.andro.poketest.tile;
 
 public enum TileType {
     GRASS("tile.grass", "grass"),
@@ -7,11 +7,11 @@ public enum TileType {
     SAND("tile.sand", "sand"),
     SLOPE("tile.slope", "grass");
 
-    public final String typeId;
-    public final String spriteId;
+    public final String gameId;
+    public final String defaultSpriteId;
 
     TileType(String typeId, String spriteId) {
-        this.typeId = typeId;
-        this.spriteId = spriteId;
+        this.gameId = typeId;
+        defaultSpriteId = spriteId;
     }
 }

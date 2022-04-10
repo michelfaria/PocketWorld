@@ -1,4 +1,4 @@
-package vc.andro.poketest.worldgen;
+package vc.andro.poketest.world;
 
 public class TreeMapGenerator {
 

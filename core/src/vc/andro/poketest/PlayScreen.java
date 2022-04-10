@@ -11,12 +11,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import vc.andro.poketest.world.Entity;
-import vc.andro.poketest.world.Tile;
+import vc.andro.poketest.entity.Entity;
+import vc.andro.poketest.tile.Tile;
 import vc.andro.poketest.world.World;
-import vc.andro.poketest.worldgen.WorldBaseCreator;
-import vc.andro.poketest.worldgen.WorldCreationParams;
-import vc.andro.poketest.worldgen.WorldGenerator;
+import vc.andro.poketest.world.WorldBaseCreator;
+import vc.andro.poketest.world.WorldCreationParams;
+import vc.andro.poketest.world.WorldGenerator;
 
 import static vc.andro.poketest.PokeTest.*;
 
@@ -95,7 +95,7 @@ public class PlayScreen implements Screen {
                 }
 
                 Tile tile = world.tiles[x][y];
-                tile.draw(spriteBatch, textureAtlas);
+                tile.draw(spriteBatch);
             }
         }
         spriteBatch.end();

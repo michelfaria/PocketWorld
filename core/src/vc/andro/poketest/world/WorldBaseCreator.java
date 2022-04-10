@@ -1,4 +1,4 @@
-package vc.andro.poketest.worldgen;
+package vc.andro.poketest.world;
 
 import vc.andro.poketest.util.BlueNoise;
 import vc.andro.poketest.util.FastNoise;

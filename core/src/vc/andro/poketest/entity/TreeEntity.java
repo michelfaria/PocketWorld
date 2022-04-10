@@ -1,4 +1,4 @@
-package vc.andro.poketest.world;
+package vc.andro.poketest.entity;
 
 public class TreeEntity extends Entity {
     public TreeEntity() {

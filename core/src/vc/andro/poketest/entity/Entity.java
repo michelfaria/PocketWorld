@@ -1,4 +1,4 @@
-package vc.andro.poketest.world;
+package vc.andro.poketest.entity;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -10,11 +10,11 @@ import static vc.andro.poketest.PokeTest.TILE_SIZE;
 public class Entity {
     public float x;
     public float y;
-    public final String typeName;
+    public final String gameId;
     public final String spriteId;
 
-    public Entity(String typeName, String spriteId) {
-        this.typeName = typeName;
+    public Entity(String gameId, String spriteId) {
+        this.gameId = gameId;
         this.spriteId = spriteId;
     }
 

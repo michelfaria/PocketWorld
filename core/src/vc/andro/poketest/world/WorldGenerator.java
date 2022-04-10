@@ -1,8 +1,11 @@
-package vc.andro.poketest.worldgen;
+package vc.andro.poketest.world;
 
 import com.badlogic.gdx.utils.Array;
 import org.jetbrains.annotations.NotNull;
-import vc.andro.poketest.world.*;
+import vc.andro.poketest.entity.Entity;
+import vc.andro.poketest.entity.TreeEntity;
+import vc.andro.poketest.tile.Tile;
+import vc.andro.poketest.tile.TileType;
 
 import java.util.Random;
 
@@ -37,7 +40,7 @@ public class WorldGenerator {
 
                 if (altitude <= worldBase.getWaterLevel()) {
                     // Is water tile
-                    tiles[x][y] = new Tile(TileType.WATER, altitude, x, y);
+                    tiles[x][y] = new Tile(TileType.WATER, x, y, altitude);
                     continue;
                 }
 
@@ -48,12 +51,12 @@ public class WorldGenerator {
 
                 if (altitude <= worldBase.getBeachAltitude()) {
                     // Is sand tile
-                    tiles[x][y] = new Tile(TileType.SAND, altitude, x, y);
+                    tiles[x][y] = new Tile(TileType.SAND, x, y, altitude);
                     continue;
                 }
 
                 // Spawn grass
-                tiles[x][y] = new Tile(TileType.GRASS, altitude, x, y);
+                tiles[x][y] = new Tile(TileType.GRASS, x, y, altitude);
             }
         }
         return tiles;
@@ -91,7 +94,7 @@ public class WorldGenerator {
             worldBase.getWidth();
             float leftAltitude = worldBase.getAltitudeMap()[x - 1][y];
             if (leftAltitude < altitude) {
-                tiles[x][y] = new Tile(TileType.WALL, altitude, x, y);
+                tiles[x][y] = new Tile(TileType.WALL, x, y, altitude);
                 return true;
             }
         }
@@ -99,7 +102,7 @@ public class WorldGenerator {
             worldBase.getWidth();
             float rightAltitude = worldBase.getAltitudeMap()[x + 1][y];
             if (rightAltitude < altitude) {
-                tiles[x][y] = new Tile(TileType.WALL, altitude, x, y);
+                tiles[x][y] = new Tile(TileType.WALL, x, y, altitude);
                 return true;
             }
         }
@@ -107,7 +110,7 @@ public class WorldGenerator {
             worldBase.getWidth();
             float belowAltitude = worldBase.getAltitudeMap()[x][y - 1];
             if (belowAltitude < altitude) {
-                tiles[x][y] = new Tile(TileType.WALL, altitude, x, y);
+                tiles[x][y] = new Tile(TileType.WALL, x, y, altitude);
                 return true;
             }
         }
@@ -115,7 +118,7 @@ public class WorldGenerator {
             worldBase.getWidth();
             float aboveAltitude = worldBase.getAltitudeMap()[x][y + 1];
             if (aboveAltitude < altitude) {
-                tiles[x][y] = new Tile(TileType.WALL, altitude, x, y);
+                tiles[x][y] = new Tile(TileType.WALL, x, y, altitude);
                 return true;
             }
         }
@@ -124,7 +127,7 @@ public class WorldGenerator {
 
     private boolean tryPlaceSlope(Tile[] tiles, int x, int y, float altitude) {
         if (random.nextFloat() <= worldBase.getSlopeChance()) {
-            tiles[y * worldBase.getWidth() + x] = new Tile(TileType.SLOPE, altitude, x, y);
+            tiles[y * worldBase.getWidth() + x] = new Tile(TileType.SLOPE, x, y, altitude);
             return true;
         }
         return false;

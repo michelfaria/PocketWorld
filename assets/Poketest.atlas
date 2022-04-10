@@ -6,77 +6,98 @@ filter: Nearest, Nearest
 repeat: none
 grass
   rotate: false
-  xy: 72, 34
+  xy: 72, 20
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+grass-ledge
+  rotate: false
+  xy: 90, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 sand
   rotate: false
-  xy: 54, 34
+  xy: 72, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 tree
   rotate: false
-  xy: 2, 2
+  xy: 2, 6
   size: 32, 48
   orig: 32, 48
   offset: 0, 0
   index: -1
-wall-bottom
+wall-bottom-edge
   rotate: false
-  xy: 36, 16
+  xy: 54, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-wall-bottomleft-corner
+wall-bottom-left-corner
   rotate: false
-  xy: 108, 34
+  xy: 36, 2
   size: 15, 16
   orig: 15, 16
   offset: 0, 0
   index: -1
-wall-bottomleft-innercorner
+wall-bottom-left-inner-corner
   rotate: false
-  xy: 90, 16
+  xy: 70, 2
   size: 15, 16
   orig: 15, 16
   offset: 0, 0
   index: -1
-wall-bottomright-corner
+wall-bottom-right-corner
   rotate: false
-  xy: 54, 16
+  xy: 36, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-wall-bottomright-innercorner
+wall-bottom-right-inner-corner
   rotate: false
-  xy: 90, 34
+  xy: 54, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-wall-left
+wall-left-edge
   rotate: false
-  xy: 107, 16
+  xy: 53, 2
   size: 15, 16
   orig: 15, 16
   offset: 0, 0
   index: -1
-wall-right
+wall-right-edge
   rotate: false
-  xy: 36, 34
+  xy: 36, 20
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+wall-top-left-corner
+  rotate: false
+  xy: 90, 20
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+wall-top-right-corner
+  rotate: false
+  xy: 108, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 water
   rotate: false
-  xy: 72, 16
+  xy: 108, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0

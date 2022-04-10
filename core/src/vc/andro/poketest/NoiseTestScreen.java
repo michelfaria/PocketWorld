@@ -7,9 +7,9 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import vc.andro.poketest.worldgen.WorldBase;
-import vc.andro.poketest.worldgen.WorldBaseCreator;
-import vc.andro.poketest.worldgen.WorldCreationParams;
+import vc.andro.poketest.world.WorldBase;
+import vc.andro.poketest.world.WorldBaseCreator;
+import vc.andro.poketest.world.WorldCreationParams;
 
 @Deprecated
 public class NoiseTestScreen implements Screen {
