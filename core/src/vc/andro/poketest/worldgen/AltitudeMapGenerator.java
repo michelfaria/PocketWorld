@@ -1,7 +1,5 @@
 package vc.andro.poketest.worldgen;
 
-import java.util.Arrays;
-
 public class AltitudeMapGenerator {
 
     private final NoiseGenerator noiseGenerator;

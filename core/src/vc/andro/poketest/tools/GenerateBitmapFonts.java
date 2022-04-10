@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.tools.bmfont.BitmapFontWriter;
 import com.badlogic.gdx.tools.hiero.Hiero;
 
-public class GenerateBitmapFonts  extends ApplicationAdapter {
+public class GenerateBitmapFonts extends ApplicationAdapter {
     @Override
     public void create() {
         var info = new BitmapFontWriter.FontInfo();

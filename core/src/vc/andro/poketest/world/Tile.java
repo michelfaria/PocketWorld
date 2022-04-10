@@ -1,10 +1,8 @@
 package vc.andro.poketest.world;
 
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import vc.andro.poketest.PokeTest;
 
 import static vc.andro.poketest.PokeTest.TILE_SIZE;
 

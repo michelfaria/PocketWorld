@@ -15,7 +15,7 @@ public class Timers {
         }
     }
 
-    private ObjectFloatMap<Id> timers;
+    private final ObjectFloatMap<Id> timers;
 
     public Timers() {
         timers = new ObjectFloatMap<>();
