@@ -1,6 +1,6 @@
 package vc.andro.poketest.tools;
 
-import vc.andro.poketest.lib.FastNoise;
+import vc.andro.poketest.util.FastNoise;
 
 public class NoiseMinMax {
     public static void main(String[] args) {

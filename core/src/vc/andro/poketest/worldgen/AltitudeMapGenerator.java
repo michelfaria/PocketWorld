@@ -19,10 +19,7 @@ public class AltitudeMapGenerator {
         final var valleyFactor = creationParams.getValleyFactor();
         final var terraces = creationParams.getTerraces();
 
-        float[][] elevations = new float[width][];
-        for (int i = 0; i < elevations.length; i++) {
-            elevations[i] = new float[height];
-        }
+        float[][] elevations = new float[width][height];
 
         for (var x = 0; x < width; x++) {
             for (var y = 0; y < height; y++) {

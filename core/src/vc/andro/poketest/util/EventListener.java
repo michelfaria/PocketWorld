@@ -1,4 +1,4 @@
-package vc.andro.poketest.events;
+package vc.andro.poketest.util;
 
 import org.jetbrains.annotations.NotNull;
 

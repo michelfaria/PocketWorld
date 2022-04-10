@@ -1,4 +1,4 @@
-package vc.andro.poketest.lib;
+package vc.andro.poketest.util;
 
 import vc.andro.poketest.worldgen.NoiseGenerator;
 

@@ -1,7 +1,7 @@
 package vc.andro.poketest.worldgen;
 
-import vc.andro.poketest.lib.BlueNoise;
-import vc.andro.poketest.lib.FastNoise;
+import vc.andro.poketest.util.BlueNoise;
+import vc.andro.poketest.util.FastNoise;
 
 public class WorldBaseCreator {
 

@@ -18,10 +18,7 @@ public class TreeMapGenerator {
         final var height = creationParams.getHeight();
         final var r = creationParams.getTreeMapRValue();
 
-        int[][] treeMap = new int[width][];
-        for (int i = 0; i < width; i++) {
-            treeMap[i] = new int[height];
-        }
+        int[][] treeMap = new int[width][height];
 
         for (int xc = 0; xc < width; xc++) {
             for (int yc = 0; yc < height; yc++) {

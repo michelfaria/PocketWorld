@@ -29,13 +29,10 @@ public class WorldGenerator {
 
     @NotNull
     private Tile[][] generateWorldTiles() {
-        Tile[][] tiles = new Tile[worldBase.getWidth()][];
-        for (int i = 0; i < worldBase.getWidth(); i++) {
-            tiles[i] = new Tile[worldBase.getHeight()];
-        }
+        Tile[][] tiles = new Tile[worldBase.getWidth()][worldBase.getHeight()];
 
-            for (int x = 0; x < worldBase.getWidth(); x++) {
-        for (int y = 0; y < worldBase.getHeight(); y++) {
+        for (int x = 0; x < worldBase.getWidth(); x++) {
+            for (int y = 0; y < worldBase.getHeight(); y++) {
                 float altitude = worldBase.getAltitudeMap()[x][y];
 
                 if (altitude <= worldBase.getWaterLevel()) {
@@ -63,8 +60,8 @@ public class WorldGenerator {
     }
 
     private void spawnTrees(Tile[][] tiles, Array<Entity> entities) {
-            for (int x = 0; x < worldBase.getHeight(); x++) {
-        for (int y = 0; y < worldBase.getWidth(); y++) {
+        for (int x = 0; x < worldBase.getHeight(); x++) {
+            for (int y = 0; y < worldBase.getWidth(); y++) {
                 if (!isTreeAllowedInPosition(tiles, y, x)) {
                     continue;
                 }
