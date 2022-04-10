@@ -3,10 +3,10 @@ package vc.andro.poketest.worldgen;
 public class WorldBase {
 
     private final WorldCreationParams creationParams;
-    private final float[] altitudeMap;
-    private final int[] treeMap;
+    private final float[][] altitudeMap;
+    private final int[][] treeMap;
 
-    public WorldBase(WorldCreationParams creationParams, float[] altitudeMap, int[] treeMap) {
+    public WorldBase(WorldCreationParams creationParams, float[][] altitudeMap, int[][] treeMap) {
         this.creationParams = creationParams;
         this.altitudeMap = altitudeMap;
         this.treeMap = treeMap;
@@ -36,11 +36,15 @@ public class WorldBase {
         return creationParams.getBeachAltitude();
     }
 
-    public float[] getAltitudeMap() {
+    public float[][] getAltitudeMap() {
         return altitudeMap;
     }
 
-    public int[] getTreeMap() {
+    public int[][] getTreeMap() {
         return treeMap;
+    }
+
+    public int getDepth() {
+        return creationParams.getDepth();
     }
 }

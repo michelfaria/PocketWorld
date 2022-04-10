@@ -1,5 +1,7 @@
 package vc.andro.poketest.worldgen;
 
+import java.util.Arrays;
+
 public class AltitudeMapGenerator {
 
     private final NoiseGenerator noiseGenerator;
@@ -10,17 +12,20 @@ public class AltitudeMapGenerator {
         this.creationParams = creationParams;
     }
 
-    public float[] generate() {
+    public float[][] generate() {
         final var width = creationParams.getWidth();
         final var height = creationParams.getHeight();
         final var islandMode = creationParams.isIslandMode();
         final var valleyFactor = creationParams.getValleyFactor();
         final var terraces = creationParams.getTerraces();
 
-        var elevations = new float[width * height];
+        float[][] elevations = new float[width][];
+        for (int i = 0; i < elevations.length; i++) {
+            elevations[i] = new float[height];
+        }
 
-        for (var y = 0; y < height; y++) {
-            for (var x = 0; x < width; x++) {
+        for (var x = 0; x < width; x++) {
+            for (var y = 0; y < height; y++) {
                 var nx = 2f * (x - width / 2) / width;
                 var ny = 2f * (y - height / 2) / height;
 
@@ -44,13 +49,13 @@ public class AltitudeMapGenerator {
                 }
 
                 // apply valley factor
-                elevation = (float)Math.pow(elevation, valleyFactor);
+                elevation = (float) Math.pow(elevation, valleyFactor);
 
                 // make terraces
-                elevation = (float)Math.round(elevation * terraces) / terraces;
+                elevation = (float) Math.round(elevation * terraces) / terraces;
 
                 // set elevation at (x, y)
-                elevations[y * width + x] = elevation;
+                elevations[x][y] = elevation;
             }
         }
 

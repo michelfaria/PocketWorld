@@ -17,48 +17,54 @@ public class WorldGenerator {
 
     public World createWorld() {
         System.out.println("Generating world...");
-        Tile[] tiles = generateWorldTiles();
-        var entities = new Array<Entity>(Entity.class);
-        spawnTrees(tiles, entities);
-        return new World(tiles, worldBase.getWidth(), worldBase.getHeight(), entities);
+        Tile[][] tiles = generateWorldTiles();
+
+        var trees = new Array<Entity>(Entity.class);
+        spawnTrees(tiles, trees);
+
+        var world = new World(worldBase, tiles);
+        world.addEntities(trees);
+        return world;
     }
 
     @NotNull
-    private Tile[] generateWorldTiles() {
-        var tiles = new Tile[worldBase.getWidth() * worldBase.getHeight()];
+    private Tile[][] generateWorldTiles() {
+        Tile[][] tiles = new Tile[worldBase.getWidth()][];
+        for (int i = 0; i < worldBase.getWidth(); i++) {
+            tiles[i] = new Tile[worldBase.getHeight()];
+        }
 
-        for (int y = 0; y < worldBase.getHeight(); y++) {
             for (int x = 0; x < worldBase.getWidth(); x++) {
-                int idx = y * worldBase.getWidth() + x;
-                float altitude = worldBase.getAltitudeMap()[idx];
+        for (int y = 0; y < worldBase.getHeight(); y++) {
+                float altitude = worldBase.getAltitudeMap()[x][y];
 
                 if (altitude <= worldBase.getWaterLevel()) {
                     // Is water tile
-                    tiles[idx] = new Tile(TileType.WATER, altitude, x, y);
+                    tiles[x][y] = new Tile(TileType.WATER, altitude, x, y);
                     continue;
                 }
 
-                if (generateWalls(tiles, x, y, idx, altitude)) {
+                if (generateWalls(tiles, x, y, altitude)) {
                     // Is wall tile
                     continue;
                 }
 
                 if (altitude <= worldBase.getBeachAltitude()) {
                     // Is sand tile
-                    tiles[idx] = new Tile(TileType.SAND, altitude, x, y);
+                    tiles[x][y] = new Tile(TileType.SAND, altitude, x, y);
                     continue;
                 }
 
                 // Spawn grass
-                tiles[idx] = new Tile(TileType.GRASS, altitude, x, y);
+                tiles[x][y] = new Tile(TileType.GRASS, altitude, x, y);
             }
         }
         return tiles;
     }
 
-    private void spawnTrees(Tile[] tiles, Array<Entity> entities) {
-        for (int y = 0; y < worldBase.getWidth(); y++) {
+    private void spawnTrees(Tile[][] tiles, Array<Entity> entities) {
             for (int x = 0; x < worldBase.getHeight(); x++) {
+        for (int y = 0; y < worldBase.getWidth(); y++) {
                 if (!isTreeAllowedInPosition(tiles, y, x)) {
                     continue;
                 }
@@ -73,41 +79,46 @@ public class WorldGenerator {
     }
 
     private boolean shouldTreeBeSpawnedAtPosition(int x, int y) {
-        int treeType = worldBase.getTreeMap()[y * worldBase.getWidth() + x];
+        int treeType = worldBase.getTreeMap()[x][y];
         return treeType > 0;
     }
 
-    private boolean isTreeAllowedInPosition(Tile[] tiles, int y, int x) {
-        Tile currentTile = getAtPosition(tiles, x, y, worldBase.getWidth());
+    private boolean isTreeAllowedInPosition(Tile[][] tiles, int y, int x) {
+        worldBase.getWidth();
+        Tile currentTile = tiles[x][y];
         return currentTile.getType().equals(TileType.GRASS);
     }
 
-    private boolean generateWalls(Tile[] tiles, int x, int y, int idx, float altitude) {
+    private boolean generateWalls(Tile[][] tiles, int x, int y, float altitude) {
         if (x > 0) {
-            float leftAltitude = getAtPosition(worldBase.getAltitudeMap(), x - 1, y, worldBase.getWidth());
+            worldBase.getWidth();
+            float leftAltitude = worldBase.getAltitudeMap()[x - 1][y];
             if (leftAltitude < altitude) {
-                tiles[idx] = new Tile(TileType.WALL, altitude, x, y);
+                tiles[x][y] = new Tile(TileType.WALL, altitude, x, y);
                 return true;
             }
         }
         if (x < worldBase.getWidth() - 1) {
-            float rightAltitude = getAtPosition(worldBase.getAltitudeMap(), x + 1, y, worldBase.getWidth());
+            worldBase.getWidth();
+            float rightAltitude = worldBase.getAltitudeMap()[x + 1][y];
             if (rightAltitude < altitude) {
-                tiles[idx] = new Tile(TileType.WALL, altitude, x, y);
+                tiles[x][y] = new Tile(TileType.WALL, altitude, x, y);
                 return true;
             }
         }
         if (y > 0) {
-            float belowAltitude = getAtPosition(worldBase.getAltitudeMap(), x, y - 1, worldBase.getWidth());
+            worldBase.getWidth();
+            float belowAltitude = worldBase.getAltitudeMap()[x][y - 1];
             if (belowAltitude < altitude) {
-                tiles[idx] = new Tile(TileType.WALL, altitude, x, y);
+                tiles[x][y] = new Tile(TileType.WALL, altitude, x, y);
                 return true;
             }
         }
         if (y < worldBase.getHeight() - 1) {
-            float aboveAltitude = getAtPosition(worldBase.getAltitudeMap(), x, y + 1, worldBase.getWidth());
+            worldBase.getWidth();
+            float aboveAltitude = worldBase.getAltitudeMap()[x][y + 1];
             if (aboveAltitude < altitude) {
-                tiles[idx] = new Tile(TileType.WALL, altitude, x, y);
+                tiles[x][y] = new Tile(TileType.WALL, altitude, x, y);
                 return true;
             }
         }
@@ -122,11 +133,4 @@ public class WorldGenerator {
         return false;
     }
 
-    private float getAtPosition(float[] arr, int x, int y, int width) {
-        return arr[y * width + x];
-    }
-
-    private <T> T getAtPosition(T[] arr, int x, int y, int width) {
-        return arr[y * width + x];
-    }
 }

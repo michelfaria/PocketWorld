@@ -35,7 +35,7 @@ public class NoiseTestScreen implements Screen {
 
         for (int y = 0; y < creationParams.getHeight(); y++) {
             for (int x = 0; x < creationParams.getWidth(); x++) {
-                float altitude = plannedWorld.getAltitudeMap()[y * creationParams.getWidth() + x];
+                float altitude = plannedWorld.getAltitudeMap()[x][y];
                 int colorRgba8888;
                 if (altitude > creationParams.getWaterLevel()) {
                     colorRgba8888 = Color.rgba8888(altitude, altitude, altitude, 1);

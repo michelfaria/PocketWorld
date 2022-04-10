@@ -1,19 +1,35 @@
 package vc.andro.poketest.world;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.FloatArray;
+import vc.andro.poketest.worldgen.WorldBase;
 
 public class World {
-    public final int width;
-    public final int height;
-
-    public final Tile[] tiles;
+    public final WorldBase worldBase;
+    public final Tile[][] tiles;
     public final Array<Entity> entities;
 
-    public World(Tile[] tiles, int width, int height, Array<Entity> entities) {
+    public World(WorldBase worldBase, Tile[][] tiles) {
+        this.worldBase = worldBase;
         this.tiles = tiles;
-        this.width = width;
-        this.height = height;
-        this.entities = entities;
+
+        entities = new Array<>(Entity.class);
+    }
+
+    public void addEntities(Array<Entity> entities) {
+        for (Entity entity : entities) {
+            this.entities.add(entity);
+        }
+    }
+
+    public int getHeight() {
+        return worldBase.getHeight();
+    }
+
+    public int getWidth() {
+        return worldBase.getWidth();
+    }
+
+    public int getDepth() {
+        return worldBase.getDepth();
     }
 }

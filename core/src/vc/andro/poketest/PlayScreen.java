@@ -64,8 +64,8 @@ public class PlayScreen implements Screen {
 
         spriteBatch.getProjectionMatrix().setToOrtho2D(0, 0, viewport.getScreenWidth(), viewport.getScreenHeight());
         spriteBatch.begin();
-        for (var y = 0; y < world.height; y++) {
-            for (var x = 0; x < world.width; x++) {
+        for (var y = 0; y < world.getHeight(); y++) {
+            for (var x = 0; x < world.getWidth(); x++) {
                 int nx = x * TILE_SIZE;
                 int ny = y * TILE_SIZE;
 
@@ -74,8 +74,7 @@ public class PlayScreen implements Screen {
                     continue;
                 }
 
-                int idx = y * world.width + x;
-                Tile tile = world.tiles[idx];
+                Tile tile = world.tiles[x][y];
 
                 if (camera.zoom <= 0.5f) {
                     Vector3 tileScreenCoords = camera.project(new Vector3(nx, ny, 0));
@@ -92,8 +91,8 @@ public class PlayScreen implements Screen {
 
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
-        for (var y = 0; y < world.height; y++) {
-            for (var x = 0; x < world.width; x++) {
+        for (var y = 0; y < world.getHeight(); y++) {
+            for (var x = 0; x < world.getWidth(); x++) {
                 int nx = x * TILE_SIZE;
                 int ny = y * TILE_SIZE;
 
@@ -102,8 +101,7 @@ public class PlayScreen implements Screen {
                     continue;
                 }
 
-                int idx = y * world.width + x;
-                Tile tile = world.tiles[idx];
+                Tile tile = world.tiles[x][y];
                 tile.draw(drawingContext);
             }
         }

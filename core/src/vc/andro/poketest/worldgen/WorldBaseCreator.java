@@ -19,8 +19,8 @@ public class WorldBaseCreator {
     }
 
     public WorldBase createBase() {
-        float[] altitudeMap = new AltitudeMapGenerator(perlinNoiseGenerator, creationParams).generate();
-        int[] treeMap = new TreeMapGenerator(blueNoiseGenerator, creationParams, altitudeMap).generate();
+        float[][] altitudeMap = new AltitudeMapGenerator(perlinNoiseGenerator, creationParams).generate();
+        int[][] treeMap = new TreeMapGenerator(blueNoiseGenerator, creationParams, altitudeMap).generate();
         return new WorldBase(creationParams, altitudeMap, treeMap);
     }
 }

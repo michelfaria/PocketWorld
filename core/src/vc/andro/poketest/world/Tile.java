@@ -1,6 +1,5 @@
 package vc.andro.poketest.world;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import vc.andro.poketest.DrawingContext;
 import vc.andro.poketest.PokeTest;
