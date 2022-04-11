@@ -1,13 +1,10 @@
 package vc.andro.poketest;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import vc.andro.poketest.entity.Entity;
 import vc.andro.poketest.entity.Player;
 import vc.andro.poketest.tile.BasicTile;
@@ -18,13 +15,14 @@ import vc.andro.poketest.world.WorldGenerator;
 
 import java.util.Random;
 
-import static vc.andro.poketest.PokeTest.*;
+import static vc.andro.poketest.PokeTest.TILE_SIZE;
+import static vc.andro.poketest.PokeTest.assetManager;
 
 public class PlayScreen implements Screen {
 
     public static final int TICKS_PER_SECOND = 16;
-    private final OrthographicCamera camera;
-    private final FitViewport viewport;
+
+    private final Pokecam pokecam;
     private final BitmapFont bitmapFont;
     private final World world;
     private final SpriteBatch spriteBatch;
@@ -36,8 +34,7 @@ public class PlayScreen implements Screen {
     private int dbgInfo_iterations = 0;
 
     public PlayScreen(WorldCreationParams worldCreationParams) {
-        camera = new OrthographicCamera();
-        viewport = new FitViewport(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, camera);
+        pokecam = new Pokecam();
         world = new WorldGenerator(new WorldBaseCreator(worldCreationParams).createBase()).createWorld();
         bitmapFont = assetManager.get(Assets.hackFont8pt);
         spriteBatch = new SpriteBatch();
@@ -55,6 +52,7 @@ public class PlayScreen implements Screen {
                 break;
             }
         }
+        pokecam.followEntity = player;
     }
 
     @Override
@@ -82,10 +80,11 @@ public class PlayScreen implements Screen {
     }
 
     private void renderTiles() {
+        pokecam.use();
         dbgInfo_tilesDrawn = 0;
         dbgInfo_iterations = 0;
 
-        spriteBatch.setProjectionMatrix(camera.combined);
+        spriteBatch.setProjectionMatrix(pokecam.getProjectionMatrix());
         spriteBatch.begin();
         for (var y = 0; y < world.getHeight(); y++) {
             for (var x = 0; x < world.getWidth(); x++) {
@@ -94,7 +93,7 @@ public class PlayScreen implements Screen {
                 int ny = y * TILE_SIZE;
 
                 // cull rendering outside of the frustrum
-                if (isPosOutsideOfCameraView(nx, ny)) {
+                if (pokecam.isPosOutsideOfCameraView(nx, ny)) {
                     continue;
                 }
 
@@ -107,12 +106,13 @@ public class PlayScreen implements Screen {
     }
 
     private void renderEntities() {
-        spriteBatch.setProjectionMatrix(camera.combined);
+        pokecam.use();
+        spriteBatch.setProjectionMatrix(pokecam.getProjectionMatrix());
         spriteBatch.begin();
         for (Entity entity : world.getEntities()) {
             float nx = entity.x * TILE_SIZE;
             float ny = entity.y * TILE_SIZE;
-            if (isPosOutsideOfCameraView(nx, ny)) {
+            if (pokecam.isPosOutsideOfCameraView(nx, ny)) {
                 continue;
             }
             entity.draw(spriteBatch);
@@ -120,9 +120,6 @@ public class PlayScreen implements Screen {
         spriteBatch.end();
     }
 
-    private boolean isPosOutsideOfCameraView(float x, float y) {
-        return !camera.frustum.boundsInFrustum(x, y, 0, TILE_SIZE, TILE_SIZE, 0);
-    }
 
     private void update(float delta) {
         if (timeSinceLastTick >= 1.0f / TICKS_PER_SECOND) {
@@ -131,60 +128,9 @@ public class PlayScreen implements Screen {
         }
         timeSinceLastTick += delta;
         world.update(delta);
-        updateCameraPosition();
-        camera.update();
-        viewport.apply();
+        pokecam.update();
     }
 
-    private void updateCameraPosition() {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            freeCam = !freeCam;
-        }
-        if (freeCam) {
-            /*
-             * Update camera translation
-             */
-            int dx = 0;
-            int dy = 0;
-            float dzoom = 0f;
-            if (Gdx.input.isKeyPressed(Input.Keys.J)) {
-                dx = -100;
-                dy = 0;
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.L)) {
-                dx = 100;
-                dy = 0;
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.I)) {
-                dx = 0;
-                dy = 100;
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.K)) {
-                dx = 0;
-                dy = -100;
-            }
-            /*
-             * Update camera zoom
-             */
-            if (Gdx.input.isKeyPressed(Input.Keys.U)) {
-                dzoom = 0.1f;
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.O)) {
-                dzoom = -0.1f;
-            }
-
-            camera.translate(dx, dy);
-
-            // (do not zoom text camera)
-            camera.zoom += dzoom;
-            camera.zoom = Math.max(camera.zoom, 0.0f);
-        } else {
-            camera.position.set(
-                    player.getX() * TILE_SIZE + TILE_SIZE / 2f,
-                    player.getY() * TILE_SIZE + TILE_SIZE / 2f, 1);
-            camera.zoom = 0.33f;
-        }
-    }
 
     private void clearScreen() {
         Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
@@ -193,7 +139,7 @@ public class PlayScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        viewport.setScreenSize(width, height);
+        pokecam.resize(width, height);
     }
 
     @Override
