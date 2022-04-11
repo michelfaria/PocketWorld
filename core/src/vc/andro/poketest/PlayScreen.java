@@ -3,13 +3,10 @@ package vc.andro.poketest;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import vc.andro.poketest.entity.Entity;
 import vc.andro.poketest.entity.Player;
@@ -25,26 +22,27 @@ import static vc.andro.poketest.PokeTest.*;
 
 public class PlayScreen implements Screen {
 
+    public static final int TICKS_PER_SECOND = 16;
     private final OrthographicCamera camera;
     private final FitViewport viewport;
     private final BitmapFont bitmapFont;
-    private final FPSLogger fpsLogger;
     private final World world;
     private final SpriteBatch spriteBatch;
-    private final Timers timers;
-    private final TextureAtlas textureAtlas;
+    private final Player player;
+
+    private boolean freeCam = false;
+    private float timeSinceLastTick = 0;
+    private int dbgInfo_tilesDrawn = 0;
+    private int dbgInfo_iterations = 0;
 
     public PlayScreen(WorldCreationParams worldCreationParams) {
         camera = new OrthographicCamera();
         viewport = new FitViewport(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, camera);
         world = new WorldGenerator(new WorldBaseCreator(worldCreationParams).createBase()).createWorld();
         bitmapFont = assetManager.get(Assets.hackFont8pt);
-        textureAtlas = assetManager.get(Assets.textureAtlas);
-        fpsLogger = new FPSLogger();
         spriteBatch = new SpriteBatch();
-        timers = new Timers();
 
-        Player player = new Player();
+        player = new Player();
         world.addEntity(player);
         // find random tile player can stand on
         var random = new Random();
@@ -69,39 +67,29 @@ public class PlayScreen implements Screen {
         clearScreen();
         renderTiles();
         renderEntities();
-        //renderDebugNumbers();
-        fpsLogger.log();
+        renderInfo();
     }
 
-    private void renderDebugNumbers() {
-        spriteBatch.getProjectionMatrix().setToOrtho2D(0, 0, viewport.getScreenWidth(), viewport.getScreenHeight());
+    private void renderInfo() {
+        spriteBatch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         spriteBatch.begin();
-        for (var y = 0; y < world.getHeight(); y++) {
-            for (var x = 0; x < world.getWidth(); x++) {
-                int nx = x * TILE_SIZE;
-                int ny = y * TILE_SIZE;
-
-                // cull rendering outside of the frustrum
-                if (isPosOutsideOfCameraView(nx, ny)) {
-                    continue;
-                }
-
-                BasicTile tile = world.getTile(x, y);
-
-                if (camera.zoom <= 0.5f) {
-                    Vector3 tileScreenCoords = camera.project(new Vector3(nx, ny, 0));
-                    bitmapFont.draw(spriteBatch, Float.toString(tile.getAltitude()), tileScreenCoords.x, tileScreenCoords.y + 8);
-                }
-            }
-        }
+        bitmapFont.draw(spriteBatch,
+                "fps: " + Gdx.graphics.getFramesPerSecond()
+                        + ", tiles drawn: " + dbgInfo_tilesDrawn
+                        + ", iters: " + dbgInfo_iterations
+                , 0, 28);
         spriteBatch.end();
     }
 
     private void renderTiles() {
+        dbgInfo_tilesDrawn = 0;
+        dbgInfo_iterations = 0;
+
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
         for (var y = 0; y < world.getHeight(); y++) {
             for (var x = 0; x < world.getWidth(); x++) {
+                dbgInfo_iterations++;
                 int nx = x * TILE_SIZE;
                 int ny = y * TILE_SIZE;
 
@@ -112,6 +100,7 @@ public class PlayScreen implements Screen {
 
                 BasicTile tile = world.getTile(x, y);
                 tile.draw(spriteBatch);
+                dbgInfo_tilesDrawn++;
             }
         }
         spriteBatch.end();
@@ -136,51 +125,65 @@ public class PlayScreen implements Screen {
     }
 
     private void update(float delta) {
-        world.tick();
+        if (timeSinceLastTick >= 1.0f / TICKS_PER_SECOND) {
+            world.tick();
+            timeSinceLastTick = Math.max(timeSinceLastTick - (1.0f / TICKS_PER_SECOND), 0.0f);
+        }
+        timeSinceLastTick += delta;
+        world.update(delta);
         updateCameraPosition();
-        timers.tickTimers(delta);
         camera.update();
         viewport.apply();
     }
 
     private void updateCameraPosition() {
-        /*
-         * Update camera translation
-         */
-        int dx = 0;
-        int dy = 0;
-        float dzoom = 0f;
-        if (Gdx.input.isKeyPressed(Input.Keys.J)) {
-            dx = -100;
-            dy = 0;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            freeCam = !freeCam;
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.L)) {
-            dx = 100;
-            dy = 0;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.I)) {
-            dx = 0;
-            dy = 100;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.K)) {
-            dx = 0;
-            dy = -100;
-        }
-        /*
-         * Update camera zoom
-         */
-        if (Gdx.input.isKeyPressed(Input.Keys.U)) {
-            dzoom = 0.1f;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.O)) {
-            dzoom = -0.1f;
-        }
+        if (freeCam) {
+            /*
+             * Update camera translation
+             */
+            int dx = 0;
+            int dy = 0;
+            float dzoom = 0f;
+            if (Gdx.input.isKeyPressed(Input.Keys.J)) {
+                dx = -100;
+                dy = 0;
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.L)) {
+                dx = 100;
+                dy = 0;
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.I)) {
+                dx = 0;
+                dy = 100;
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.K)) {
+                dx = 0;
+                dy = -100;
+            }
+            /*
+             * Update camera zoom
+             */
+            if (Gdx.input.isKeyPressed(Input.Keys.U)) {
+                dzoom = 0.1f;
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.O)) {
+                dzoom = -0.1f;
+            }
 
-        camera.translate(dx, dy);
+            camera.translate(dx, dy);
 
-        // (do not zoom text camera)
-        camera.zoom += dzoom;
-        camera.zoom = Math.max(camera.zoom, 0.0f);
+            // (do not zoom text camera)
+            camera.zoom += dzoom;
+            camera.zoom = Math.max(camera.zoom, 0.0f);
+        } else {
+            camera.position.set(
+                    player.getX() * TILE_SIZE + TILE_SIZE / 2f,
+                    player.getY() * TILE_SIZE + TILE_SIZE / 2f, 1);
+            camera.zoom = 0.33f;
+        }
     }
 
     private void clearScreen() {

@@ -44,6 +44,12 @@ public class World {
         }
     }
 
+    public void update(float delta) {
+        for (Entity entity : entities) {
+            entity.update(delta);
+        }
+    }
+
     public void updateAllTiles() {
         for (int x = 0; x < getWidth(); x++) {
             for (int y = 0; y < getHeight(); y++) {

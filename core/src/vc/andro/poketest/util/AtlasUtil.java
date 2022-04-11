@@ -2,6 +2,7 @@ package vc.andro.poketest.util;
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Array;
 
 public final class AtlasUtil {
     private AtlasUtil() {
@@ -13,5 +14,13 @@ public final class AtlasUtil {
             throw new NullPointerException("Region not found: " + regionName);
         }
         return region;
+    }
+
+    public static Array<TextureAtlas.AtlasRegion> findRegions(TextureAtlas atlas, String regionName) {
+        Array<TextureAtlas.AtlasRegion> regions = atlas.findRegions(regionName);
+        if (regions == null || regions.isEmpty()) {
+            throw new IllegalStateException("Region not found: " + regionName);
+        }
+        return regions;
     }
 }

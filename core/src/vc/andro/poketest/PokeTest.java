@@ -20,7 +20,7 @@ public class PokeTest extends Game {
     private static final float WORLD_BEACH_ALTITUDE = 0.45f;
     private static final int TREE_MAP_R_VALUE = 4;
     private static final boolean ISLAND_MODE = true;
-    private static final float VALLEY_FACTOR = 1.0f;
+    private static final float VALLEY_FACTOR = 1.8f;
     private static final float SLOPE_CHANCE = 0.05f;
 
     private static final WorldCreationParams WORLD_CREATION_PARAMS = new WorldCreationParams(

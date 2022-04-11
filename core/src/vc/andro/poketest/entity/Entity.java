@@ -19,6 +19,10 @@ public class Entity {
 
     public void draw(SpriteBatch spriteBatch) {
         TextureRegion sprite = AtlasUtil.findRegion(PokeTest.assetManager.get(Assets.textureAtlas), spriteId);
+        draw(spriteBatch, sprite);
+    }
+
+    protected void draw(SpriteBatch spriteBatch, TextureRegion sprite) {
         spriteBatch.draw(
                 sprite,
                 x * TILE_SIZE,
@@ -29,8 +33,19 @@ public class Entity {
     public void tick() {
     }
 
+    public void update(float delta) {
+    }
+
     public void setPosition(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    public float getX() {
+        return x;
+    }
+
+    public float getY() {
+        return y;
     }
 }
