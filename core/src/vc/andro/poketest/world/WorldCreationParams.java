@@ -1,6 +1,20 @@
 package vc.andro.poketest.world;
 
+import java.util.Random;
+
 public class WorldCreationParams {
+
+    private static final int DEFAULT_WORLD_SEED = new Random().nextInt();
+    private static final int DEFAULT_WORLD_WIDTH = 500;
+    private static final int DEFAULT_WORLD_HEIGHT = 500;
+    private static final float DEFAULT_WORLD_WATER_LEVEL = 0.4f;
+    private static final int DEFAULT_WORLD_TERRACES = 48;
+    private static final float DEFAULT_WORLD_BEACH_ALTITUDE = 0.45f;
+    private static final int DEFAULT_TREE_MAP_R_VALUE = 4;
+    private static final boolean DEFAULT_ISLAND_MODE = true;
+    private static final float DEFAULT_VALLEY_FACTOR = 1.8f;
+    private static final float DEFAULT_SLOPE_CHANCE = 0.05f;
+
     private final int seed;
     private final int width;
     private final int height;
@@ -24,6 +38,12 @@ public class WorldCreationParams {
         this.islandMode = islandMode;
         this.valleyFactor = valleyFactor;
         this.slopeChance = slopeChance;
+    }
+
+    public WorldCreationParams() {
+        this(DEFAULT_WORLD_SEED, DEFAULT_WORLD_WIDTH, DEFAULT_WORLD_HEIGHT, DEFAULT_WORLD_WATER_LEVEL,
+                DEFAULT_WORLD_TERRACES, DEFAULT_WORLD_BEACH_ALTITUDE, DEFAULT_TREE_MAP_R_VALUE,
+                DEFAULT_ISLAND_MODE, DEFAULT_VALLEY_FACTOR, DEFAULT_SLOPE_CHANCE);
     }
 
     public int getSeed() {
