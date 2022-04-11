@@ -20,7 +20,9 @@ import static vc.andro.poketest.PokeTest.assetManager;
 
 public class PlayScreen implements Screen {
 
-    public static final int TICKS_PER_SECOND = 16;
+    private static final int TICKS_PER_SECOND = 16;
+    private static final int VIEWPORT_HEIGHT = 600;
+    private static final int VIEWPORT_WIDTH = 800;
 
     private final Pokecam pokecam;
     private final BitmapFont bitmapFont;
@@ -34,7 +36,7 @@ public class PlayScreen implements Screen {
     private int dbgInfo_iterations = 0;
 
     public PlayScreen(WorldCreationParams worldCreationParams) {
-        pokecam = new Pokecam();
+        pokecam = new Pokecam(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
         world = new WorldGenerator(new WorldBaseCreator(worldCreationParams).createBase()).createWorld();
         bitmapFont = assetManager.get(Assets.hackFont8pt);
         spriteBatch = new SpriteBatch();
@@ -46,7 +48,7 @@ public class PlayScreen implements Screen {
         while (true) {
             int x = random.nextInt(world.getWidth());
             int y = random.nextInt(world.getHeight());
-            BasicTile tile = world.getTile(x, y);
+            BasicTile tile = world.getTileAt(x, y);
             if (tile.canPlayerWalkOnIt()) {
                 player.setPosition(x, y);
                 break;
@@ -92,12 +94,12 @@ public class PlayScreen implements Screen {
                 int nx = x * TILE_SIZE;
                 int ny = y * TILE_SIZE;
 
-                // cull rendering outside of the frustrum
+                 // cull rendering outside of the frustrum
                 if (pokecam.isPosOutsideOfCameraView(nx, ny)) {
                     continue;
                 }
 
-                BasicTile tile = world.getTile(x, y);
+                BasicTile tile = world.getTileAt(x, y);
                 tile.draw(spriteBatch);
                 dbgInfo_tilesDrawn++;
             }

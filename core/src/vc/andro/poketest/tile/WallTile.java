@@ -2,6 +2,7 @@ package vc.andro.poketest.tile;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import org.jetbrains.annotations.Nullable;
+import vc.andro.poketest.world.Chunk;
 import vc.andro.poketest.world.World;
 
 public class WallTile extends BasicTile {
@@ -11,15 +12,15 @@ public class WallTile extends BasicTile {
     private @Nullable
     BasicTile neighborTile = null;
 
-    public WallTile(World world, int x, int y, float altitude, WallType wallType) {
-        super(world, TileType.WALL, x, y, altitude);
+    public WallTile(float altitude, WallType wallType) {
+        super(TileType.WALL, altitude);
         updateWallType(wallType);
     }
 
     @Override
     public void draw(SpriteBatch spriteBatch) {
         if (neighborTile != null) {
-            neighborTile.draw(spriteBatch, x, y);
+            neighborTile.draw(spriteBatch, worldX, worldY);
         }
         super.draw(spriteBatch);
     }
@@ -37,8 +38,8 @@ public class WallTile extends BasicTile {
             return;
         }
 
-        int dirX = x - updateOrigin.x;
-        int dirY = y - updateOrigin.y;
+        int dirX = worldX - updateOrigin.worldX;
+        int dirY = worldY - updateOrigin.worldY;
         boolean acceptNeighbor;
 
         switch (wallType) {

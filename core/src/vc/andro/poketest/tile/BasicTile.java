@@ -2,35 +2,36 @@ package vc.andro.poketest.tile;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.Assets;
 import vc.andro.poketest.PokeTest;
 import vc.andro.poketest.util.AtlasUtil;
+import vc.andro.poketest.world.Chunk;
 import vc.andro.poketest.world.World;
 
 import static vc.andro.poketest.PokeTest.TILE_SIZE;
 
 public class BasicTile {
 
-    protected final World world;
-    protected final TileType type;
-    protected final int x;
-    protected final int y;
-    protected final float altitude;
+    public World world;
+    public Chunk chunk;
+    public Integer worldX;
+    public Integer worldY;
+    public Integer chunkLocalX;
+    public Integer chunkLocalY;
 
-    protected String spriteId;
+    public float altitude;
+    public TileType type;
+    public String spriteId;
 
-    public BasicTile(World world, TileType type, int x, int y, float altitude) {
-        this.world = world;
+    public BasicTile(TileType type, float altitude) {
         this.type = type;
         this.altitude = altitude;
-        this.x = x;
-        this.y = y;
-
         spriteId = type.defaultSpriteId;
     }
 
     public void draw(SpriteBatch spriteBatch) {
-        draw(spriteBatch, x, y);
+        draw(spriteBatch, worldX, worldY);
     }
 
     protected void draw(SpriteBatch spriteBatch, int atX, int atY) {
@@ -40,14 +41,6 @@ public class BasicTile {
                 atX * TILE_SIZE,
                 atY * TILE_SIZE
         );
-    }
-
-    public float getAltitude() {
-        return altitude;
-    }
-
-    public TileType getType() {
-        return type;
     }
 
     public void doTileUpdate() {
@@ -60,15 +53,8 @@ public class BasicTile {
     public void tick() {
     }
 
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
     public boolean canPlayerWalkOnIt() {
         return type.canPlayerWalkOnIt;
     }
+
 }

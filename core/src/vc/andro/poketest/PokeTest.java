@@ -7,8 +7,6 @@ import vc.andro.poketest.world.WorldCreationParams;
 public class PokeTest extends Game {
 
     public static final int TILE_SIZE = 16;
-    public static final int VIEWPORT_HEIGHT = 600;
-    public static final int VIEWPORT_WIDTH = 800;
 
     public static AssetManager assetManager;
 

@@ -19,9 +19,9 @@ public class Pokecam {
     public @Nullable
     Entity followEntity = null;
 
-    public Pokecam() {
+    public Pokecam(float worldWidth, float worldHeight) {
         camera = new OrthographicCamera();
-        viewport = new FitViewport(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, camera);
+        viewport = new FitViewport(worldWidth, worldHeight, camera);
     }
 
     public Matrix4 getProjectionMatrix() {
