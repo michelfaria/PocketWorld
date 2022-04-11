@@ -33,7 +33,7 @@ public class WallTile extends BasicTile {
     public void receiveTileUpdate(BasicTile updateOrigin) {
         super.receiveTileUpdate(updateOrigin);
 
-        if (!updateOrigin.type.isFloorTile) {
+        if (!updateOrigin.type.isFlatTile) {
             return;
         }
 

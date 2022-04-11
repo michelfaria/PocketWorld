@@ -57,11 +57,18 @@ public class BasicTile {
     public void receiveTileUpdate(BasicTile updateOrigin) {
     }
 
+    public void tick() {
+    }
+
     public int getX() {
         return x;
     }
 
     public int getY() {
         return y;
+    }
+
+    public boolean canPlayerWalkOnIt() {
+        return type.canPlayerWalkOnIt;
     }
 }

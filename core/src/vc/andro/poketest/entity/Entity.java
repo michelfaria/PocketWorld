@@ -11,11 +11,9 @@ import static vc.andro.poketest.PokeTest.TILE_SIZE;
 public class Entity {
     public float x;
     public float y;
-    public final String gameId;
     public final String spriteId;
 
-    public Entity(String gameId, String spriteId) {
-        this.gameId = gameId;
+    public Entity(String spriteId) {
         this.spriteId = spriteId;
     }
 
@@ -26,5 +24,13 @@ public class Entity {
                 x * TILE_SIZE,
                 y * TILE_SIZE
         );
+    }
+
+    public void tick() {
+    }
+
+    public void setPosition(int x, int y) {
+        this.x = x;
+        this.y = y;
     }
 }

@@ -12,11 +12,14 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import vc.andro.poketest.entity.Entity;
+import vc.andro.poketest.entity.Player;
 import vc.andro.poketest.tile.BasicTile;
 import vc.andro.poketest.world.World;
 import vc.andro.poketest.world.WorldBaseCreator;
 import vc.andro.poketest.world.WorldCreationParams;
 import vc.andro.poketest.world.WorldGenerator;
+
+import java.util.Random;
 
 import static vc.andro.poketest.PokeTest.*;
 
@@ -40,11 +43,24 @@ public class PlayScreen implements Screen {
         fpsLogger = new FPSLogger();
         spriteBatch = new SpriteBatch();
         timers = new Timers();
+
+        Player player = new Player();
+        world.addEntity(player);
+        // find random tile player can stand on
+        var random = new Random();
+        while (true) {
+            int x = random.nextInt(world.getWidth());
+            int y = random.nextInt(world.getHeight());
+            BasicTile tile = world.getTile(x, y);
+            if (tile.canPlayerWalkOnIt()) {
+                player.setPosition(x, y);
+                break;
+            }
+        }
     }
 
     @Override
     public void show() {
-
     }
 
     @Override
@@ -120,9 +136,9 @@ public class PlayScreen implements Screen {
     }
 
     private void update(float delta) {
+        world.tick();
         updateCameraPosition();
         timers.tickTimers(delta);
-
         camera.update();
         viewport.apply();
     }

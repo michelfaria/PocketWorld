@@ -1,19 +1,18 @@
 package vc.andro.poketest.tile;
 
 public enum TileType {
-    GRASS("tile.grass", "grass", true),
-    WALL("tile.wall", "wall-bottom-edge", false),
-    WATER("tile.water", "water", true),
-    SAND("tile.sand", "sand", true),
-    SLOPE("tile.slope", "grass", true);
+    GRASS("grass", true, true),
+    WALL("wall-bottom-edge", false, false),
+    WATER("water", true, false),
+    SAND("sand", true, true);
 
-    public final String gameId;
     public final String defaultSpriteId;
-    public final boolean isFloorTile;
+    public final boolean isFlatTile;
+    public final boolean canPlayerWalkOnIt;
 
-    TileType(String gameId, String spriteId, boolean isFloorTile) {
-        this.gameId = gameId;
+    TileType(String spriteId, boolean isFlatTile, boolean canPlayerWalkOnIt) {
         defaultSpriteId = spriteId;
-        this.isFloorTile = isFloorTile;
+        this.isFlatTile = isFlatTile;
+        this.canPlayerWalkOnIt = canPlayerWalkOnIt;
     }
 }
