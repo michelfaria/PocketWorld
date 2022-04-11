@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import vc.andro.poketest.entity.Entity;
-import vc.andro.poketest.tile.Tile;
+import vc.andro.poketest.tile.BasicTile;
 import vc.andro.poketest.world.World;
 import vc.andro.poketest.world.WorldBaseCreator;
 import vc.andro.poketest.world.WorldCreationParams;
@@ -70,7 +70,7 @@ public class PlayScreen implements Screen {
                     continue;
                 }
 
-                Tile tile = world.tiles[x][y];
+                BasicTile tile = world.getTile(x, y);
 
                 if (camera.zoom <= 0.5f) {
                     Vector3 tileScreenCoords = camera.project(new Vector3(nx, ny, 0));
@@ -94,7 +94,7 @@ public class PlayScreen implements Screen {
                     continue;
                 }
 
-                Tile tile = world.tiles[x][y];
+                BasicTile tile = world.getTile(x, y);
                 tile.draw(spriteBatch);
             }
         }
@@ -104,7 +104,7 @@ public class PlayScreen implements Screen {
     private void renderEntities() {
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
-        for (Entity entity : world.entities) {
+        for (Entity entity : world.getEntities()) {
             float nx = entity.x * TILE_SIZE;
             float ny = entity.y * TILE_SIZE;
             if (isPosOutsideOfCameraView(nx, ny)) {

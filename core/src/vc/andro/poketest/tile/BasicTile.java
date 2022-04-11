@@ -1,24 +1,26 @@
 package vc.andro.poketest.tile;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import vc.andro.poketest.Assets;
 import vc.andro.poketest.PokeTest;
 import vc.andro.poketest.util.AtlasUtil;
+import vc.andro.poketest.world.World;
 
 import static vc.andro.poketest.PokeTest.TILE_SIZE;
 
-public class Tile {
+public class BasicTile {
 
-    private final TileType type;
-    private final int x;
-    private final int y;
-    private final float altitude;
+    protected final World world;
+    protected final TileType type;
+    protected final int x;
+    protected final int y;
+    protected final float altitude;
 
-    private String spriteId;
+    protected String spriteId;
 
-    public Tile(TileType type, int x, int y, float altitude) {
+    public BasicTile(World world, TileType type, int x, int y, float altitude) {
+        this.world = world;
         this.type = type;
         this.altitude = altitude;
         this.x = x;
@@ -28,11 +30,15 @@ public class Tile {
     }
 
     public void draw(SpriteBatch spriteBatch) {
+        draw(spriteBatch, x, y);
+    }
+
+    protected void draw(SpriteBatch spriteBatch, int atX, int atY) {
         TextureRegion region = AtlasUtil.findRegion(PokeTest.assetManager.get(Assets.textureAtlas), spriteId);
         spriteBatch.draw(
                 region,
-                x * TILE_SIZE,
-                y * TILE_SIZE
+                atX * TILE_SIZE,
+                atY * TILE_SIZE
         );
     }
 
@@ -44,11 +50,18 @@ public class Tile {
         return type;
     }
 
-    protected String getSpriteId() {
-        return spriteId;
+    public void doTileUpdate() {
+        world.propagateTileUpdate(this);
     }
 
-    protected void setSpriteId(String spriteId) {
-        this.spriteId = spriteId;
+    public void receiveTileUpdate(BasicTile updateOrigin) {
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
     }
 }

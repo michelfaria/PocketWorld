@@ -6,21 +6,21 @@ filter: Nearest, Nearest
 repeat: none
 grass
   rotate: false
-  xy: 72, 20
+  xy: 108, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 grass-ledge
   rotate: false
-  xy: 90, 38
+  xy: 54, 2
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 sand
   rotate: false
-  xy: 72, 38
+  xy: 90, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -34,23 +34,23 @@ tree
   index: -1
 wall-bottom-edge
   rotate: false
-  xy: 54, 38
+  xy: 72, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 wall-bottom-left-corner
   rotate: false
-  xy: 36, 2
-  size: 15, 16
-  orig: 15, 16
+  xy: 54, 20
+  size: 16, 16
+  orig: 16, 16
   offset: 0, 0
   index: -1
 wall-bottom-left-inner-corner
   rotate: false
-  xy: 70, 2
-  size: 15, 16
-  orig: 15, 16
+  xy: 36, 2
+  size: 16, 16
+  orig: 16, 16
   offset: 0, 0
   index: -1
 wall-bottom-right-corner
@@ -62,19 +62,26 @@ wall-bottom-right-corner
   index: -1
 wall-bottom-right-inner-corner
   rotate: false
-  xy: 54, 20
+  xy: 90, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 wall-left-edge
   rotate: false
-  xy: 53, 2
-  size: 15, 16
-  orig: 15, 16
+  xy: 108, 20
+  size: 16, 16
+  orig: 16, 16
   offset: 0, 0
   index: -1
 wall-right-edge
+  rotate: false
+  xy: 54, 38
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+wall-top-edge
   rotate: false
   xy: 36, 20
   size: 16, 16
@@ -83,21 +90,35 @@ wall-right-edge
   index: -1
 wall-top-left-corner
   rotate: false
-  xy: 90, 20
+  xy: 72, 2
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 wall-top-right-corner
   rotate: false
-  xy: 108, 20
+  xy: 108, 2
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+wall-top-right-inner-corner
+  rotate: false
+  xy: 72, 20
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+wall-top-left-inner-corner
+  rotate: false
+  xy: 72, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 water
   rotate: false
-  xy: 108, 38
+  xy: 90, 2
   size: 16, 16
   orig: 16, 16
   offset: 0, 0

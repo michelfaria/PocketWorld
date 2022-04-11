@@ -4,7 +4,6 @@ public class WorldCreationParams {
     private final int seed;
     private final int width;
     private final int height;
-    private final int depth;
     private final float waterLevel;
     private final int terraces;
     private final float beachAltitude;
@@ -13,12 +12,11 @@ public class WorldCreationParams {
     private final float valleyFactor;
     private final float slopeChance;
 
-    public WorldCreationParams(int seed, int width, int height, int depth, float waterLevel, int terraces, float beachAltitude,
+    public WorldCreationParams(int seed, int width, int height, float waterLevel, int terraces, float beachAltitude,
                                int treeMapRValue, boolean islandMode, float valleyFactor, float slopeChance) {
         this.seed = seed;
         this.width = width;
         this.height = height;
-        this.depth = depth;
         this.waterLevel = waterLevel;
         this.terraces = terraces;
         this.beachAltitude = beachAltitude;
@@ -66,9 +64,5 @@ public class WorldCreationParams {
 
     public float getSlopeChance() {
         return slopeChance;
-    }
-
-    public int getDepth() {
-        return depth;
     }
 }

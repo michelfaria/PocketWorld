@@ -15,7 +15,6 @@ public class PokeTest extends Game {
     private static final int WORLD_SEED = new Random().nextInt();
     private static final int WORLD_WIDTH = 500;
     private static final int WORLD_HEIGHT = 500;
-    private static final int WORLD_DEPTH = 100;
     private static final float WORLD_WATER_LEVEL = 0.4f;
     private static final int WORLD_TERRACES = 48;
     private static final float WORLD_BEACH_ALTITUDE = 0.45f;
@@ -25,7 +24,7 @@ public class PokeTest extends Game {
     private static final float SLOPE_CHANCE = 0.05f;
 
     private static final WorldCreationParams WORLD_CREATION_PARAMS = new WorldCreationParams(
-            WORLD_SEED, WORLD_WIDTH, WORLD_HEIGHT, WORLD_DEPTH, WORLD_WATER_LEVEL, WORLD_TERRACES, WORLD_BEACH_ALTITUDE,
+            WORLD_SEED, WORLD_WIDTH, WORLD_HEIGHT, WORLD_WATER_LEVEL, WORLD_TERRACES, WORLD_BEACH_ALTITUDE,
             TREE_MAP_R_VALUE, ISLAND_MODE, VALLEY_FACTOR, SLOPE_CHANCE);
 
     public static AssetManager assetManager;

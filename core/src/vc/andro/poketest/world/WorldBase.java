@@ -43,8 +43,4 @@ public class WorldBase {
     public int[][] getTreeMap() {
         return treeMap;
     }
-
-    public int getDepth() {
-        return creationParams.getDepth();
-    }
 }

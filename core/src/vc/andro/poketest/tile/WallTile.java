@@ -1,43 +1,64 @@
 package vc.andro.poketest.tile;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import org.jetbrains.annotations.Nullable;
+import vc.andro.poketest.world.World;
 
-public class WallTile extends Tile {
+public class WallTile extends BasicTile {
 
-    private enum WallType {
-        TOP_LEFT_CORNER(null),
-        TOP_EDGE(null),
-        TOP_RIGHT_CORNER(null),
-        LEFT_EDGE("wall-left-edge"),
-        RIGHT_EDGE("wall-right-edge"),
-        BOTTOM_LEFT_CORNER("wall-bottom-left-corner"),
-        BOTTOM_EDGE("wall-bottom-edge"),
-        BOTTOM_RIGHT_CORNER("wall-bottom-right-corner"),
-        TOP_LEFT_INNER_CORNER(null),
-        TOP_RIGHT_INNER_CORNER(null),
-        BOTTOM_LEFT_INNER_CORNER("wall-bottom-left-inner-corner"),
-        BOTTOM_RIGHT_INNER_CORNER("wall-bottom-right-inner-corner");
+    private WallType wallType;
 
-        private final String spriteId;
+    private @Nullable
+    BasicTile neighborTile = null;
 
-        WallType(String spriteId) {
-            this.spriteId = spriteId;
-        }
-
-        public String getSpriteId() {
-            if (spriteId == null) {
-                throw new UnsupportedOperationException("This wall type is currently unsupported");
-            }
-            return spriteId;
-        }
+    public WallTile(World world, int x, int y, float altitude, WallType wallType) {
+        super(world, TileType.WALL, x, y, altitude);
+        updateWallType(wallType);
     }
 
-    public WallTile(float altitude, int x, int y) {
-        super(TileType.WALL, x, y, altitude);
+    @Override
+    public void draw(SpriteBatch spriteBatch) {
+        if (neighborTile != null) {
+            neighborTile.draw(spriteBatch, x, y);
+        }
+        super.draw(spriteBatch);
     }
 
     public void updateWallType(WallType newType) {
-        setSpriteId(newType.spriteId);
+        spriteId = newType.getSpriteId();
+        wallType = newType;
+    }
+
+    @Override
+    public void receiveTileUpdate(BasicTile updateOrigin) {
+        super.receiveTileUpdate(updateOrigin);
+
+        if (!updateOrigin.type.isFloorTile) {
+            return;
+        }
+
+        int dirX = x - updateOrigin.x;
+        int dirY = y - updateOrigin.y;
+        boolean acceptNeighbor;
+
+        switch (wallType) {
+            case TOP_LEFT_CORNER -> acceptNeighbor = dirX > 0 || dirY < 0;
+            case TOP_EDGE -> acceptNeighbor = dirX == 0 && dirY < 0;
+            case TOP_RIGHT_CORNER -> acceptNeighbor = dirX < 0 || dirY < 0 ;
+            case LEFT_EDGE -> acceptNeighbor = dirX > 0 && dirY == 0;
+            case RIGHT_EDGE -> acceptNeighbor = dirX < 0 && dirY == 0;
+            case BOTTOM_LEFT_CORNER -> acceptNeighbor = dirX > 0 || dirY > 0;
+            case BOTTOM_EDGE -> acceptNeighbor = dirX == 0 && dirY > 0;
+            case BOTTOM_RIGHT_CORNER -> acceptNeighbor = dirX < 0 || dirY > 0;
+            case TOP_LEFT_INNER_CORNER -> acceptNeighbor = dirX > 0 && dirY < 0;
+            case TOP_RIGHT_INNER_CORNER -> acceptNeighbor = dirX < 0 && dirY < 0;
+            case BOTTOM_LEFT_INNER_CORNER -> acceptNeighbor = dirX > 0 && dirY > 0;
+            case BOTTOM_RIGHT_INNER_CORNER -> acceptNeighbor = dirX < 0 && dirY > 0;
+            default -> throw new AssertionError();
+        }
+
+        if (acceptNeighbor) {
+            neighborTile = updateOrigin;
+        }
     }
 }
