@@ -3,11 +3,13 @@ package vc.andro.poketest;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
 import vc.andro.poketest.entity.Entity;
 import vc.andro.poketest.tile.BasicTile;
 import vc.andro.poketest.world.World;
@@ -76,26 +78,49 @@ public class PlayScreen implements Screen {
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
             world.updateChunk(
-                    World.worldXToChunkX((int) (pokecam.getPosition().x / TILE_SIZE)),
-                    World.worldYToChunkY((int) (pokecam.getPosition().y / TILE_SIZE)));
+                    World.WxCx((int) (pokecam.getPosition().x / TILE_SIZE)),
+                    World.WzCz((int) (pokecam.getPosition().y / TILE_SIZE)));
         }
 
         renderChunkBorders();
+        renderTileYs();
+    }
+
+    private void renderTileYs() {
+        spriteBatch.setColor(Color.BLUE);
+        spriteBatch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        spriteBatch.begin();
+
+        int curTileWorldX = (int)pokecam.getPosition().x / TILE_SIZE;
+        int curTileWorldZ = (int)pokecam.getPosition().y / TILE_SIZE;
+
+        for (int wx = curTileWorldX - 10; wx < curTileWorldX + 10; wx++) {
+            for (int wz = curTileWorldZ - 10; wz < curTileWorldZ + 10; wz++) {
+                BasicTile surfaceTile = world.getSurfaceTile(wx, wz);
+                if (surfaceTile == null) {
+                    continue;
+                }
+                Vector3 renderPos = pokecam.project(new Vector3(wx*TILE_SIZE+ 8, wz * TILE_SIZE + 8, 0));
+                bitmapFont.draw(spriteBatch, "" + surfaceTile.y, renderPos.x, renderPos.y);
+            }
+        }
+        spriteBatch.end();
+        spriteBatch.setColor(Color.WHITE);
     }
 
     private void renderChunkBorders() {
         shapeRenderer.setProjectionMatrix(pokecam.getProjectionMatrix());
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
 
-        int curChunkX = World.worldXToChunkX((int) (pokecam.getPosition().x / TILE_SIZE));
-        int curChunkY = World.worldYToChunkY((int) (pokecam.getPosition().y / TILE_SIZE));
+        int curChunkX = World.WxCx((int) (pokecam.getPosition().x / TILE_SIZE));
+        int curChunkZ = World.WzCz((int) (pokecam.getPosition().y / TILE_SIZE));
 
         for (int cx = curChunkX - 5; cx < curChunkX + 5; cx++) {
-            for (int cy = curChunkY - 5; cy < curChunkY + 5; cy++) {
-                final int renderX = World.chunkXToWorldX(cx) * TILE_SIZE;
-                final int renderY = World.chunkYToWorldY(cy) * TILE_SIZE;
-                final int renderWidth = CHUNK_SIZE * TILE_SIZE;
-                final int renderHeight = CHUNK_SIZE * TILE_SIZE;
+            for (int cz = curChunkZ - 5; cz < curChunkZ + 5; cz++) {
+                int renderX = World.CxWx(cx) * TILE_SIZE;
+                int renderY = World.CzWz(cz) * TILE_SIZE;
+                int renderWidth = CHUNK_SIZE * TILE_SIZE;
+                int renderHeight = CHUNK_SIZE * TILE_SIZE;
                 shapeRenderer.rect(renderX, renderY, renderWidth, renderHeight);
             }
         }
@@ -106,10 +131,10 @@ public class PlayScreen implements Screen {
         spriteBatch.begin();
 
         for (int cx = curChunkX - 5; cx < curChunkX + 5; cx++) {
-            for (int cy = curChunkY - 5; cy < curChunkY + 5; cy++) {
-                final int renderX = World.chunkXToWorldX(cx) * TILE_SIZE;
-                final int renderY = World.chunkYToWorldY(cy) * TILE_SIZE;
-                bitmapFont.draw(spriteBatch, "" + cx + ", " + cy, renderX + 5, renderY - 5);
+            for (int cz = curChunkZ - 5; cz < curChunkZ + 5; cz++) {
+                final int renderX = World.CxWx(cx) * TILE_SIZE;
+                final int renderY = World.CzWz(cz) * TILE_SIZE;
+                bitmapFont.draw(spriteBatch, "" + cx + ", " + cz, renderX + 5, renderY - 5);
             }
         }
 
@@ -137,18 +162,26 @@ public class PlayScreen implements Screen {
         spriteBatch.setProjectionMatrix(pokecam.getProjectionMatrix());
         spriteBatch.begin();
 
-        final Rectangle visibleArea = pokecam.getVisibleArea();
+        Rectangle visibleArea = pokecam.getVisibleArea();
 
         for (int worldX = (int) visibleArea.x / TILE_SIZE - CAMERA_CULL_LEEWAY;
              worldX < visibleArea.x / TILE_SIZE + visibleArea.width / TILE_SIZE;
              worldX++
         ) {
-            for (int worldY = (int) visibleArea.y / TILE_SIZE - CAMERA_CULL_LEEWAY;
-                 worldY < visibleArea.y / TILE_SIZE + visibleArea.height / TILE_SIZE;
-                 worldY++
+            for (int worldZ = (int) visibleArea.y / TILE_SIZE - CAMERA_CULL_LEEWAY;
+                 worldZ < visibleArea.y / TILE_SIZE + visibleArea.height / TILE_SIZE;
+                 worldZ++
             ) {
                 dbgInfo_iterations++;
-                BasicTile tile = world.getTileOrGenerateAt(worldX, worldY);
+                BasicTile surfaceTile = world.getSurfaceTile_G(worldX, worldZ);
+                if (surfaceTile == null) {
+                    continue;
+                }
+                BasicTile tile = world.getTileAt_G_WP(
+                        worldX,
+                        surfaceTile.y,
+                        worldZ
+                );
                 if (tile != null) {
                     tile.draw(spriteBatch);
                     dbgInfo_tilesDrawn++;

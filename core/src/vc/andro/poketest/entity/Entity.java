@@ -10,6 +10,7 @@ import static vc.andro.poketest.PokeTest.TILE_SIZE;
 
 public class Entity {
     public float worldX;
+    public float y;
     public float worldZ;
     public final String spriteId;
 
@@ -34,18 +35,5 @@ public class Entity {
     }
 
     public void update(float delta) {
-    }
-
-    public void setPosition(int worldX, int worldY) {
-        this.worldX = worldX;
-        this.worldZ = worldY;
-    }
-
-    public float getWorldX() {
-        return worldX;
-    }
-
-    public float getWorldZ() {
-        return worldZ;
     }
 }

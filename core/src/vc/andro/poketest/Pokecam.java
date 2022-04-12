@@ -31,6 +31,10 @@ public class Pokecam {
         return camera.combined;
     }
 
+    public Vector3 project(Vector3 worldCoords) {
+        return camera.project(worldCoords);
+    }
+
     public boolean isPosOutsideOfCameraView(float x, float z) {
         return !camera.frustum.boundsInFrustum(x, z, 0, TILE_SIZE, TILE_SIZE, 0);
     }
@@ -86,8 +90,8 @@ public class Pokecam {
             camera.zoom = Math.max(camera.zoom, 0.0f);
         } else if (followEntity != null) {
             camera.position.set(
-                    followEntity.getWorldX() * TILE_SIZE + TILE_SIZE / 2f,
-                    followEntity.getWorldZ() * TILE_SIZE + TILE_SIZE / 2f, 1);
+                    followEntity.worldX * TILE_SIZE + TILE_SIZE / 2f,
+                    followEntity.worldZ * TILE_SIZE + TILE_SIZE / 2f, 1);
             camera.zoom = 0.33f;
         }
     }

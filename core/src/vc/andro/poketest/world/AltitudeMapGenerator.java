@@ -1,5 +1,9 @@
 package vc.andro.poketest.world;
 
+import com.badlogic.gdx.math.MathUtils;
+
+import static vc.andro.poketest.world.Chunk.CHUNK_DEPTH;
+
 public class AltitudeMapGenerator {
 
     private final NoiseGenerator noiseGenerator;
@@ -10,7 +14,7 @@ public class AltitudeMapGenerator {
         this.creationParams = creationParams;
     }
 
-    public float altitudeAtPos(int worldX, int worldZ) {
+    public int altitudeAtPos(int worldX, int worldZ) {
         float elevation = 0.0f;
         {
             float amplitudeSum = 0.0f;
@@ -22,11 +26,11 @@ public class AltitudeMapGenerator {
                 );
                 amplitudeSum += amplitude;
             }
-            // keep e within range after adding multiple octaves
+            // keep e within [-1.0..1.0] range after adding multiple octaves
             elevation /= amplitudeSum;
         }
 
-        // normalize elevation to 0.0 - 1.0 (from -1.0 - 1.0)
+        // normalize elevation to [0.0..1.0] (from [-1.0 - 1.0])
         elevation = (elevation + 1f) / 2f;
 
         if (creationParams.islandMode) {
@@ -42,10 +46,14 @@ public class AltitudeMapGenerator {
 
         // apply valley factor
         elevation = (float) Math.pow(elevation, creationParams.valleyFactor);
-
         // make terraces
         elevation = (float) Math.round(elevation * creationParams.terraces) / creationParams.terraces;
+        // adapt elevation to chunk depth
+        elevation *= CHUNK_DEPTH;
 
-        return elevation;
+        int elevationBlocks = Math.round(elevation);
+        elevationBlocks += creationParams.altitudeOffset;
+        elevationBlocks = MathUtils.clamp(elevationBlocks, 0, CHUNK_DEPTH - 1);
+        return elevationBlocks;
     }
 }

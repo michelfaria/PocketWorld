@@ -14,8 +14,7 @@ import java.util.Random;
 
 import static vc.andro.poketest.tile.WallType.*;
 import static vc.andro.poketest.world.Chunk.CHUNK_SIZE;
-import static vc.andro.poketest.world.World.chunkLocalXToWorldX;
-import static vc.andro.poketest.world.World.chunkLocalZToWorldZ;
+import static vc.andro.poketest.world.World.*;
 
 public class WorldGenerator {
     public final WorldCreationParams params;
@@ -59,29 +58,29 @@ public class WorldGenerator {
         assert world != null;
         for (int chunkLocalX = 0; chunkLocalX < CHUNK_SIZE; chunkLocalX++) {
             for (int chunkLocalZ = 0; chunkLocalZ < CHUNK_SIZE; chunkLocalZ++) {
-                final int worldX = chunkLocalXToWorldX(chunkX, chunkLocalX);
-                final int worldZ = chunkLocalZToWorldZ(chunkZ, chunkLocalZ);
-                final float altitude = altitudeMapGenerator.altitudeAtPos(worldX, worldZ);
+                int worldX = LxWx(chunkX, chunkLocalX);
+                int worldZ = LzWz(chunkZ, chunkLocalZ);
+                int y = altitudeMapGenerator.altitudeAtPos(worldX, worldZ);
 
-                if (altitude <= world.getCreationParams().waterLevel) {
+                if (y <= world.getCreationParams().waterLevel) {
                     // Is water tile
-                    world.putTileAt(worldX, worldZ, new BasicTile(TileType.WATER, altitude));
+                    world.putTileAt_WP(worldX, y, worldZ, new BasicTile(TileType.WATER));
                     continue;
                 }
 
-                if (generateWalls(worldX, worldZ, altitude)) {
+                if (generateWalls(worldX, y, worldZ)) {
                     // Is wall tile
                     continue;
                 }
 
-                if (altitude <= params.beachAltitude) {
+                if (y <= params.beachAltitude) {
                     // Is sand tile
-                    world.putTileAt(worldX, worldZ, new BasicTile(TileType.SAND, altitude));
+                    world.putTileAt_WP(worldX, y, worldZ, new BasicTile(TileType.SAND));
                     continue;
                 }
 
                 // Spawn grass
-                world.putTileAt(worldX, worldZ, new BasicTile(TileType.GRASS, altitude));
+                world.putTileAt_WP(worldX, y, worldZ, new BasicTile(TileType.GRASS));
             }
         }
         spawnTrees(chunkX, chunkZ);
@@ -90,12 +89,18 @@ public class WorldGenerator {
 
     private void spawnTrees(int chunkX, int chunkZ) {
         assert world != null;
+        Chunk chunk = world.getChunkAt_CP(chunkX, chunkZ);
+        assert chunk != null;
         for (int chunkLocalX = 0; chunkLocalX < CHUNK_SIZE; chunkLocalX++) {
             for (int chunkLocalZ = 0; chunkLocalZ < CHUNK_SIZE; chunkLocalZ++) {
-                final int worldX = chunkLocalXToWorldX(chunkX, chunkLocalX);
-                final int worldZ = chunkLocalZToWorldZ(chunkZ, chunkLocalZ);
+                int worldX = LxWx(chunkX, chunkLocalX);
+                BasicTile surfaceTile = chunk.getSurfaceTile(chunkLocalX, chunkLocalZ);
+                if (surfaceTile == null) {
+                    continue;
+                }
+                int worldZ = LzWz(chunkZ, chunkLocalZ);
 
-                if (shouldTreeBeSpawnedAtPosition(worldX, worldZ)) {
+                if (shouldTreeBeSpawnedAtPosition(worldX, surfaceTile.y, worldZ)) {
                     var tree = new TreeEntity();
                     tree.worldX = worldX;
                     tree.worldZ = worldZ;
@@ -105,92 +110,87 @@ public class WorldGenerator {
         }
     }
 
-    private boolean shouldTreeBeSpawnedAtPosition(int worldX, int worldZ) {
-        if (!isTreeAllowedInPosition(worldX, worldZ)) {
+    private boolean shouldTreeBeSpawnedAtPosition(int worldX, int y, int worldZ) {
+        assert world != null;
+        BasicTile tile = world.getTileAt_WP(worldX, y, worldZ);
+        if (tile == null || !tile.type.equals(TileType.GRASS)) {
             return false;
         }
         int treeType = treeMapGenerator.getTreeAtPos(worldX, worldZ);
         return treeType > 0;
     }
 
-    private boolean isTreeAllowedInPosition(int worldX, int worldZ) {
-        assert world != null;
-        BasicTile tile = world.getTileOrGenerateAt(worldX, worldZ);
-        return tile != null && tile.type.equals(TileType.GRASS);
-    }
-
     @SuppressWarnings("DuplicatedCode")
-    private boolean generateWalls(int worldX, int worldZ, float altitude) {
+    private boolean generateWalls(int worldX, int y, int worldZ) {
         assert world != null;
 
-        final float topLeftAltitude = altitudeMapGenerator.altitudeAtPos(worldX - 1, worldZ + 1);
-        final float topAltitude = altitudeMapGenerator.altitudeAtPos(worldX, worldZ + 1);
-        final float topRightAltitude = altitudeMapGenerator.altitudeAtPos(worldX + 1, worldZ + 1);
-        final float leftAltitude = altitudeMapGenerator.altitudeAtPos(worldX - 1, worldZ);
-        final float rightAltitude = altitudeMapGenerator.altitudeAtPos(worldX + 1, worldZ);
-        final float bottomLeftAltitude = altitudeMapGenerator.altitudeAtPos(worldX - 1, worldZ - 1);
-        final float bottomAltitude = altitudeMapGenerator.altitudeAtPos(worldX, worldZ - 1);
-        final float bottomRightAltitude = altitudeMapGenerator.altitudeAtPos(worldX + 1, worldZ - 1);
+        float topLeftY = altitudeMapGenerator.altitudeAtPos(worldX - 1, worldZ + 1);
+        float topY = altitudeMapGenerator.altitudeAtPos(worldX, worldZ + 1);
+        float topRightY = altitudeMapGenerator.altitudeAtPos(worldX + 1, worldZ + 1);
+        float leftY = altitudeMapGenerator.altitudeAtPos(worldX - 1, worldZ);
+        float rightY = altitudeMapGenerator.altitudeAtPos(worldX + 1, worldZ);
+        float bottomLeftY = altitudeMapGenerator.altitudeAtPos(worldX - 1, worldZ - 1);
+        float bottomY = altitudeMapGenerator.altitudeAtPos(worldX, worldZ - 1);
+        float bottomRightY = altitudeMapGenerator.altitudeAtPos(worldX + 1, worldZ - 1);
 
-        if (altitude > topLeftAltitude && altitude > leftAltitude && altitude > topAltitude) {
-            world.putTileAt(worldX, worldZ, new WallTile(altitude, TOP_LEFT_CORNER));
+        if (y > topLeftY && y > leftY && y > topY) {
+            world.putTileAt_WP(worldX, y, worldZ, new WallTile(TOP_LEFT_CORNER));
             return true;
         }
 
 
-        if (altitude > topRightAltitude && altitude > topAltitude && altitude > rightAltitude) {
-            world.putTileAt(worldX, worldZ, new WallTile(altitude, TOP_RIGHT_CORNER));
+        if (y > topRightY && y > topY && y > rightY) {
+            world.putTileAt_WP(worldX, y, worldZ, new WallTile(TOP_RIGHT_CORNER));
             return true;
         }
 
-        if (altitude > bottomLeftAltitude && altitude > leftAltitude && altitude > bottomAltitude) {
-            world.putTileAt(worldX, worldZ, new WallTile(altitude, BOTTOM_LEFT_CORNER));
+        if (y > bottomLeftY && y > leftY && y > bottomY) {
+            world.putTileAt_WP(worldX, y, worldZ, new WallTile(BOTTOM_LEFT_CORNER));
             return true;
         }
 
-        if (altitude > bottomRightAltitude && altitude > rightAltitude && altitude > bottomAltitude) {
-            world.putTileAt(worldX, worldZ, new WallTile(altitude, BOTTOM_RIGHT_CORNER));
+        if (y > bottomRightY && y > rightY && y > bottomY) {
+            world.putTileAt_WP(worldX, y, worldZ, new WallTile(BOTTOM_RIGHT_CORNER));
             return true;
         }
 
-        if (altitude > bottomLeftAltitude && MathUtils.isEqual(altitude, leftAltitude) && MathUtils.isEqual(altitude, bottomAltitude)) {
-            world.putTileAt(worldX, worldZ, new WallTile(altitude, BOTTOM_LEFT_INNER_CORNER));
+        if (y > bottomLeftY && MathUtils.isEqual(y, leftY) && MathUtils.isEqual(y, bottomY)) {
+            world.putTileAt_WP(worldX, y, worldZ, new WallTile(BOTTOM_LEFT_INNER_CORNER));
             return true;
         }
 
-        if (altitude > bottomRightAltitude && MathUtils.isEqual(altitude, rightAltitude) && MathUtils.isEqual(altitude, bottomAltitude)) {
-            world.putTileAt(worldX, worldZ, new WallTile(altitude, BOTTOM_RIGHT_INNER_CORNER));
+        if (y > bottomRightY && MathUtils.isEqual(y, rightY) && MathUtils.isEqual(y, bottomY)) {
+            world.putTileAt_WP(worldX, y, worldZ, new WallTile(BOTTOM_RIGHT_INNER_CORNER));
             return true;
         }
 
-        if (altitude > topLeftAltitude && MathUtils.isEqual(altitude, leftAltitude) && MathUtils.isEqual(altitude, topAltitude)) {
-            world.putTileAt(worldX, worldZ, new WallTile(altitude, TOP_LEFT_INNER_CORNER));
+        if (y > topLeftY && MathUtils.isEqual(y, leftY) && MathUtils.isEqual(y, topY)) {
+            world.putTileAt_WP(worldX, y, worldZ, new WallTile(TOP_LEFT_INNER_CORNER));
             return true;
         }
 
-        if (altitude > topRightAltitude && MathUtils.isEqual(altitude, rightAltitude) && MathUtils.isEqual(altitude, topAltitude)) {
-            world.putTileAt(worldX, worldZ, new WallTile(altitude, TOP_RIGHT_INNER_CORNER));
+        if (y > topRightY && MathUtils.isEqual(y, rightY) && MathUtils.isEqual(y, topY)) {
+            world.putTileAt_WP(worldX, y, worldZ, new WallTile(TOP_RIGHT_INNER_CORNER));
             return true;
         }
 
-
-        if (leftAltitude < altitude) {
-            world.putTileAt(worldX, worldZ, new WallTile(altitude, LEFT_EDGE));
+        if (leftY < y) {
+            world.putTileAt_WP(worldX, y, worldZ, new WallTile(LEFT_EDGE));
             return true;
         }
 
-        if (rightAltitude < altitude) {
-            world.putTileAt(worldX, worldZ, new WallTile(altitude, RIGHT_EDGE));
+        if (rightY < y) {
+            world.putTileAt_WP(worldX, y, worldZ, new WallTile(RIGHT_EDGE));
             return true;
         }
 
-        if (bottomAltitude < altitude) {
-            world.putTileAt(worldX, worldZ, new WallTile(altitude, BOTTOM_EDGE));
+        if (bottomY < y) {
+            world.putTileAt_WP(worldX, y, worldZ, new WallTile(BOTTOM_EDGE));
             return true;
         }
 
-        if (topAltitude < altitude) {
-            world.putTileAt(worldX, worldZ, new WallTile(altitude, TOP_EDGE));
+        if (topY < y) {
+            world.putTileAt_WP(worldX, y, worldZ, new WallTile(TOP_EDGE));
             return true;
         }
 

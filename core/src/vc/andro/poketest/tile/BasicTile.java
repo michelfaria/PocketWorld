@@ -17,15 +17,14 @@ public class BasicTile {
     public Integer worldX;
     public Integer worldZ;
     public Integer chunkLocalX;
+    public Integer y;
     public Integer chunkLocalZ;
 
-    public float altitude;
     public TileType type;
     public TextureRegion texture;
 
-    public BasicTile(TileType type, float altitude) {
+    public BasicTile(TileType type) {
         this.type = type;
-        this.altitude = altitude;
         setSprite(type.defaultSpriteId);
     }
 

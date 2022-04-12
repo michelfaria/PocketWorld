@@ -11,7 +11,7 @@ public class TreeMapGenerator {
     }
 
     public int getTreeAtPos(int worldX, int worldZ) {
-        final var r = creationParams.treeMapRValue;
+        var r = creationParams.treeMapRValue;
         double max = 0;
         for (int xn = worldX - r; xn <= worldX + r; xn++) {
             for (int zn = worldZ - r; zn <= worldZ + r; zn++) {
