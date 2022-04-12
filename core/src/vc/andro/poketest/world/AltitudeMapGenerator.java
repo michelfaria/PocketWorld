@@ -11,24 +11,25 @@ public class AltitudeMapGenerator {
     }
 
     public float altitudeAtPos(int worldX, int worldY) {
-        final var islandMode = creationParams.islandMode;
-        final var valleyFactor = creationParams.valleyFactor;
-        final var terraces = creationParams.terraces;
+        float elevation = 0.0f;
+        {
+            float amplitudeSum = 0.0f;
+            for (int octave = 1; octave <= creationParams.altitudeMapOctaves; octave++) {
+                float amplitude = 1.0f / (float) octave;
+                elevation += amplitude * noiseGenerator.getNoise(
+                        worldX * creationParams.altitudeMapFrequency * octave,
+                        worldY * creationParams.altitudeMapFrequency * octave
+                );
+                amplitudeSum += amplitude;
+            }
+            // keep e within range after adding multiple octaves
+            elevation /= amplitudeSum;
+        }
 
-        var elevation =
-                // first octave
-                noiseGenerator.getNoise(worldX, worldY)
-                        // second octave
-                        + 0.5f * noiseGenerator.getNoise(2f * worldX, 2f * worldY)
-                        // third octave
-                        + 0.25f * noiseGenerator.getNoise(4f * worldX, 4f * worldY);
-
-        // keep e within range after adding multiple octaves
-        elevation = elevation / (1f + 0.5f + 0.25f);
         // normalize elevation to 0.0 - 1.0 (from -1.0 - 1.0)
         elevation = (elevation + 1f) / 2f;
 
-        if (islandMode) {
+        if (creationParams.islandMode) {
             var nx = 2f * (worldX - creationParams.islandModeSize / 2) / creationParams.islandModeSize;
             var ny = 2f * (worldY - creationParams.islandModeSize / 2) / creationParams.islandModeSize;
 
@@ -39,10 +40,10 @@ public class AltitudeMapGenerator {
         }
 
         // apply valley factor
-        elevation = (float) Math.pow(elevation, valleyFactor);
+        elevation = (float) Math.pow(elevation, creationParams.valleyFactor);
 
         // make terraces
-        elevation = (float) Math.round(elevation * terraces) / terraces;
+        elevation = (float) Math.round(elevation * creationParams.terraces) / creationParams.terraces;
 
         return elevation;
     }
