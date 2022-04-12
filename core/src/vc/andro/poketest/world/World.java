@@ -1,16 +1,22 @@
 package vc.andro.poketest.world;
 
 import com.badlogic.gdx.utils.Array;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.entity.Entity;
 import vc.andro.poketest.tile.BasicTile;
 
+import static vc.andro.poketest.world.Chunk.CHUNK_SIZE;
+
 public class World {
-    private final WorldBase base;
+    private final WorldCreationParams creationParams;
+    private final WorldGenerator worldGenerator;
     private final CoordMat<Chunk> chunks;
     private final Array<Entity> entities;
 
-    public World(WorldBase base) {
-        this.base = base;
+    public World(WorldCreationParams creationParams, WorldGenerator worldGenerator) {
+        this.creationParams = creationParams;
+        this.worldGenerator = worldGenerator;
         chunks = new CoordMat<>();
         entities = new Array<>(Entity.class);
     }
@@ -25,16 +31,8 @@ public class World {
         }
     }
 
-    public WorldBase getBase() {
-        return base;
-    }
-
-    public int getHeight() {
-        return base.getHeight();
-    }
-
-    public int getWidth() {
-        return base.getWidth();
+    public WorldCreationParams getCreationParams() {
+        return creationParams;
     }
 
     public void tick() {
@@ -49,51 +47,83 @@ public class World {
         }
     }
 
-    public void updateAllTiles() {
-        for (int x = 0; x < getWidth(); x++) {
-            for (int y = 0; y < getHeight(); y++) {
-                getTileAt(x, y).doTileUpdate();
-            }
+    public void updateChunk(int chunkX, int chunkY) {
+        Chunk chunk = getChunkAtPos(chunkX, chunkY);
+        if (chunk == null) {
+            throw new NullPointerException("no such chunk (" + chunkX + ", " + chunkY + ")");
         }
+        chunk.updateTiles();
     }
 
-    public void propagateTileUpdate(BasicTile updateOrigin) {
+    public void broadcastTileUpdateToAdjacentTiles(BasicTile updateOrigin) {
         final int ox = updateOrigin.worldX;
         final int oy = updateOrigin.worldY;
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
-                if (dx == dy || ox + dx < 0 || ox + dx >= getWidth() || oy + dy < 0 || oy + dy >= getHeight()) {
+                if (Math.abs(dx) == Math.abs(dy)) {
                     continue;
                 }
                 BasicTile tile = getTileAt(ox + dx, oy + dy);
-                tile.receiveTileUpdate(updateOrigin);
+                if (tile != null) {
+                    tile.receiveTileUpdate(updateOrigin);
+                }
             }
         }
     }
 
-    public BasicTile putTileAt(int worldX, int worldY, BasicTile tile) {
-        final ChunkPos pos = calculateChunkPosition(worldX, worldY);
-        final Chunk chunk = getChunkOrCreateNew(pos.chunkX, pos.chunkY);
-        chunk.putTileAt(pos.chunkLocalX, pos.chunkLocalY, tile);
+    public @NotNull
+    BasicTile putTileAt(int worldX, int worldY, @NotNull BasicTile tile) {
+        final int chunkX = worldXToChunkX(worldX);
+        final int chunkY = worldYToChunkY(worldY);
+        final Chunk chunk = getChunkOrCreateNew(chunkX, chunkY);
+        final int chunkLocalX = worldXToChunkLocalX(worldX);
+        final int chunkLocalY = worldYToChunkLocalY(worldY);
+        chunk.putTileAt(chunkLocalX, chunkLocalY, tile);
         return tile;
     }
 
+    @Nullable
     public BasicTile getTileAt(int worldX, int worldY) {
-        final ChunkPos pos = calculateChunkPosition(worldX, worldY);
-        final Chunk chunk = getChunkOrThrowError(pos.chunkX, pos.chunkY);
-        return chunk.getTileAt(pos.chunkLocalX, pos.chunkLocalY);
+        final int chunkX = worldXToChunkX(worldX);
+        final int chunkY = worldYToChunkY(worldY);
+        Chunk chunk = getChunkAtPos(chunkX, chunkY);
+        if (chunk == null) {
+            return null;
+        }
+        final int chunkLocalX = worldXToChunkLocalX(worldX);
+        final int chunkLocalY = worldYToChunkLocalY(worldY);
+        BasicTile tile = chunk.getTileAt(chunkLocalX, chunkLocalY);
+        if (tile == null) {
+            throw new IllegalStateException("No tile at world x:" + worldX + ", y:" + worldY);
+        }
+        return tile;
+    }
+
+    public BasicTile getTileOrGenerateAt(int worldX, int worldY) {
+        final int chunkX = worldXToChunkX(worldX);
+        final int chunkY = worldYToChunkY(worldY);
+        Chunk chunk = getChunkAtPos(chunkX, chunkY);
+        if (chunk == null) {
+            worldGenerator.generateChunk(chunkX, chunkY);
+            chunk = getChunkAtPos(chunkX, chunkY);
+            assert chunk != null : "chunk should have generated";
+        }
+        final int chunkLocalX = worldXToChunkLocalX(worldX);
+        final int chunkLocalY = worldYToChunkLocalY(worldY);
+        BasicTile tile = chunk.getTileAt(chunkLocalX, chunkLocalY);
+        if (tile == null) {
+            throw new IllegalStateException("No tile at world x:" + worldX + ", y:" + worldY);
+        }
+        return tile;
     }
 
     public Array<Entity> getEntities() {
         return entities;
     }
 
-    private Chunk getChunkOrThrowError(int chunkX, int chunkY) {
-        Chunk chunk = chunks.get(chunkX, chunkY);
-        if (chunk == null) {
-            throw new IllegalArgumentException("chunk (%d,%d) not found".formatted(chunkX, chunkY));
-        }
-        return chunk;
+    private @Nullable
+    Chunk getChunkAtPos(int chunkX, int chunkY) {
+        return chunks.get(chunkX, chunkY);
     }
 
     private Chunk getChunkOrCreateNew(int chunkX, int chunkY) {
@@ -105,15 +135,41 @@ public class World {
         return chunk;
     }
 
-    private ChunkPos calculateChunkPosition(int worldX, int worldY) {
-        return new ChunkPos(
-                worldX / Chunk.CHUNK_SIZE,
-                worldY / Chunk.CHUNK_SIZE,
-                worldX % Chunk.CHUNK_SIZE,
-                worldY % Chunk.CHUNK_SIZE
-        );
+    public static int worldXToChunkX(int worldX) {
+        return (int) Math.floor(worldX / (float) CHUNK_SIZE);
     }
 
-    private record ChunkPos(int chunkX, int chunkY, int chunkLocalX, int chunkLocalY) {
+    public static int worldYToChunkY(int worldY) {
+        return (int) Math.floor(worldY / (float) CHUNK_SIZE);
+    }
+
+    public static int chunkXToWorldX(int chunkX) {
+        return chunkX * CHUNK_SIZE;
+    }
+
+    public static int chunkYToWorldY(int chunkY) {
+        return chunkY * CHUNK_SIZE;
+    }
+
+    public static int worldXToChunkLocalX(int worldX) {
+        if (worldX >= 0) {
+            return worldX % CHUNK_SIZE;
+        }
+        return (CHUNK_SIZE + (worldX % CHUNK_SIZE)) % CHUNK_SIZE;
+    }
+
+    public static int worldYToChunkLocalY(int worldY) {
+        if (worldY >= 0) {
+            return worldY % CHUNK_SIZE;
+        }
+        return (CHUNK_SIZE + (worldY % CHUNK_SIZE)) % CHUNK_SIZE;
+    }
+
+    public static int chunkLocalXToWorldX(int chunkX, int localChunkX) {
+        return chunkX * CHUNK_SIZE + localChunkX;
+    }
+
+    public static int chunkLocalYToWorldY(int chunkY, int localChunkY) {
+        return chunkY * CHUNK_SIZE + localChunkY;
     }
 }

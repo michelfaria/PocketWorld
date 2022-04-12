@@ -4,14 +4,17 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.entity.Entity;
 
-import static vc.andro.poketest.PokeTest.*;
+import static vc.andro.poketest.PokeTest.TILE_SIZE;
 
 public class Pokecam {
 
+    public static final int CAM_SPEED = 30;
     private final OrthographicCamera camera;
     private final FitViewport viewport;
 
@@ -53,20 +56,18 @@ public class Pokecam {
             int dy = 0;
             float dzoom = 0f;
             if (Gdx.input.isKeyPressed(Input.Keys.J)) {
-                dx = -100;
-                dy = 0;
+                dx = -CAM_SPEED;
             }
             if (Gdx.input.isKeyPressed(Input.Keys.L)) {
-                dx = 100;
-                dy = 0;
+                dx = CAM_SPEED;
             }
             if (Gdx.input.isKeyPressed(Input.Keys.I)) {
                 dx = 0;
-                dy = 100;
+                dy = CAM_SPEED;
             }
             if (Gdx.input.isKeyPressed(Input.Keys.K)) {
                 dx = 0;
-                dy = -100;
+                dy = -CAM_SPEED;
             }
             /*
              * Update camera zoom
@@ -85,13 +86,26 @@ public class Pokecam {
             camera.zoom = Math.max(camera.zoom, 0.0f);
         } else if (followEntity != null) {
             camera.position.set(
-                    followEntity.getX() * TILE_SIZE + TILE_SIZE / 2f,
-                    followEntity.getY() * TILE_SIZE + TILE_SIZE / 2f, 1);
+                    followEntity.getWorldX() * TILE_SIZE + TILE_SIZE / 2f,
+                    followEntity.getWorldY() * TILE_SIZE + TILE_SIZE / 2f, 1);
             camera.zoom = 0.33f;
         }
     }
 
     public void resize(int width, int height) {
         viewport.setScreenSize(width, height);
+    }
+
+    public Rectangle getVisibleArea() {
+        var rect = new Rectangle();
+        rect.x = camera.position.x - camera.viewportWidth / 2f * camera.zoom;
+        rect.y = camera.position.y - camera.viewportHeight / 2f * camera.zoom;
+        rect.width = camera.viewportWidth * camera.zoom;
+        rect.height = camera.viewportHeight * camera.zoom;
+        return rect;
+    }
+
+    public Vector3 getPosition() {
+        return camera.position;
     }
 }

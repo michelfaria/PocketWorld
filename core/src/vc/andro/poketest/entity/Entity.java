@@ -9,8 +9,8 @@ import vc.andro.poketest.util.AtlasUtil;
 import static vc.andro.poketest.PokeTest.TILE_SIZE;
 
 public class Entity {
-    public float x;
-    public float y;
+    public float worldX;
+    public float worldY;
     public final String spriteId;
 
     public Entity(String spriteId) {
@@ -25,8 +25,8 @@ public class Entity {
     protected void draw(SpriteBatch spriteBatch, TextureRegion sprite) {
         spriteBatch.draw(
                 sprite,
-                x * TILE_SIZE,
-                y * TILE_SIZE
+                worldX * TILE_SIZE,
+                worldY * TILE_SIZE
         );
     }
 
@@ -36,16 +36,16 @@ public class Entity {
     public void update(float delta) {
     }
 
-    public void setPosition(int x, int y) {
-        this.x = x;
-        this.y = y;
+    public void setPosition(int worldX, int worldY) {
+        this.worldX = worldX;
+        this.worldY = worldY;
     }
 
-    public float getX() {
-        return x;
+    public float getWorldX() {
+        return worldX;
     }
 
-    public float getY() {
-        return y;
+    public float getWorldY() {
+        return worldY;
     }
 }

@@ -98,20 +98,20 @@ public class Player extends Entity {
     public void updateMovement() {
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             direction = Direction.LEFT;
-            x -= 0.5f;
+            worldX -= 0.5f;
             playerMoving = true;
         } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             direction = Direction.RIGHT;
-            x += 0.5f;
+            worldX += 0.5f;
             playerMoving = true;
         } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             direction = Direction.DOWN;
             playerMoving = true;
-            y -= 0.5f;
+            worldY -= 0.5f;
         } else if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
             direction = Direction.UP;
             playerMoving = true;
-            y += 0.5f;
+            worldY += 0.5f;
         } else {
             playerMoving = false;
         }

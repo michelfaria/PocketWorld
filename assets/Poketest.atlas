@@ -130,6 +130,13 @@ player/walk-up
   orig: 16, 20
   offset: 0, 0
   index: 2
+rocky-floor
+  rotate: false
+  xy: 74, 28
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 sand
   rotate: false
   xy: 38, 28
@@ -202,14 +209,14 @@ wall-top-edge
   index: -1
 wall-top-left-corner
   rotate: false
-  xy: 74, 28
+  xy: 92, 64
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 wall-top-right-corner
   rotate: false
-  xy: 110, 68
+  xy: 110, 50
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -230,7 +237,7 @@ wall-top-left-inner-corner
   index: -1
 water
   rotate: false
-  xy: 92, 64
+  xy: 110, 68
   size: 16, 16
   orig: 16, 16
   offset: 0, 0

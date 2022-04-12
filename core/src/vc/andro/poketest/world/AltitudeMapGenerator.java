@@ -10,50 +10,40 @@ public class AltitudeMapGenerator {
         this.creationParams = creationParams;
     }
 
-    public float[][] generate() {
-        final var width = creationParams.getWidth();
-        final var height = creationParams.getHeight();
-        final var islandMode = creationParams.isIslandMode();
-        final var valleyFactor = creationParams.getValleyFactor();
-        final var terraces = creationParams.getTerraces();
+    public float altitudeAtPos(int worldX, int worldY) {
+        final var islandMode = creationParams.islandMode;
+        final var valleyFactor = creationParams.valleyFactor;
+        final var terraces = creationParams.terraces;
 
-        float[][] elevations = new float[width][height];
+        var elevation =
+                // first octave
+                noiseGenerator.getNoise(worldX, worldY)
+                        // second octave
+                        + 0.5f * noiseGenerator.getNoise(2f * worldX, 2f * worldY)
+                        // third octave
+                        + 0.25f * noiseGenerator.getNoise(4f * worldX, 4f * worldY);
 
-        for (var x = 0; x < width; x++) {
-            for (var y = 0; y < height; y++) {
-                var nx = 2f * (x - width / 2) / width;
-                var ny = 2f * (y - height / 2) / height;
+        // keep e within range after adding multiple octaves
+        elevation = elevation / (1f + 0.5f + 0.25f);
+        // normalize elevation to 0.0 - 1.0 (from -1.0 - 1.0)
+        elevation = (elevation + 1f) / 2f;
 
-                var elevation =
-                        // first octave
-                        noiseGenerator.getNoise(x, y)
-                                // second octave
-                                + 0.5f * noiseGenerator.getNoise(2f * x, 2f * y)
-                                // third octave
-                                + 0.25f * noiseGenerator.getNoise(4f * x, 4f * y);
-                // keep e within range after adding multiple octaves
-                elevation = elevation / (1f + 0.5f + 0.25f);
-                // normalize elevation to 0.0 - 1.0 (from -1.0 - 1.0)
-                elevation = (elevation + 1f) / 2f;
+        if (islandMode) {
+            var nx = 2f * (worldX - creationParams.islandModeSize / 2) / creationParams.islandModeSize;
+            var ny = 2f * (worldY - creationParams.islandModeSize / 2) / creationParams.islandModeSize;
 
-                if (islandMode) {
-                    var distance = 1f - (1f - (float) Math.pow(nx, 2f)) * (1f - (float) Math.pow(ny, 2f));
-                    distance += 0.2f;
-                    // apply distance function to elevation
-                    elevation = (elevation + (1f - distance)) / 2f;
-                }
-
-                // apply valley factor
-                elevation = (float) Math.pow(elevation, valleyFactor);
-
-                // make terraces
-                elevation = (float) Math.round(elevation * terraces) / terraces;
-
-                // set elevation at (x, y)
-                elevations[x][y] = elevation;
-            }
+            var distance = 1f - (1f - (float) Math.pow(nx, 2f)) * (1f - (float) Math.pow(ny, 2f));
+            distance += 0.2f;
+            // apply distance function to elevation
+            elevation = (elevation + (1f - distance)) / 2f;
         }
 
-        return elevations;
+        // apply valley factor
+        elevation = (float) Math.pow(elevation, valleyFactor);
+
+        // make terraces
+        elevation = (float) Math.round(elevation * terraces) / terraces;
+
+        return elevation;
     }
 }

@@ -33,4 +33,22 @@ public class Chunk {
         tiles[chunkLocalX][chunkLocalY] = tile;
         return prev;
     }
+
+    public void updateTiles() {
+        for (int chunkLocalX = 0; chunkLocalX < CHUNK_SIZE; chunkLocalX++) {
+            for (int chunkLocalY = 0; chunkLocalY < CHUNK_SIZE; chunkLocalY++) {
+                BasicTile tile = getTileAt(chunkLocalX, chunkLocalY);
+                assert tile != null; // No null tiles should exist in a chunk
+                tile.doTileUpdate();
+            }
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Chunk{" +
+                "chunkX=" + chunkX +
+                ", chunkY=" + chunkY +
+                '}';
+    }
 }

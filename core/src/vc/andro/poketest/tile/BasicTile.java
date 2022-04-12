@@ -2,7 +2,6 @@ package vc.andro.poketest.tile;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.Assets;
 import vc.andro.poketest.PokeTest;
 import vc.andro.poketest.util.AtlasUtil;
@@ -44,7 +43,7 @@ public class BasicTile {
     }
 
     public void doTileUpdate() {
-        world.propagateTileUpdate(this);
+        world.broadcastTileUpdateToAdjacentTiles(this);
     }
 
     public void receiveTileUpdate(BasicTile updateOrigin) {
@@ -57,4 +56,18 @@ public class BasicTile {
         return type.canPlayerWalkOnIt;
     }
 
+    @Override
+    public String toString() {
+        return "BasicTile{" +
+                "world=" + world +
+                ", chunk=" + chunk +
+                ", worldX=" + worldX +
+                ", worldY=" + worldY +
+                ", chunkLocalX=" + chunkLocalX +
+                ", chunkLocalY=" + chunkLocalY +
+                ", altitude=" + altitude +
+                ", type=" + type +
+                ", spriteId='" + spriteId + '\'' +
+                '}';
+    }
 }
