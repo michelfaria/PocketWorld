@@ -33,8 +33,9 @@ public class AltitudeMapGenerator {
             var nx = 2f * (worldX - creationParams.islandModeSize / 2) / creationParams.islandModeSize;
             var ny = 2f * (worldY - creationParams.islandModeSize / 2) / creationParams.islandModeSize;
 
-            var distance = 1f - (1f - (float) Math.pow(nx, 2f)) * (1f - (float) Math.pow(ny, 2f));
+            float distance = 1f - (1f - (float) Math.pow(nx, 2f)) * (1f - (float) Math.pow(ny, 2f));
             distance += 0.2f;
+
             // apply distance function to elevation
             elevation = (elevation + (1f - distance)) / 2f;
         }
