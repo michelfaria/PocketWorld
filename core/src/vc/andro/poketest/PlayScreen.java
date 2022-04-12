@@ -164,7 +164,7 @@ public class PlayScreen implements Screen {
         spriteBatch.begin();
         for (Entity entity : world.getEntities()) {
             float nx = entity.worldX * TILE_SIZE;
-            float ny = entity.worldY * TILE_SIZE;
+            float ny = entity.worldZ * TILE_SIZE;
             if (pokecam.isPosOutsideOfCameraView(nx, ny)) {
                 continue;
             }

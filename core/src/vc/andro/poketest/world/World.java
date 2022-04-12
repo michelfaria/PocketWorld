@@ -47,23 +47,23 @@ public class World {
         }
     }
 
-    public void updateChunk(int chunkX, int chunkY) {
-        Chunk chunk = getChunkAtPos(chunkX, chunkY);
+    public void updateChunk(int chunkX, int chunkZ) {
+        Chunk chunk = getChunkAtPos(chunkX, chunkZ);
         if (chunk == null) {
-            throw new NullPointerException("no such chunk (" + chunkX + ", " + chunkY + ")");
+            throw new NullPointerException("no such chunk (" + chunkX + ", " + chunkZ + ")");
         }
         chunk.updateTiles();
     }
 
     public void broadcastTileUpdateToAdjacentTiles(BasicTile updateOrigin) {
         final int ox = updateOrigin.worldX;
-        final int oy = updateOrigin.worldY;
+        final int oz = updateOrigin.worldZ;
         for (int dx = -1; dx <= 1; dx++) {
-            for (int dy = -1; dy <= 1; dy++) {
-                if (Math.abs(dx) == Math.abs(dy)) {
+            for (int dz = -1; dz <= 1; dz++) {
+                if (Math.abs(dx) == Math.abs(dz)) {
                     continue;
                 }
-                BasicTile tile = getTileAt(ox + dx, oy + dy);
+                BasicTile tile = getTileAt(ox + dx, oz + dz);
                 if (tile != null) {
                     tile.receiveTileUpdate(updateOrigin);
                 }
@@ -72,47 +72,47 @@ public class World {
     }
 
     public @NotNull
-    BasicTile putTileAt(int worldX, int worldY, @NotNull BasicTile tile) {
+    BasicTile putTileAt(int worldX, int worldZ, @NotNull BasicTile tile) {
         final int chunkX = worldXToChunkX(worldX);
-        final int chunkY = worldYToChunkY(worldY);
-        final Chunk chunk = getChunkOrCreateNew(chunkX, chunkY);
+        final int chunkZ = worldZTochunkZ(worldZ);
+        final Chunk chunk = getChunkOrCreateNew(chunkX, chunkZ);
         final int chunkLocalX = worldXToChunkLocalX(worldX);
-        final int chunkLocalY = worldYToChunkLocalY(worldY);
-        chunk.putTileAt(chunkLocalX, chunkLocalY, tile);
+        final int chunkLocalZ = worldYTochunkLocalZ(worldZ);
+        chunk.putTileAt(chunkLocalX, chunkLocalZ, tile);
         return tile;
     }
 
     @Nullable
-    public BasicTile getTileAt(int worldX, int worldY) {
+    public BasicTile getTileAt(int worldX, int worldZ) {
         final int chunkX = worldXToChunkX(worldX);
-        final int chunkY = worldYToChunkY(worldY);
-        Chunk chunk = getChunkAtPos(chunkX, chunkY);
+        final int chunkZ = worldZTochunkZ(worldZ);
+        Chunk chunk = getChunkAtPos(chunkX, chunkZ);
         if (chunk == null) {
             return null;
         }
         final int chunkLocalX = worldXToChunkLocalX(worldX);
-        final int chunkLocalY = worldYToChunkLocalY(worldY);
-        BasicTile tile = chunk.getTileAt(chunkLocalX, chunkLocalY);
+        final int chunkLocalZ = worldYTochunkLocalZ(worldZ);
+        BasicTile tile = chunk.getTileAt(chunkLocalX, chunkLocalZ);
         if (tile == null) {
-            throw new IllegalStateException("No tile at world x:" + worldX + ", y:" + worldY);
+            throw new IllegalStateException("No tile at world x:" + worldX + ", z:" + worldZ);
         }
         return tile;
     }
 
-    public BasicTile getTileOrGenerateAt(int worldX, int worldY) {
+    public BasicTile getTileOrGenerateAt(int worldX, int worldZ) {
         final int chunkX = worldXToChunkX(worldX);
-        final int chunkY = worldYToChunkY(worldY);
-        Chunk chunk = getChunkAtPos(chunkX, chunkY);
+        final int chunkZ = worldZTochunkZ(worldZ);
+        Chunk chunk = getChunkAtPos(chunkX, chunkZ);
         if (chunk == null) {
-            worldGenerator.generateChunk(chunkX, chunkY);
-            chunk = getChunkAtPos(chunkX, chunkY);
+            worldGenerator.generateChunk(chunkX, chunkZ);
+            chunk = getChunkAtPos(chunkX, chunkZ);
             assert chunk != null : "chunk should have generated";
         }
         final int chunkLocalX = worldXToChunkLocalX(worldX);
-        final int chunkLocalY = worldYToChunkLocalY(worldY);
-        BasicTile tile = chunk.getTileAt(chunkLocalX, chunkLocalY);
+        final int chunkLocalZ = worldYTochunkLocalZ(worldZ);
+        BasicTile tile = chunk.getTileAt(chunkLocalX, chunkLocalZ);
         if (tile == null) {
-            throw new IllegalStateException("No tile at world x:" + worldX + ", y:" + worldY);
+            throw new IllegalStateException("No tile at world x:" + worldX + ", z:" + worldZ);
         }
         return tile;
     }
@@ -122,15 +122,15 @@ public class World {
     }
 
     private @Nullable
-    Chunk getChunkAtPos(int chunkX, int chunkY) {
-        return chunks.get(chunkX, chunkY);
+    Chunk getChunkAtPos(int chunkX, int chunkZ) {
+        return chunks.get(chunkX, chunkZ);
     }
 
-    private Chunk getChunkOrCreateNew(int chunkX, int chunkY) {
-        Chunk chunk = chunks.get(chunkX, chunkY);
+    private Chunk getChunkOrCreateNew(int chunkX, int chunkZ) {
+        Chunk chunk = chunks.get(chunkX, chunkZ);
         if (chunk == null) {
-            chunk = new Chunk(this, chunkX, chunkY);
-            chunks.set(chunkX, chunkY, chunk);
+            chunk = new Chunk(this, chunkX, chunkZ);
+            chunks.set(chunkX, chunkZ, chunk);
         }
         return chunk;
     }
@@ -139,16 +139,16 @@ public class World {
         return (int) Math.floor(worldX / (float) CHUNK_SIZE);
     }
 
-    public static int worldYToChunkY(int worldY) {
-        return (int) Math.floor(worldY / (float) CHUNK_SIZE);
+    public static int worldZTochunkZ(int worldZ) {
+        return (int) Math.floor(worldZ / (float) CHUNK_SIZE);
     }
 
     public static int chunkXToWorldX(int chunkX) {
         return chunkX * CHUNK_SIZE;
     }
 
-    public static int chunkYToWorldY(int chunkY) {
-        return chunkY * CHUNK_SIZE;
+    public static int chunkZToWorldZ(int chunkZ) {
+        return chunkZ * CHUNK_SIZE;
     }
 
     public static int worldXToChunkLocalX(int worldX) {
@@ -158,18 +158,18 @@ public class World {
         return (CHUNK_SIZE + (worldX % CHUNK_SIZE)) % CHUNK_SIZE;
     }
 
-    public static int worldYToChunkLocalY(int worldY) {
-        if (worldY >= 0) {
-            return worldY % CHUNK_SIZE;
+    public static int worldYTochunkLocalZ(int worldZ) {
+        if (worldZ >= 0) {
+            return worldZ % CHUNK_SIZE;
         }
-        return (CHUNK_SIZE + (worldY % CHUNK_SIZE)) % CHUNK_SIZE;
+        return (CHUNK_SIZE + (worldZ % CHUNK_SIZE)) % CHUNK_SIZE;
     }
 
     public static int chunkLocalXToWorldX(int chunkX, int localChunkX) {
         return chunkX * CHUNK_SIZE + localChunkX;
     }
 
-    public static int chunkLocalYToWorldY(int chunkY, int localChunkY) {
-        return chunkY * CHUNK_SIZE + localChunkY;
+    public static int chunkLocalZToWorldZ(int chunkZ, int localchunkZ) {
+        return chunkZ * CHUNK_SIZE + localchunkZ;
     }
 }

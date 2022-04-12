@@ -10,7 +10,7 @@ public class AltitudeMapGenerator {
         this.creationParams = creationParams;
     }
 
-    public float altitudeAtPos(int worldX, int worldY) {
+    public float altitudeAtPos(int worldX, int worldZ) {
         float elevation = 0.0f;
         {
             float amplitudeSum = 0.0f;
@@ -18,7 +18,7 @@ public class AltitudeMapGenerator {
                 float amplitude = 1.0f / (float) octave;
                 elevation += amplitude * noiseGenerator.getNoise(
                         worldX * creationParams.altitudeMapFrequency * octave,
-                        worldY * creationParams.altitudeMapFrequency * octave
+                        worldZ * creationParams.altitudeMapFrequency * octave
                 );
                 amplitudeSum += amplitude;
             }
@@ -31,7 +31,7 @@ public class AltitudeMapGenerator {
 
         if (creationParams.islandMode) {
             var nx = 2f * (worldX - creationParams.islandModeSize / 2) / creationParams.islandModeSize;
-            var ny = 2f * (worldY - creationParams.islandModeSize / 2) / creationParams.islandModeSize;
+            var ny = 2f * (worldZ - creationParams.islandModeSize / 2) / creationParams.islandModeSize;
 
             float distance = 1f - (1f - (float) Math.pow(nx, 2f)) * (1f - (float) Math.pow(ny, 2f));
             distance += 0.2f;

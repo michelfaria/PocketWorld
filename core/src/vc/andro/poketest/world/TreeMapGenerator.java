@@ -10,18 +10,18 @@ public class TreeMapGenerator {
         this.creationParams = creationParams;
     }
 
-    public int getTreeAtPos(int worldX, int worldY) {
+    public int getTreeAtPos(int worldX, int worldZ) {
         final var r = creationParams.treeMapRValue;
         double max = 0;
         for (int xn = worldX - r; xn <= worldX + r; xn++) {
-            for (int yn = worldY - r; yn <= worldY + r; yn++) {
-                double e = noiseGenerator.getNoise(xn, yn);
+            for (int zn = worldZ - r; zn <= worldZ + r; zn++) {
+                double e = noiseGenerator.getNoise(xn, zn);
                 if (e > max) {
                     max = e;
                 }
             }
         }
-        if (noiseGenerator.getNoise(worldX, worldY) == max) {
+        if (noiseGenerator.getNoise(worldX, worldZ) == max) {
             return 1;
         }
         return 0;

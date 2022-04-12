@@ -31,8 +31,8 @@ public class Pokecam {
         return camera.combined;
     }
 
-    public boolean isPosOutsideOfCameraView(float x, float y) {
-        return !camera.frustum.boundsInFrustum(x, y, 0, TILE_SIZE, TILE_SIZE, 0);
+    public boolean isPosOutsideOfCameraView(float x, float z) {
+        return !camera.frustum.boundsInFrustum(x, z, 0, TILE_SIZE, TILE_SIZE, 0);
     }
 
     public void use() {
@@ -53,7 +53,7 @@ public class Pokecam {
              * Update camera translation
              */
             int dx = 0;
-            int dy = 0;
+            int dz = 0;
             float dzoom = 0f;
             if (Gdx.input.isKeyPressed(Input.Keys.J)) {
                 dx = -CAM_SPEED;
@@ -63,11 +63,11 @@ public class Pokecam {
             }
             if (Gdx.input.isKeyPressed(Input.Keys.I)) {
                 dx = 0;
-                dy = CAM_SPEED;
+                dz = CAM_SPEED;
             }
             if (Gdx.input.isKeyPressed(Input.Keys.K)) {
                 dx = 0;
-                dy = -CAM_SPEED;
+                dz = -CAM_SPEED;
             }
             /*
              * Update camera zoom
@@ -79,7 +79,7 @@ public class Pokecam {
                 dzoom = -0.1f;
             }
 
-            camera.translate(dx, dy);
+            camera.translate(dx, dz);
 
             // (do not zoom text camera)
             camera.zoom += dzoom;
@@ -87,7 +87,7 @@ public class Pokecam {
         } else if (followEntity != null) {
             camera.position.set(
                     followEntity.getWorldX() * TILE_SIZE + TILE_SIZE / 2f,
-                    followEntity.getWorldY() * TILE_SIZE + TILE_SIZE / 2f, 1);
+                    followEntity.getWorldZ() * TILE_SIZE + TILE_SIZE / 2f, 1);
             camera.zoom = 0.33f;
         }
     }

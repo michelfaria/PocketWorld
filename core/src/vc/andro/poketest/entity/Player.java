@@ -34,7 +34,7 @@ public class Player extends Entity {
 
     public Player() {
         super("player/idle-down");
-        direction = Direction.DOWN;
+        direction = Direction.SOUTH;
 
         final TextureAtlas textureAtlas = PokeTest.assetManager.get(Assets.textureAtlas);
 
@@ -65,10 +65,10 @@ public class Player extends Entity {
         Animation<TextureRegion> currentAnimation;
         if (playerMoving) {
             switch (direction) {
-                case UP -> currentAnimation = walkUpAnimation;
-                case LEFT -> currentAnimation = walkLeftAnimation;
-                case RIGHT -> currentAnimation = walkRightAnimation;
-                case DOWN -> currentAnimation = walkDownAnimation;
+                case NORTH -> currentAnimation = walkUpAnimation;
+                case WEST -> currentAnimation = walkLeftAnimation;
+                case EAST -> currentAnimation = walkRightAnimation;
+                case SOUTH -> currentAnimation = walkDownAnimation;
                 default -> throw new AssertionError();
             }
         } else {
@@ -82,10 +82,10 @@ public class Player extends Entity {
         }
 
         switch (direction) {
-            case UP -> currentTexture = idleUp;
-            case LEFT -> currentTexture = idleLeft;
-            case RIGHT -> currentTexture = idleRight;
-            case DOWN -> currentTexture = idleDown;
+            case NORTH -> currentTexture = idleUp;
+            case WEST -> currentTexture = idleLeft;
+            case EAST -> currentTexture = idleRight;
+            case SOUTH -> currentTexture = idleDown;
         }
     }
 
@@ -97,21 +97,21 @@ public class Player extends Entity {
 
     public void updateMovement() {
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            direction = Direction.LEFT;
+            direction = Direction.WEST;
             worldX -= 0.5f;
             playerMoving = true;
         } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            direction = Direction.RIGHT;
+            direction = Direction.EAST;
             worldX += 0.5f;
             playerMoving = true;
         } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            direction = Direction.DOWN;
+            direction = Direction.SOUTH;
             playerMoving = true;
-            worldY -= 0.5f;
+            worldZ -= 0.5f;
         } else if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            direction = Direction.UP;
+            direction = Direction.NORTH;
             playerMoving = true;
-            worldY += 0.5f;
+            worldZ += 0.5f;
         } else {
             playerMoving = false;
         }

@@ -8,13 +8,13 @@ public class Chunk {
 
     public final World world;
     public final int chunkX;
-    public final int chunkY;
+    public final int chunkZ;
     public final BasicTile[][] tiles;
 
-    public Chunk(World world, int chunkX, int chunkY) {
+    public Chunk(World world, int chunkX, int chunkZ) {
         this.world = world;
         this.chunkX = chunkX;
-        this.chunkY = chunkY;
+        this.chunkZ = chunkZ;
         tiles = new BasicTile[CHUNK_SIZE][CHUNK_SIZE];
     }
 
@@ -22,33 +22,25 @@ public class Chunk {
         return tiles[chunkLocalX][chunkLocalY];
     }
 
-    public BasicTile putTileAt(int chunkLocalX, int chunkLocalY, BasicTile tile) {
-        final BasicTile prev = getTileAt(chunkLocalX, chunkLocalY);
+    public BasicTile putTileAt(int chunkLocalX, int chunkLocalZ, BasicTile tile) {
+        final BasicTile prev = getTileAt(chunkLocalX, chunkLocalZ);
         tile.world = world;
         tile.chunk = this;
         tile.worldX = chunkX * CHUNK_SIZE + chunkLocalX;
-        tile.worldY = chunkY * CHUNK_SIZE + chunkLocalY;
+        tile.worldZ = chunkZ * CHUNK_SIZE + chunkLocalZ;
         tile.chunkLocalX = chunkLocalX;
-        tile.chunkLocalY = chunkLocalY;
-        tiles[chunkLocalX][chunkLocalY] = tile;
+        tile.chunkLocalZ = chunkLocalZ;
+        tiles[chunkLocalX][chunkLocalZ] = tile;
         return prev;
     }
 
     public void updateTiles() {
         for (int chunkLocalX = 0; chunkLocalX < CHUNK_SIZE; chunkLocalX++) {
-            for (int chunkLocalY = 0; chunkLocalY < CHUNK_SIZE; chunkLocalY++) {
-                BasicTile tile = getTileAt(chunkLocalX, chunkLocalY);
+            for (int chunkLocalZ = 0; chunkLocalZ < CHUNK_SIZE; chunkLocalZ++) {
+                BasicTile tile = getTileAt(chunkLocalX, chunkLocalZ);
                 assert tile != null; // No null tiles should exist in a chunk
                 tile.doTileUpdate();
             }
         }
-    }
-
-    @Override
-    public String toString() {
-        return "Chunk{" +
-                "chunkX=" + chunkX +
-                ", chunkY=" + chunkY +
-                '}';
     }
 }

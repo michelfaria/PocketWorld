@@ -15,9 +15,9 @@ public class BasicTile {
     public World world;
     public Chunk chunk;
     public Integer worldX;
-    public Integer worldY;
+    public Integer worldZ;
     public Integer chunkLocalX;
-    public Integer chunkLocalY;
+    public Integer chunkLocalZ;
 
     public float altitude;
     public TileType type;
@@ -30,11 +30,11 @@ public class BasicTile {
     }
 
     public void draw(SpriteBatch spriteBatch) {
-        draw(spriteBatch, worldX, worldY);
+        draw(spriteBatch, worldX, worldZ);
     }
 
-    protected void draw(SpriteBatch spriteBatch, int atX, int atY) {
-        spriteBatch.draw(texture, atX * TILE_SIZE, atY * TILE_SIZE);
+    protected void draw(SpriteBatch spriteBatch, int atX, int atZ) {
+        spriteBatch.draw(texture, atX * TILE_SIZE, atZ * TILE_SIZE);
     }
 
     public void doTileUpdate() {
@@ -53,20 +53,5 @@ public class BasicTile {
 
     public void setSprite(String spriteId) {
         texture = AtlasUtil.findRegion(PokeTest.assetManager.get(Assets.textureAtlas), spriteId);
-    }
-
-    @Override
-    public String toString() {
-        return "BasicTile{" +
-                "world=" + world +
-                ", chunk=" + chunk +
-                ", worldX=" + worldX +
-                ", worldY=" + worldY +
-                ", chunkLocalX=" + chunkLocalX +
-                ", chunkLocalY=" + chunkLocalY +
-                ", altitude=" + altitude +
-                ", type=" + type +
-                ", texture=" + texture +
-                '}';
     }
 }
