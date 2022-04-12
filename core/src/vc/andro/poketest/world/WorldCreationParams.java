@@ -9,7 +9,7 @@ public class WorldCreationParams {
     private static final int DEFAULT_WORLD_TERRACES = 48;
     private static final float DEFAULT_WORLD_BEACH_ALTITUDE = 0.25f;
     private static final int DEFAULT_TREE_MAP_R_VALUE = 2;
-    private static final boolean DEFAULT_ISLAND_MODE = true;
+    private static final boolean DEFAULT_ISLAND_MODE = false;
     private static final float DEFAULT_VALLEY_FACTOR = 1.8f;
     private static final float DEFAULT_SLOPE_CHANCE = 0.05f;
     private static final float DEFAULT_ISLAND_MODE_SIZE = 200;

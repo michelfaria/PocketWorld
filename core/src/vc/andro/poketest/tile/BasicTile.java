@@ -21,12 +21,12 @@ public class BasicTile {
 
     public float altitude;
     public TileType type;
-    public String spriteId;
+    public TextureRegion texture;
 
     public BasicTile(TileType type, float altitude) {
         this.type = type;
         this.altitude = altitude;
-        spriteId = type.defaultSpriteId;
+        setSprite(type.defaultSpriteId);
     }
 
     public void draw(SpriteBatch spriteBatch) {
@@ -34,12 +34,7 @@ public class BasicTile {
     }
 
     protected void draw(SpriteBatch spriteBatch, int atX, int atY) {
-        TextureRegion region = AtlasUtil.findRegion(PokeTest.assetManager.get(Assets.textureAtlas), spriteId);
-        spriteBatch.draw(
-                region,
-                atX * TILE_SIZE,
-                atY * TILE_SIZE
-        );
+        spriteBatch.draw(texture, atX * TILE_SIZE, atY * TILE_SIZE);
     }
 
     public void doTileUpdate() {
@@ -56,6 +51,10 @@ public class BasicTile {
         return type.canPlayerWalkOnIt;
     }
 
+    public void setSprite(String spriteId) {
+        texture = AtlasUtil.findRegion(PokeTest.assetManager.get(Assets.textureAtlas), spriteId);
+    }
+
     @Override
     public String toString() {
         return "BasicTile{" +
@@ -67,7 +66,7 @@ public class BasicTile {
                 ", chunkLocalY=" + chunkLocalY +
                 ", altitude=" + altitude +
                 ", type=" + type +
-                ", spriteId='" + spriteId + '\'' +
+                ", texture=" + texture +
                 '}';
     }
 }

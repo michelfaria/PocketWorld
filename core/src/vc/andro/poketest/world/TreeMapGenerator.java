@@ -11,25 +11,19 @@ public class TreeMapGenerator {
     }
 
     public int getTreeAtPos(int worldX, int worldY) {
-
         final var r = creationParams.treeMapRValue;
-
         double max = 0;
         for (int xn = worldX - r; xn <= worldX + r; xn++) {
             for (int yn = worldY - r; yn <= worldY + r; yn++) {
-           //     if (0 <= yn && yn < height && 0 <= xn && xn < width) {
-                    double e = noiseGenerator.getNoise(xn, yn);
-                    if (e > max) {
-                        max = e;
-           //         }
+                double e = noiseGenerator.getNoise(xn, yn);
+                if (e > max) {
+                    max = e;
                 }
             }
         }
-
         if (noiseGenerator.getNoise(worldX, worldY) == max) {
             return 1;
         }
-
         return 0;
     }
 }

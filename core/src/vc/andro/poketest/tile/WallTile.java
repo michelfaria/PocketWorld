@@ -34,7 +34,7 @@ public class WallTile extends BasicTile {
     }
 
     public void updateWallType(WallType newType) {
-        spriteId = newType.getSpriteId();
+        setSprite(newType.getSpriteId());
         wallType = newType;
     }
 
