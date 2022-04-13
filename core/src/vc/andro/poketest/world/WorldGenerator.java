@@ -14,7 +14,8 @@ import java.util.Random;
 
 import static vc.andro.poketest.tile.WallType.*;
 import static vc.andro.poketest.world.Chunk.CHUNK_SIZE;
-import static vc.andro.poketest.world.World.*;
+import static vc.andro.poketest.world.World.LxWx;
+import static vc.andro.poketest.world.World.LzWz;
 
 public class WorldGenerator {
     public final WorldCreationParams params;
@@ -58,33 +59,43 @@ public class WorldGenerator {
         assert world != null;
         for (int chunkLocalX = 0; chunkLocalX < CHUNK_SIZE; chunkLocalX++) {
             for (int chunkLocalZ = 0; chunkLocalZ < CHUNK_SIZE; chunkLocalZ++) {
-                int worldX = LxWx(chunkX, chunkLocalX);
-                int worldZ = LzWz(chunkZ, chunkLocalZ);
-                int y = altitudeMapGenerator.altitudeAtPos(worldX, worldZ);
-
-                if (y <= world.getCreationParams().waterLevel) {
-                    // Is water tile
-                    world.putTileAt_WP(worldX, y, worldZ, new BasicTile(TileType.WATER));
-                    continue;
-                }
-
-                if (generateWalls(worldX, y, worldZ)) {
-                    // Is wall tile
-                    continue;
-                }
-
-                if (y <= params.beachAltitude) {
-                    // Is sand tile
-                    world.putTileAt_WP(worldX, y, worldZ, new BasicTile(TileType.SAND));
-                    continue;
-                }
-
-                // Spawn grass
-                world.putTileAt_WP(worldX, y, worldZ, new BasicTile(TileType.GRASS));
+                generateTileAtPosition(chunkX, chunkZ, chunkLocalX, chunkLocalZ);
             }
         }
         spawnTrees(chunkX, chunkZ);
         world.updateChunk(chunkX, chunkZ);
+    }
+
+    private void generateTileAtPosition(int chunkX, int chunkZ, int chunkLocalX, int chunkLocalZ) {
+        generateTileAtPosition(chunkX, chunkZ, chunkLocalX, chunkLocalZ, -1);
+    }
+
+    private void generateTileAtPosition(int chunkX, int chunkZ, int chunkLocalX, int chunkLocalZ, int y) {
+        assert world != null;
+        int worldX = LxWx(chunkX, chunkLocalX);
+        int worldZ = LzWz(chunkZ, chunkLocalZ);
+        y = y < 0 ? altitudeMapGenerator.altitudeAtPos(worldX, worldZ) : y;
+
+        if (y <= world.getCreationParams().waterLevel) {
+            // Is water tile
+            world.putTileAt_WP(worldX, y, worldZ, new BasicTile(TileType.WATER));
+            return;
+        }
+
+        if (generateWalls(worldX, y, worldZ)) {
+            // Wall tile generated
+            generateTileAtPosition(chunkX, chunkZ, chunkLocalX, chunkLocalZ, y - 1);
+            return;
+        }
+
+        if (y <= params.beachAltitude) {
+            // Is sand tile
+            world.putTileAt_WP(worldX, y, worldZ, new BasicTile(TileType.SAND));
+            return;
+        }
+
+        // Spawn grass
+        world.putTileAt_WP(worldX, y, worldZ, new BasicTile(TileType.GRASS));
     }
 
     private void spawnTrees(int chunkX, int chunkZ) {

@@ -15,6 +15,8 @@ import vc.andro.poketest.world.World;
 import vc.andro.poketest.world.WorldCreationParams;
 import vc.andro.poketest.world.WorldGenerator;
 
+import java.util.Stack;
+
 import static vc.andro.poketest.PokeTest.TILE_SIZE;
 import static vc.andro.poketest.PokeTest.assetManager;
 import static vc.andro.poketest.world.Chunk.CHUNK_SIZE;
@@ -157,8 +159,23 @@ public class PlayScreen implements Screen {
                 if (surfaceTile == null) {
                     continue;
                 }
-                surfaceTile.draw(spriteBatch);
-                dbgInfo_tilesDrawn++;
+                Stack<BasicTile> drawStack = new Stack<>();
+                drawStack.push(surfaceTile);
+                if (surfaceTile.transparent) {
+                    BasicTile under = world.getTileAt_G_WP(worldX, surfaceTile.y - 1, worldZ);
+                    while(under != null) {
+                        drawStack.push(under);
+                        if (!under.transparent || under.y == 0) {
+                            break;
+                        }
+                        under = world.getTileAt_G_WP(worldX, under.y - 1, worldZ);
+                    }
+                }
+                while (!drawStack.empty()) {
+                    BasicTile tile = drawStack.pop();
+                    tile.draw(spriteBatch);
+                    dbgInfo_tilesDrawn++;
+                }
             }
         }
         spriteBatch.end();
