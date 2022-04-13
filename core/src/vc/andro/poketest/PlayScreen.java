@@ -4,12 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.ScreenUtils;
 import vc.andro.poketest.entity.Entity;
 import vc.andro.poketest.tile.BasicTile;
 import vc.andro.poketest.world.World;
@@ -32,9 +31,7 @@ public class PlayScreen implements Screen {
     private final World world;
     private final SpriteBatch spriteBatch;
     private final ShapeRenderer shapeRenderer;
-    //   private final Player player;
 
-    private boolean freeCam = false;
     private float timeSinceLastTick = 0;
     private int dbgInfo_tilesDrawn = 0;
     private int dbgInfo_iterations = 0;
@@ -45,23 +42,6 @@ public class PlayScreen implements Screen {
         bitmapFont = assetManager.get(Assets.hackFont8pt);
         spriteBatch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
-
-//        player = new Player();
-//        world.addEntity(player);
-        // find random tile player can stand on
-//        var random = new Random();
-//        while (true) {
-//            int x = random.nextInt(1000);
-//            int y = random.nextInt(1000);
-//            BasicTile tile = world.getTileAt(x, y);
-//            if (tile !=null) {
-//            if (tile.canPlayerWalkOnIt()) {
-//                player.setPosition(x, y);
-//                break;
-//            }}
-//        }
-        //pokecam.followEntity = player;
-        pokecam.freeCam = true;
     }
 
     @Override
@@ -91,8 +71,8 @@ public class PlayScreen implements Screen {
         spriteBatch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         spriteBatch.begin();
 
-        int curTileWorldX = (int)pokecam.getPosition().x / TILE_SIZE;
-        int curTileWorldZ = (int)pokecam.getPosition().y / TILE_SIZE;
+        int curTileWorldX = (int) pokecam.getPosition().x / TILE_SIZE;
+        int curTileWorldZ = (int) pokecam.getPosition().y / TILE_SIZE;
 
         for (int wx = curTileWorldX - 10; wx < curTileWorldX + 10; wx++) {
             for (int wz = curTileWorldZ - 10; wz < curTileWorldZ + 10; wz++) {
@@ -100,7 +80,7 @@ public class PlayScreen implements Screen {
                 if (surfaceTile == null) {
                     continue;
                 }
-                Vector3 renderPos = pokecam.project(new Vector3(wx*TILE_SIZE+ 8, wz * TILE_SIZE + 8, 0));
+                Vector3 renderPos = pokecam.project(new Vector3(wx * TILE_SIZE + 8, wz * TILE_SIZE + 8, 0));
                 bitmapFont.draw(spriteBatch, "" + surfaceTile.y, renderPos.x, renderPos.y);
             }
         }
@@ -132,8 +112,8 @@ public class PlayScreen implements Screen {
 
         for (int cx = curChunkX - 5; cx < curChunkX + 5; cx++) {
             for (int cz = curChunkZ - 5; cz < curChunkZ + 5; cz++) {
-                final int renderX = World.CxWx(cx) * TILE_SIZE;
-                final int renderY = World.CzWz(cz) * TILE_SIZE;
+                int renderX = World.CxWx(cx) * TILE_SIZE;
+                int renderY = World.CzWz(cz) * TILE_SIZE;
                 bitmapFont.draw(spriteBatch, "" + cx + ", " + cz, renderX + 5, renderY - 5);
             }
         }
@@ -148,28 +128,28 @@ public class PlayScreen implements Screen {
                 "fps: " + Gdx.graphics.getFramesPerSecond()
                         + ", tiles drawn: " + dbgInfo_tilesDrawn
                         + ", iters: " + dbgInfo_iterations
-                        + ", x: " + pokecam.getPosition().x / TILE_SIZE
-                        + ", y: " + pokecam.getPosition().y / TILE_SIZE,
+                        + ", camPos: " + pokecam.getPosition().toString(),
                 0, 28);
         spriteBatch.end();
     }
 
     private void renderTiles() {
-        pokecam.use();
         dbgInfo_tilesDrawn = 0;
         dbgInfo_iterations = 0;
 
         spriteBatch.setProjectionMatrix(pokecam.getProjectionMatrix());
         spriteBatch.begin();
 
-        Rectangle visibleArea = pokecam.getVisibleArea();
+        int renderDistanceTiles = 8 * CHUNK_SIZE;
+        float camWorldX = pokecam.getPosition().x / TILE_SIZE;
+        float camWorldZ = pokecam.getPosition().y / TILE_SIZE;
 
-        for (int worldX = (int) visibleArea.x / TILE_SIZE - CAMERA_CULL_LEEWAY;
-             worldX < visibleArea.x / TILE_SIZE + visibleArea.width / TILE_SIZE;
+        for (int worldX = (int) (camWorldX - renderDistanceTiles);
+             worldX < camWorldX + renderDistanceTiles;
              worldX++
         ) {
-            for (int worldZ = (int) visibleArea.y / TILE_SIZE - CAMERA_CULL_LEEWAY;
-                 worldZ < visibleArea.y / TILE_SIZE + visibleArea.height / TILE_SIZE;
+            for (int worldZ = (int) (camWorldZ - renderDistanceTiles);
+                 worldZ < camWorldZ + renderDistanceTiles;
                  worldZ++
             ) {
                 dbgInfo_iterations++;
@@ -177,22 +157,14 @@ public class PlayScreen implements Screen {
                 if (surfaceTile == null) {
                     continue;
                 }
-                BasicTile tile = world.getTileAt_G_WP(
-                        worldX,
-                        surfaceTile.y,
-                        worldZ
-                );
-                if (tile != null) {
-                    tile.draw(spriteBatch);
-                    dbgInfo_tilesDrawn++;
-                }
+                surfaceTile.draw(spriteBatch);
+                dbgInfo_tilesDrawn++;
             }
         }
         spriteBatch.end();
     }
 
     private void renderEntities() {
-        pokecam.use();
         spriteBatch.setProjectionMatrix(pokecam.getProjectionMatrix());
         spriteBatch.begin();
         for (Entity entity : world.getEntities()) {
@@ -219,8 +191,7 @@ public class PlayScreen implements Screen {
 
 
     private void clearScreen() {
-        Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        ScreenUtils.clear(0, 0, 0, 1f, true);
     }
 
     @Override
