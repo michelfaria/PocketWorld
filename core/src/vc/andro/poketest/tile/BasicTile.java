@@ -19,6 +19,7 @@ public class BasicTile {
     public Integer chunkLocalX;
     public Integer y;
     public Integer chunkLocalZ;
+    public boolean isTransparent = false;
 
     public TileType type;
     public TextureRegion texture;

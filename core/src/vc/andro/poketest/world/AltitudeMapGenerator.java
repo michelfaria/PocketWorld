@@ -46,8 +46,10 @@ public class AltitudeMapGenerator {
 
         // apply valley factor
         elevation = (float) Math.pow(elevation, creationParams.valleyFactor);
-        // make terraces
-        elevation = (float) Math.round(elevation * creationParams.terraces) / creationParams.terraces;
+        if (creationParams.terraces > 0) {
+            // make terraces
+            elevation = (float) Math.round(elevation * creationParams.terraces) / creationParams.terraces;
+        }
         // adapt elevation to chunk depth
         elevation *= CHUNK_DEPTH;
 
