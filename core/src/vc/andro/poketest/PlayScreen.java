@@ -8,14 +8,10 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader;
-import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -85,7 +81,7 @@ public class PlayScreen implements Screen {
         }
 
         //dbgInfo_renderChunkBorders();
-       // dbgInfo_renderTileYs();
+        // dbgInfo_renderTileYs();
     }
 
     private void renderTiles3D() {
@@ -160,7 +156,8 @@ public class PlayScreen implements Screen {
                         + ", tiles drawn: " + dbgInfo_tilesDrawn
                         + ", iters: " + dbgInfo_iterations
                         + ", camPos: " + pokecam.getPosition().toString()
-                        + ", camRot: " + pokecam.getDirection().toString(),
+                        + ", camRot: " + pokecam.getDirection().toString()
+                        + ", chunksRendered: " + world.getChunksRendered(),
                 0, 28);
         spriteBatch.end();
     }
@@ -234,7 +231,7 @@ public class PlayScreen implements Screen {
         timeSinceLastTick += delta;
         world.update(delta);
         pokecam.update();
-        world.setRenderPosition((int)pokecam.getPosition().x, (int)pokecam.getPosition().z);
+        world.setRenderPosition((int) pokecam.getPosition().x, (int) pokecam.getPosition().z);
     }
 
 

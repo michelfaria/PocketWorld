@@ -24,7 +24,8 @@ public class World implements RenderableProvider {
 
     private int renderX;
     private int renderZ;
-    private int renderDistance = 10;
+    public int renderDistance = 10;
+    private int chunksRendered;
 
     public World(WorldCreationParams creationParams, WorldGenerator worldGenerator) {
         this.creationParams = creationParams;
@@ -235,10 +236,9 @@ public class World implements RenderableProvider {
 
     @Override
     public void getRenderables(Array<Renderable> renderables, Pool<Renderable> pool) {
-        int chunksRendered = 0;
+        chunksRendered = 0;
         int chunkX = WxCx(renderX);
         int chunkZ = WzCz(renderZ);
-
         for (int cx = chunkX - renderDistance; cx < chunkX + renderDistance; cx++) {
             for (int cz = chunkZ - renderDistance; cz < chunkZ + renderDistance; cz++) {
                 Chunk chunk = getChunkAt_G_CP(cx, cz);
@@ -251,14 +251,12 @@ public class World implements RenderableProvider {
                 chunksRendered++;
             }
         }
-        Gdx.app.log("World", "Chunks rendered: " + chunksRendered);
     }
 
     public void setRenderPosition(int renderX, int renderZ) {
         // unload chunks outside of render distance
         int chunkX = WxCx(renderX);
         int chunkZ = WzCz(renderZ);
-
         for (IntMap<Chunk> yMap : chunks.map.values()) {
             Iterator<Chunk> iterChunk = yMap.values().iterator();
             while (iterChunk.hasNext()) {
@@ -270,8 +268,11 @@ public class World implements RenderableProvider {
                 }
             }
         }
-
         this.renderX = renderX;
         this.renderZ = renderZ;
+    }
+
+    public int getChunksRendered() {
+        return chunksRendered;
     }
 }

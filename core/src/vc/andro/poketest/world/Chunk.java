@@ -1,5 +1,6 @@
 package vc.andro.poketest.world;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
@@ -47,6 +48,7 @@ public class Chunk {
     private final Mesh mesh;
     private final Material material;
     public boolean needsRenderingUpdate;
+    public int voxelCount; // Amount of voxels that exist in this chunk
 
     public Chunk(World world, int chunkX, int chunkZ) {
         this.world = world;
@@ -74,14 +76,22 @@ public class Chunk {
         return voxels[chunkLocalX][y][chunkLocalZ];
     }
 
-    public void putTileAt(int chunkLocalX, int y, int chunkLocalZ, BasicTile tile) {
-        tile.world = world;
-        tile.chunk = this;
-        tile.worldX = chunkX * CHUNK_SIZE + chunkLocalX;
-        tile.worldZ = chunkZ * CHUNK_SIZE + chunkLocalZ;
-        tile.y = y;
-        tile.chunkLocalX = chunkLocalX;
-        tile.chunkLocalZ = chunkLocalZ;
+    public void putTileAt(int chunkLocalX, int y, int chunkLocalZ, @Nullable BasicTile tile) {
+        BasicTile previousTile = getTileAt(chunkLocalX, y, chunkLocalZ);
+        if (previousTile == null && tile != null) {
+            voxelCount++;
+        } else if (previousTile != null && tile == null) {
+            voxelCount--;
+        }
+        if (tile != null) {
+            tile.world = world;
+            tile.chunk = this;
+            tile.worldX = chunkX * CHUNK_SIZE + chunkLocalX;
+            tile.worldZ = chunkZ * CHUNK_SIZE + chunkLocalZ;
+            tile.y = y;
+            tile.chunkLocalX = chunkLocalX;
+            tile.chunkLocalZ = chunkLocalZ;
+        }
         voxels[chunkLocalX][y][chunkLocalZ] = tile;
     }
 
@@ -163,10 +173,10 @@ public class Chunk {
                     }
                 }
             }
-            amountVertices = vertexAttributes_i / VERTEX_SIZE;
-            amountVertices = amountVertices / 4 * 6;
+            amountVertices = (vertexAttributes_i / VERTEX_SIZE) / 4 * 6;
             mesh.setVertices(vertexAttributes, 0, vertexAttributes_i);
             needsRenderingUpdate = false;
+            Gdx.app.log("Chunk", "Amount vertices: " + amountVertices);
         }
     }
 
