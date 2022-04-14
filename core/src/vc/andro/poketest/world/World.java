@@ -1,6 +1,5 @@
 package vc.andro.poketest.world;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.RenderableProvider;
 import com.badlogic.gdx.utils.Array;
@@ -261,10 +260,10 @@ public class World implements RenderableProvider {
             Iterator<Chunk> iterChunk = yMap.values().iterator();
             while (iterChunk.hasNext()) {
                 Chunk chunk = iterChunk.next();
-                if (Math.abs(chunkX- chunk.chunkX) > renderDistance
+                if (Math.abs(chunkX - chunk.chunkX) > renderDistance
                         || Math.abs(chunkZ - chunk.chunkZ) > renderDistance) {
                     iterChunk.remove();
-                    System.out.println("removed chunk at ("+chunk.chunkX+","+chunk.chunkZ+")");
+                    System.out.println("removed chunk at (" + chunk.chunkX + "," + chunk.chunkZ + ")");
                 }
             }
         }

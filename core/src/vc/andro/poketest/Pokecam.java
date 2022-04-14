@@ -4,15 +4,20 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import org.jetbrains.annotations.Nullable;
 
 import static vc.andro.poketest.PokeTest.TILE_SIZE;
 
 public class Pokecam {
 
     public static final int CAM_SPEED = 5;
+    private static final boolean doDebugFPSController = true;
+
     private final PerspectiveCamera camera;
+    private final @Nullable FirstPersonCameraController firstPersonCameraController;
 
     public Pokecam(float worldWidth, float worldHeight) {
         camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -20,6 +25,14 @@ public class Pokecam {
         camera.far = 1000f;
         camera.position.set(65, 225, 95);
         camera.lookAt(0, 0, 0);
+
+        if (doDebugFPSController) {
+            firstPersonCameraController = new FirstPersonCameraController(camera);
+            firstPersonCameraController.setVelocity(100);
+            Gdx.input.setInputProcessor(firstPersonCameraController);
+        } else {
+            firstPersonCameraController = null;
+        }
     }
 
     public Matrix4 getProjectionMatrix() {
@@ -40,6 +53,10 @@ public class Pokecam {
     }
 
     private void updatePosition() {
+        if (firstPersonCameraController != null) {
+            firstPersonCameraController.update();
+            return;
+        }
         /*
          * Update camera translation
          */

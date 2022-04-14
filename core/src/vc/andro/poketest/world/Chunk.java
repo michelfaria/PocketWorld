@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
-import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Pool;
 import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.Assets;
@@ -129,42 +128,42 @@ public class Chunk {
                             continue;
                         }
                         if (y < CHUNK_DEPTH - 1) {
-                            if (voxels[x][y + 1][z] == null) {
+                            if (voxels[x][y + 1][z] == null || voxels[x][y + 1][z].transparent) {
                                 voxel.createTopVertices(vertexArray);
                             }
                         } else {
                             voxel.createTopVertices(vertexArray);
                         }
                         if (y > 0) {
-                            if (voxels[x][y - 1][z] == null) {
+                            if (voxels[x][y - 1][z] == null || voxels[x][y - 1][z].transparent) {
                                 voxel.createBottomVertices(vertexArray);
                             }
                         } else {
                             voxel.createBottomVertices(vertexArray);
                         }
                         if (x > 0) {
-                            if (voxels[x - 1][y][z] == null) {
+                            if (voxels[x - 1][y][z] == null || voxels[x - 1][y][z].transparent) {
                                 voxel.createLeftVertices(vertexArray);
                             }
                         } else {
                             voxel.createLeftVertices(vertexArray);
                         }
                         if (x < CHUNK_SIZE - 1) {
-                            if (voxels[x + 1][y][z] == null) {
+                            if (voxels[x + 1][y][z] == null || voxels[x + 1][y][z].transparent) {
                                 voxel.createRightVertices(vertexArray);
                             }
                         } else {
                             voxel.createRightVertices(vertexArray);
                         }
                         if (z > 0) {
-                            if (voxels[x][y][z - 1] == null) {
+                            if (voxels[x][y][z - 1] == null || voxels[x][y][z - 1].transparent) {
                                 voxel.createFrontVertices(vertexArray);
                             }
                         } else {
                             voxel.createFrontVertices(vertexArray);
                         }
                         if (z < CHUNK_SIZE - 1) {
-                            if (voxels[x][y][z + 1] == null) {
+                            if (voxels[x][y][z + 1] == null || voxels[x][y][z + 1].transparent) {
                                 voxel.createBackVertices(vertexArray);
                             }
                         } else {
