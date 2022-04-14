@@ -4,13 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Renderable;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Pool;
 import org.jetbrains.annotations.Nullable;
@@ -18,11 +14,12 @@ import vc.andro.poketest.Assets;
 import vc.andro.poketest.PokeTest;
 import vc.andro.poketest.tile.BasicTile;
 
+import static vc.andro.poketest.world.VertexArray.VERTEX_SIZE;
+
 public class Chunk {
 
     public static final int CHUNK_SIZE = 16; // in tiles
     public static final int CHUNK_DEPTH = 128;
-    private static final int VERTEX_SIZE = 8;
     public static final int VOXELS_PER_CHUNK = CHUNK_SIZE * CHUNK_DEPTH * CHUNK_SIZE;
     public static final int MAX_VERTICES_PER_CHUNK = VOXELS_PER_CHUNK * 6 * 4;
     public static final int INDICES_PER_CHUNK = VOXELS_PER_CHUNK * 6 * 6 / 3;
@@ -48,8 +45,7 @@ public class Chunk {
     public final BasicTile[][][] voxels;
     public int voxelCount; // Amount of voxels that exist in this chunk
 
-    public FloatArray vertexAttributes;
-    public int amountVertices;
+    private VertexArray vertexArray;
     private final Mesh mesh;
     private final Material material;
     public boolean needsRenderingUpdate;
@@ -59,8 +55,7 @@ public class Chunk {
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
         voxels = new BasicTile[CHUNK_SIZE][CHUNK_DEPTH][CHUNK_SIZE];
-        vertexAttributes = new FloatArray();
-        amountVertices = 0;
+        vertexArray = new VertexArray();
         {
             mesh = new Mesh(true, MAX_VERTICES_PER_CHUNK, INDICES_PER_CHUNK,
                     VertexAttribute.Position(),
@@ -125,6 +120,7 @@ public class Chunk {
 
     public void updateVerticesIfDirty() {
         if (needsRenderingUpdate) {
+            vertexArray.clear();
             for (int y = 0; y < CHUNK_DEPTH; y++) {
                 for (int z = 0; z < CHUNK_SIZE; z++) {
                     for (int x = 0; x < CHUNK_SIZE; x++) {
@@ -134,294 +130,55 @@ public class Chunk {
                         }
                         if (y < CHUNK_DEPTH - 1) {
                             if (voxels[x][y + 1][z] == null) {
-                                createTop(voxel);
+                                voxel.createTopVertices(vertexArray);
                             }
                         } else {
-                            createTop(voxel);
+                            voxel.createTopVertices(vertexArray);
                         }
                         if (y > 0) {
                             if (voxels[x][y - 1][z] == null) {
-                                createBottom(voxel);
+                                voxel.createBottomVertices(vertexArray);
                             }
                         } else {
-                            createBottom(voxel);
+                            voxel.createBottomVertices(vertexArray);
                         }
                         if (x > 0) {
                             if (voxels[x - 1][y][z] == null) {
-                                createLeft(voxel);
+                                voxel.createLeftVertices(vertexArray);
                             }
                         } else {
-                            createLeft(voxel);
+                            voxel.createLeftVertices(vertexArray);
                         }
                         if (x < CHUNK_SIZE - 1) {
                             if (voxels[x + 1][y][z] == null) {
-                                createRight(voxel);
+                                voxel.createRightVertices(vertexArray);
                             }
                         } else {
-                            createRight(voxel);
+                            voxel.createRightVertices(vertexArray);
                         }
                         if (z > 0) {
-                            if (voxels[x][y][z - 1] == null) createFront(voxel);
+                            if (voxels[x][y][z - 1] == null) {
+                                voxel.createFrontVertices(vertexArray);
+                            }
                         } else {
-                            createFront(voxel);
+                            voxel.createFrontVertices(vertexArray);
                         }
                         if (z < CHUNK_SIZE - 1) {
                             if (voxels[x][y][z + 1] == null) {
-                                createBack(voxel);
+                                voxel.createBackVertices(vertexArray);
                             }
                         } else {
-                            createBack(voxel);
+                            voxel.createBackVertices(vertexArray);
                         }
                     }
                 }
             }
-            amountVertices = (vertexAttributes.size / VERTEX_SIZE) / 4 * 6;
-            mesh.setVertices(vertexAttributes.items, 0, vertexAttributes.size);
+            mesh.setVertices(vertexArray.getVertices(), 0, vertexArray.getVertices().length);
             needsRenderingUpdate = false;
             Gdx.app.log("Chunk",
-                    "Amount vertices: " + amountVertices
-                            + ", vertexAttributes.size = " + vertexAttributes.size);
+                    "Amount vertices: " + vertexArray.getAmountVertices()
+                            + ", amount attributes: " + vertexArray.getVertices().length);
         }
-    }
-
-    private void createTop(BasicTile tile) {
-        // position
-        vertexAttributes.add(tile.worldX);
-        vertexAttributes.add(tile.y + 1);
-        vertexAttributes.add(tile.worldZ);
-        // normals
-        vertexAttributes.add(0);
-        vertexAttributes.add(1);
-        vertexAttributes.add(0);
-        // texture coords
-        vertexAttributes.add(tile.textureRegion.getU());
-        vertexAttributes.add(tile.textureRegion.getV2());
-
-        // position
-        vertexAttributes.add(tile.worldX + 1);
-        vertexAttributes.add(tile.y + 1);
-        vertexAttributes.add(tile.worldZ);
-        // normals
-        vertexAttributes.add(0);
-        vertexAttributes.add(1);
-        vertexAttributes.add(0);
-        // texture coords
-        vertexAttributes.add(tile.textureRegion.getU2());
-        vertexAttributes.add(tile.textureRegion.getV2());
-
-        // position
-        vertexAttributes.add(tile.worldX + 1);
-        vertexAttributes.add(tile.y + 1);
-        vertexAttributes.add(tile.worldZ + 1);
-        // normals
-        vertexAttributes.add(0);
-        vertexAttributes.add(1);
-        vertexAttributes.add(0);
-        // texture coords
-        vertexAttributes.add(tile.textureRegion.getU2());
-        vertexAttributes.add(tile.textureRegion.getV());
-
-        // position
-        vertexAttributes.add(tile.worldX);
-        vertexAttributes.add(tile.y + 1);
-        vertexAttributes.add(tile.worldZ + 1);
-        // normals
-        vertexAttributes.add(0);
-        vertexAttributes.add(1);
-        vertexAttributes.add(0);
-        // texture coords
-        vertexAttributes.add(tile.textureRegion.getU());
-        vertexAttributes.add(tile.textureRegion.getV());
-    }
-
-    private void createBottom(BasicTile tile) {
-        vertexAttributes.add(tile.worldX);
-        vertexAttributes.add(tile.y);
-        vertexAttributes.add(tile.worldZ);
-        vertexAttributes.add(0);
-        vertexAttributes.add(-1);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0); // TODO: TxCoord
-        vertexAttributes.add(0); // TODO: TxCoord
-
-        vertexAttributes.add(tile.worldX);
-        vertexAttributes.add(tile.y);
-        vertexAttributes.add(tile.worldZ + 1);
-        vertexAttributes.add(0);
-        vertexAttributes.add(-1);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0); // TODO: TxCoord
-        vertexAttributes.add(0); // TODO: TxCoord
-
-        vertexAttributes.add(tile.worldX + 1);
-        vertexAttributes.add(tile.y);
-        vertexAttributes.add(tile.worldZ + 1);
-        vertexAttributes.add(0);
-        vertexAttributes.add(-1);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0); // TODO: TxCoord
-        vertexAttributes.add(0); // TODO: TxCoord
-
-        vertexAttributes.add(tile.worldX + 1);
-        vertexAttributes.add(tile.y);
-        vertexAttributes.add(tile.worldZ);
-        vertexAttributes.add(0);
-        vertexAttributes.add(-1);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0); // TODO: TxCoord
-        vertexAttributes.add(0); // TODO: TxCoord
-    }
-
-    private void createLeft(BasicTile tile) {
-        vertexAttributes.add(tile.worldX);
-        vertexAttributes.add(tile.y);
-        vertexAttributes.add(tile.worldZ);
-        vertexAttributes.add(-1);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0); // TODO: TxCoord
-        vertexAttributes.add(0); // TODO: TxCoord
-
-        vertexAttributes.add(tile.worldX);
-        vertexAttributes.add(tile.y + 1);
-        vertexAttributes.add(tile.worldZ);
-        vertexAttributes.add(-1);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0); // TODO: TxCoord
-        vertexAttributes.add(0); // TODO: TxCoord
-
-        vertexAttributes.add(tile.worldX);
-        vertexAttributes.add(tile.y + 1);
-        vertexAttributes.add(tile.worldZ + 1);
-        vertexAttributes.add(-1);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0); // TODO: TxCoord
-        vertexAttributes.add(0); // TODO: TxCoord
-
-        vertexAttributes.add(tile.worldX);
-        vertexAttributes.add(tile.y);
-        vertexAttributes.add(tile.worldZ + 1);
-        vertexAttributes.add(-1);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0); // TODO: TxCoord
-        vertexAttributes.add(0); // TODO: TxCoord
-    }
-
-    private void createRight(BasicTile tile) {
-        vertexAttributes.add(tile.worldX + 1);
-        vertexAttributes.add(tile.y);
-        vertexAttributes.add(tile.worldZ);
-        vertexAttributes.add(1);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0); // TODO: TxCoord
-        vertexAttributes.add(0); // TODO: TxCoord
-
-        vertexAttributes.add(tile.worldX + 1);
-        vertexAttributes.add(tile.y);
-        vertexAttributes.add(tile.worldZ + 1);
-        vertexAttributes.add(1);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0); // TODO: TxCoord
-        vertexAttributes.add(0); // TODO: TxCoord
-
-        vertexAttributes.add(tile.worldX + 1);
-        vertexAttributes.add(tile.y + 1);
-        vertexAttributes.add(tile.worldZ + 1);
-        vertexAttributes.add(1);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0); // TODO: TxCoord
-        vertexAttributes.add(0); // TODO: TxCoord
-
-        vertexAttributes.add(tile.worldX + 1);
-        vertexAttributes.add(tile.y + 1);
-        vertexAttributes.add(tile.worldZ);
-        vertexAttributes.add(1);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0); // TODO: TxCoord
-        vertexAttributes.add(0); // TODO: TxCoord
-    }
-
-    private void createFront(BasicTile tile) {
-        vertexAttributes.add(tile.worldX);
-        vertexAttributes.add(tile.y);
-        vertexAttributes.add(tile.worldZ);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0);
-        vertexAttributes.add(1);
-        vertexAttributes.add(0); // TODO: TxCoord
-        vertexAttributes.add(0); // TODO: TxCoord
-
-        vertexAttributes.add(tile.worldX + 1);
-        vertexAttributes.add(tile.y);
-        vertexAttributes.add(tile.worldZ);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0);
-        vertexAttributes.add(1);
-        vertexAttributes.add(0); // TODO: TxCoord
-        vertexAttributes.add(0); // TODO: TxCoord
-
-        vertexAttributes.add(tile.worldX + 1);
-        vertexAttributes.add(tile.y + 1);
-        vertexAttributes.add(tile.worldZ);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0);
-        vertexAttributes.add(1);
-        vertexAttributes.add(0); // TODO: TxCoord
-        vertexAttributes.add(0); // TODO: TxCoord
-
-        vertexAttributes.add(tile.worldX);
-        vertexAttributes.add(tile.y + 1);
-        vertexAttributes.add(tile.worldZ);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0);
-        vertexAttributes.add(1);
-        vertexAttributes.add(0); // TODO: TxCoord
-        vertexAttributes.add(0); // TODO: TxCoord
-    }
-
-    private void createBack(BasicTile tile) {
-        vertexAttributes.add(tile.worldX);
-        vertexAttributes.add(tile.y);
-        vertexAttributes.add(tile.worldZ + 1);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0);
-        vertexAttributes.add(-1);
-        vertexAttributes.add(0); // TODO: TxCoord
-        vertexAttributes.add(0); // TODO: TxCoord
-
-        vertexAttributes.add(tile.worldX);
-        vertexAttributes.add(tile.y + 1);
-        vertexAttributes.add(tile.worldZ + 1);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0);
-        vertexAttributes.add(-1);
-        vertexAttributes.add(0); // TODO: TxCoord
-        vertexAttributes.add(0); // TODO: TxCoord
-
-        vertexAttributes.add(tile.worldX + 1);
-        vertexAttributes.add(tile.y + 1);
-        vertexAttributes.add(tile.worldZ + 1);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0);
-        vertexAttributes.add(-1);
-        vertexAttributes.add(0); // TODO: TxCoord
-        vertexAttributes.add(0); // TODO: TxCoord
-
-        vertexAttributes.add(tile.worldX + 1);
-        vertexAttributes.add(tile.y);
-        vertexAttributes.add(tile.worldZ + 1);
-        vertexAttributes.add(0);
-        vertexAttributes.add(0);
-        vertexAttributes.add(-1);
-        vertexAttributes.add(0); // TODO: TxCoord
-        vertexAttributes.add(0); // TODO: TxCoord
     }
 
     public Renderable getRenderable(Pool<Renderable> pool) {
@@ -429,8 +186,12 @@ public class Chunk {
         r.material = material;
         r.meshPart.mesh = mesh;
         r.meshPart.offset = 0;
-        r.meshPart.size = amountVertices;
+        r.meshPart.size = (vertexArray.getVertices().length / VERTEX_SIZE) / 4 * 6;
         r.meshPart.primitiveType = GL20.GL_TRIANGLES;
         return r;
+    }
+
+    public int getAmountVertices() {
+        return vertexArray.getAmountVertices();
     }
 }

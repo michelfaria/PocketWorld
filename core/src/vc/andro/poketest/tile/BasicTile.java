@@ -6,6 +6,7 @@ import vc.andro.poketest.Assets;
 import vc.andro.poketest.PokeTest;
 import vc.andro.poketest.util.AtlasUtil;
 import vc.andro.poketest.world.Chunk;
+import vc.andro.poketest.world.VertexArray;
 import vc.andro.poketest.world.World;
 
 import static vc.andro.poketest.PokeTest.TILE_SIZE;
@@ -53,5 +54,243 @@ public class BasicTile {
 
     public void setSprite(String spriteId) {
         textureRegion = AtlasUtil.findRegion(PokeTest.assetManager.get(Assets.tileAtlas), spriteId);
+    }
+
+    public void createTopVertices(VertexArray vertices) {
+        vertices.addVertex(
+                worldX,                    // x
+                y + 1,                     // y
+                worldZ,                    // z
+                0,                         // normal x
+                1,                         //        y
+                0,                         //        z
+                textureRegion.getU(),      // u
+                textureRegion.getV2()      // v
+        );
+        vertices.addVertex(
+                worldX + 1,                // x
+                y + 1,                     // y
+                worldZ,                    // z
+                0,                         // normal x
+                1,                         //        y
+                0,                         //        z
+                textureRegion.getU2(),     // u
+                textureRegion.getV2()      // v
+        );
+        vertices.addVertex(
+                worldX + 1,                // x
+                y + 1,                     // y
+                worldZ + 1,                // z
+                0,                         // normal x
+                1,                         //        y
+                0,                         //        z
+                textureRegion.getU2(),     // u
+                textureRegion.getV()       // v
+        );
+        vertices.addVertex(
+                worldX,                    // x
+                y + 1,                     // y
+                worldZ + 1,                // z
+                0,                         // normal x
+                1,                         //        y
+                0,                         //        z
+                textureRegion.getU(),      // u
+                textureRegion.getV()       // v
+        );
+    }
+
+    public void createBottomVertices(VertexArray vertices) {
+        vertices.addVertex(
+                worldX,         // x
+                y,              // y
+                worldZ,         // z
+                0,              // normal x
+                -1,             //        y
+                0,              //        z
+                0,              // u
+                0);             // v
+        vertices.addVertex(
+                worldX,         // x
+                y,              // y
+                worldZ + 1,     // z
+                0,              // normal x
+                -1,             //        y
+                0,              //        z
+                0,              // u
+                0);             // v
+        vertices.addVertex(
+                worldX + 1,     // x
+                y,              // y
+                worldZ + 1,     // z
+                0,              // normal x
+                -1,             //        y
+                0,              //        z
+                0,              // u
+                0);             // v
+        vertices.addVertex(
+                worldX + 1,    // x
+                y,             // y
+                worldZ,        // z
+                0,             // normal x
+                -1,            //        y
+                0,             //        z
+                0,             // u
+                0);            // v
+    }
+
+    public void createLeftVertices(VertexArray vertices) {
+        vertices.addVertex(
+                worldX,        // x
+                y,             // y
+                worldZ,        // z
+                -1,            // normal x
+                0,             //        y
+                0,             //        z
+                0,             // u
+                0);            // v
+        vertices.addVertex(
+                worldX,        // x
+                y + 1,         // y
+                worldZ,        // z
+                -1,            // normal x
+                0,             //        y
+                0,             //        z
+                0,             // u
+                0);            // v
+        vertices.addVertex(
+                worldX,        // x
+                y + 1,         // y
+                worldZ + 1,    // z
+                -1,            // normal x
+                0,             //        y
+                0,             //        z
+                0,             // u
+                0);            // v
+        vertices.addVertex(
+                worldX,        // x
+                y,             // y
+                worldZ + 1,    // z
+                -1,            // normal x
+                0,             //        y
+                0,             //        z
+                0,             // u
+                0);            // v
+    }
+
+    public void createRightVertices(VertexArray vertices) {
+        vertices.addVertex(
+                worldX + 1,     // x
+                y,              // y
+                worldZ,         // z
+                1,              // normal x
+                0,              //        y
+                0,              //        z
+                0,              // u
+                0);             // v
+        vertices.addVertex(
+                worldX + 1,     // x
+                y,              // y
+                worldZ + 1,     // z
+                1,              // normal x
+                0,              //        y
+                0,              //        z
+                0,              // u
+                0);             // v
+        vertices.addVertex(
+                worldX + 1,     // x
+                y + 1,          // y
+                worldZ + 1,     // z
+                1,              // normal x
+                0,              //        y
+                0,              //        z
+                0,              // u
+                0);             // v
+        vertices.addVertex(
+                worldX + 1,     // x
+                y + 1,          // y
+                worldZ,         // z
+                1,              // normal x
+                0,              //        y
+                0,              //        z
+                0,              // u
+                0);             // v
+    }
+
+    public void createFrontVertices(VertexArray vertices) {
+        vertices.addVertex(
+                worldX,         // x
+                y,              // y
+                worldZ,         // z
+                0,              // normal x
+                0,              //        y
+                1,              //        z
+                0,              // u
+                0);             // v
+        vertices.addVertex(
+                worldX + 1,     // x
+                y,              // y
+                worldZ,         // z
+                0,              // normal x
+                0,              //        y
+                1,              //        z
+                0,              // u
+                0);             // v
+        vertices.addVertex(
+                worldX + 1,     // x
+                y + 1,          // y
+                worldZ,         // z
+                0,              // normal x
+                0,              //        y
+                1,              //        z
+                0,              // u
+                0);             // v
+        vertices.addVertex(
+                worldX,         // x
+                y + 1,          // y
+                worldZ,         // z
+                0,              // normal x
+                0,              //        y
+                1,              //        z
+                0,              // u
+                0);             // v
+    }
+
+    public void createBackVertices(VertexArray vertices) {
+        vertices.addVertex(
+                worldX,         // x
+                y,              // y
+                worldZ + 1,     // z
+                0,              // normal x
+                0,              //        y
+                -1,             //        z
+                0,              // u
+                0);             // v
+        vertices.addVertex(
+                worldX,         // x
+                y + 1,          // y
+                worldZ + 1,     // z
+                0,              // normal x
+                0,              //        y
+                -1,             //        z
+                0,              // u
+                0);             // v
+        vertices.addVertex(
+                worldX + 1,     // x
+                y + 1,          // y
+                worldZ + 1,     // z
+                0,              // normal x
+                0,              //        y
+                -1,             //        z
+                0,              // u
+                0);             // v
+        vertices.addVertex(
+                worldX + 1,     // x
+                y,              // y
+                worldZ + 1,     // z
+                0,              // normal x
+                0,              //        y
+                -1,             //        z
+                0,              // u
+                0);             // v
     }
 }

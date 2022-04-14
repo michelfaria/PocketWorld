@@ -243,7 +243,7 @@ public class World implements RenderableProvider {
             for (int cz = chunkZ - renderDistance; cz < chunkZ + renderDistance; cz++) {
                 Chunk chunk = getChunkAt_G_CP(cx, cz);
                 chunk.updateVerticesIfDirty();
-                if (chunk.amountVertices == 0) {
+                if (chunk.getAmountVertices() == 0) {
                     return;
                 }
                 Renderable r = chunk.getRenderable(pool);
