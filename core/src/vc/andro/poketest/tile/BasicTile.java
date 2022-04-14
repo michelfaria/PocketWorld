@@ -22,7 +22,7 @@ public class BasicTile {
     public boolean transparent;
 
     public TileType type;
-    public TextureRegion texture;
+    public TextureRegion textureRegion;
 
     public BasicTile(TileType type) {
         this.type = type;
@@ -34,7 +34,7 @@ public class BasicTile {
     }
 
     protected void draw(SpriteBatch spriteBatch, int atX, int atZ) {
-        spriteBatch.draw(texture, atX * TILE_SIZE, atZ * TILE_SIZE);
+        spriteBatch.draw(textureRegion, atX * TILE_SIZE, atZ * TILE_SIZE);
     }
 
     public void doTileUpdate() {
@@ -52,6 +52,6 @@ public class BasicTile {
     }
 
     public void setSprite(String spriteId) {
-        texture = AtlasUtil.findRegion(PokeTest.assetManager.get(Assets.tileAtlas), spriteId);
+        textureRegion = AtlasUtil.findRegion(PokeTest.assetManager.get(Assets.tileAtlas), spriteId);
     }
 }

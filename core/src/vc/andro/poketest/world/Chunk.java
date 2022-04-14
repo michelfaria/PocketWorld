@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
@@ -21,12 +22,12 @@ public class Chunk {
 
     public static final int CHUNK_SIZE = 16; // in tiles
     public static final int CHUNK_DEPTH = 128;
-    private static final int VERTEX_SIZE = 6;
+    private static final int VERTEX_SIZE = 8;
     public static final int VOXELS_PER_CHUNK = CHUNK_SIZE * CHUNK_DEPTH * CHUNK_SIZE;
     public static final int MAX_VERTICES_PER_CHUNK = VOXELS_PER_CHUNK * 6 * 4;
     public static final int INDICES_PER_CHUNK = VOXELS_PER_CHUNK * 6 * 6 / 3;
 
-    private static short[] INDICES = new short[INDICES_PER_CHUNK];
+    private static final short[] INDICES = new short[INDICES_PER_CHUNK];
 
     static {
         short j = 0;
@@ -48,7 +49,7 @@ public class Chunk {
     public int voxelCount; // Amount of voxels that exist in this chunk
 
     public FloatArray vertexAttributes;
-    private final Vector3 worldOffsetPos;
+    private final Vector3 worldOffsetPos; // TODO: Replace this
     public int amountVertices;
     private final Mesh mesh;
     private final Material material;
@@ -63,15 +64,15 @@ public class Chunk {
         worldOffsetPos = new Vector3(World.CxWx(chunkX), 0, World.CzWz(chunkZ));
         amountVertices = 0;
         {
-            mesh = new Mesh(true, MAX_VERTICES_PER_CHUNK, INDICES_PER_CHUNK, VertexAttribute.Position(), VertexAttribute.Normal());
+            mesh = new Mesh(true, MAX_VERTICES_PER_CHUNK, INDICES_PER_CHUNK,
+                    VertexAttribute.Position(),
+                    VertexAttribute.Normal(),
+                    VertexAttribute.TexCoords(0));
             mesh.setIndices(INDICES);
         }
         material = new Material(
-                new ColorAttribute(ColorAttribute.Diffuse,
-                        MathUtils.random(0.5f, 1.0f),
-                        MathUtils.random(0.5f, 1.0f),
-                        MathUtils.random(0.5f, 1.0f), 1),
-                new TextureAttribute(TextureAttribute.Diffuse, PokeTest.assetManager.get(Assets.tileAtlas).getTextures().first()));
+                new TextureAttribute(TextureAttribute.Diffuse,
+                        PokeTest.assetManager.get(Assets.tileAtlas).getTextures().first()));
         needsRenderingUpdate = true;
     }
 
@@ -135,10 +136,10 @@ public class Chunk {
                         }
                         if (y < CHUNK_DEPTH - 1) {
                             if (voxels[x][y + 1][z] == null) {
-                                createTop(x, y, z);
+                                createTop(x, y, z, voxel.textureRegion);
                             }
                         } else {
-                            createTop(x, y, z);
+                            createTop(x, y, z, voxel.textureRegion);
                         }
                         if (y > 0) {
                             if (voxels[x][y - 1][z] == null) {
@@ -185,34 +186,54 @@ public class Chunk {
         }
     }
 
-    private void createTop(int x, int y, int z) {
+    private void createTop(int x, int y, int z, TextureRegion r) {
+        // position
         vertexAttributes.add(worldOffsetPos.x + x);
         vertexAttributes.add(worldOffsetPos.y + y + 1);
         vertexAttributes.add(worldOffsetPos.z + z);
+        // normals
         vertexAttributes.add(0);
         vertexAttributes.add(1);
         vertexAttributes.add(0);
+        // texture coords
+        vertexAttributes.add(r.getU());
+        vertexAttributes.add(r.getV2());
 
+        // position
         vertexAttributes.add(worldOffsetPos.x + x + 1);
         vertexAttributes.add(worldOffsetPos.y + y + 1);
         vertexAttributes.add(worldOffsetPos.z + z);
+        // normals
         vertexAttributes.add(0);
         vertexAttributes.add(1);
         vertexAttributes.add(0);
+        // texture coords
+        vertexAttributes.add(r.getU2());
+        vertexAttributes.add(r.getV2());
 
+        // position
         vertexAttributes.add(worldOffsetPos.x + x + 1);
         vertexAttributes.add(worldOffsetPos.y + y + 1);
         vertexAttributes.add(worldOffsetPos.z + z + 1);
+        // normals
         vertexAttributes.add(0);
         vertexAttributes.add(1);
         vertexAttributes.add(0);
+        // texture coords
+        vertexAttributes.add(r.getU2());
+        vertexAttributes.add(r.getV());
 
+        // position
         vertexAttributes.add(worldOffsetPos.x + x);
         vertexAttributes.add(worldOffsetPos.y + y + 1);
         vertexAttributes.add(worldOffsetPos.z + z + 1);
+        // normals
         vertexAttributes.add(0);
         vertexAttributes.add(1);
         vertexAttributes.add(0);
+        // texture coords
+        vertexAttributes.add(r.getU());
+        vertexAttributes.add(r.getV());
     }
 
     private void createBottom(int x, int y, int z) {
@@ -222,6 +243,8 @@ public class Chunk {
         vertexAttributes.add(0);
         vertexAttributes.add(-1);
         vertexAttributes.add(0);
+        vertexAttributes.add(0); // TODO: TxCoord
+        vertexAttributes.add(0); // TODO: TxCoord
 
         vertexAttributes.add(worldOffsetPos.x + x);
         vertexAttributes.add(worldOffsetPos.y + y);
@@ -229,6 +252,8 @@ public class Chunk {
         vertexAttributes.add(0);
         vertexAttributes.add(-1);
         vertexAttributes.add(0);
+        vertexAttributes.add(0); // TODO: TxCoord
+        vertexAttributes.add(0); // TODO: TxCoord
 
         vertexAttributes.add(worldOffsetPos.x + x + 1);
         vertexAttributes.add(worldOffsetPos.y + y);
@@ -236,6 +261,8 @@ public class Chunk {
         vertexAttributes.add(0);
         vertexAttributes.add(-1);
         vertexAttributes.add(0);
+        vertexAttributes.add(0); // TODO: TxCoord
+        vertexAttributes.add(0); // TODO: TxCoord
 
         vertexAttributes.add(worldOffsetPos.x + x + 1);
         vertexAttributes.add(worldOffsetPos.y + y);
@@ -243,6 +270,8 @@ public class Chunk {
         vertexAttributes.add(0);
         vertexAttributes.add(-1);
         vertexAttributes.add(0);
+        vertexAttributes.add(0); // TODO: TxCoord
+        vertexAttributes.add(0); // TODO: TxCoord
     }
 
     private void createLeft(int x, int y, int z) {
@@ -252,6 +281,8 @@ public class Chunk {
         vertexAttributes.add(-1);
         vertexAttributes.add(0);
         vertexAttributes.add(0);
+        vertexAttributes.add(0); // TODO: TxCoord
+        vertexAttributes.add(0); // TODO: TxCoord
 
         vertexAttributes.add(worldOffsetPos.x + x);
         vertexAttributes.add(worldOffsetPos.y + y + 1);
@@ -259,6 +290,8 @@ public class Chunk {
         vertexAttributes.add(-1);
         vertexAttributes.add(0);
         vertexAttributes.add(0);
+        vertexAttributes.add(0); // TODO: TxCoord
+        vertexAttributes.add(0); // TODO: TxCoord
 
         vertexAttributes.add(worldOffsetPos.x + x);
         vertexAttributes.add(worldOffsetPos.y + y + 1);
@@ -266,6 +299,8 @@ public class Chunk {
         vertexAttributes.add(-1);
         vertexAttributes.add(0);
         vertexAttributes.add(0);
+        vertexAttributes.add(0); // TODO: TxCoord
+        vertexAttributes.add(0); // TODO: TxCoord
 
         vertexAttributes.add(worldOffsetPos.x + x);
         vertexAttributes.add(worldOffsetPos.y + y);
@@ -273,6 +308,8 @@ public class Chunk {
         vertexAttributes.add(-1);
         vertexAttributes.add(0);
         vertexAttributes.add(0);
+        vertexAttributes.add(0); // TODO: TxCoord
+        vertexAttributes.add(0); // TODO: TxCoord
     }
 
     private void createRight(int x, int y, int z) {
@@ -282,6 +319,8 @@ public class Chunk {
         vertexAttributes.add(1);
         vertexAttributes.add(0);
         vertexAttributes.add(0);
+        vertexAttributes.add(0); // TODO: TxCoord
+        vertexAttributes.add(0); // TODO: TxCoord
 
         vertexAttributes.add(worldOffsetPos.x + x + 1);
         vertexAttributes.add(worldOffsetPos.y + y);
@@ -289,6 +328,8 @@ public class Chunk {
         vertexAttributes.add(1);
         vertexAttributes.add(0);
         vertexAttributes.add(0);
+        vertexAttributes.add(0); // TODO: TxCoord
+        vertexAttributes.add(0); // TODO: TxCoord
 
         vertexAttributes.add(worldOffsetPos.x + x + 1);
         vertexAttributes.add(worldOffsetPos.y + y + 1);
@@ -296,6 +337,8 @@ public class Chunk {
         vertexAttributes.add(1);
         vertexAttributes.add(0);
         vertexAttributes.add(0);
+        vertexAttributes.add(0); // TODO: TxCoord
+        vertexAttributes.add(0); // TODO: TxCoord
 
         vertexAttributes.add(worldOffsetPos.x + x + 1);
         vertexAttributes.add(worldOffsetPos.y + y + 1);
@@ -303,6 +346,8 @@ public class Chunk {
         vertexAttributes.add(1);
         vertexAttributes.add(0);
         vertexAttributes.add(0);
+        vertexAttributes.add(0); // TODO: TxCoord
+        vertexAttributes.add(0); // TODO: TxCoord
     }
 
     private void createFront(int x, int y, int z) {
@@ -312,6 +357,8 @@ public class Chunk {
         vertexAttributes.add(0);
         vertexAttributes.add(0);
         vertexAttributes.add(1);
+        vertexAttributes.add(0); // TODO: TxCoord
+        vertexAttributes.add(0); // TODO: TxCoord
 
         vertexAttributes.add(worldOffsetPos.x + x + 1);
         vertexAttributes.add(worldOffsetPos.y + y);
@@ -319,6 +366,8 @@ public class Chunk {
         vertexAttributes.add(0);
         vertexAttributes.add(0);
         vertexAttributes.add(1);
+        vertexAttributes.add(0); // TODO: TxCoord
+        vertexAttributes.add(0); // TODO: TxCoord
 
         vertexAttributes.add(worldOffsetPos.x + x + 1);
         vertexAttributes.add(worldOffsetPos.y + y + 1);
@@ -326,6 +375,8 @@ public class Chunk {
         vertexAttributes.add(0);
         vertexAttributes.add(0);
         vertexAttributes.add(1);
+        vertexAttributes.add(0); // TODO: TxCoord
+        vertexAttributes.add(0); // TODO: TxCoord
 
         vertexAttributes.add(worldOffsetPos.x + x);
         vertexAttributes.add(worldOffsetPos.y + y + 1);
@@ -333,6 +384,8 @@ public class Chunk {
         vertexAttributes.add(0);
         vertexAttributes.add(0);
         vertexAttributes.add(1);
+        vertexAttributes.add(0); // TODO: TxCoord
+        vertexAttributes.add(0); // TODO: TxCoord
     }
 
     private void createBack(int x, int y, int z) {
@@ -342,6 +395,8 @@ public class Chunk {
         vertexAttributes.add(0);
         vertexAttributes.add(0);
         vertexAttributes.add(-1);
+        vertexAttributes.add(0); // TODO: TxCoord
+        vertexAttributes.add(0); // TODO: TxCoord
 
         vertexAttributes.add(worldOffsetPos.x + x);
         vertexAttributes.add(worldOffsetPos.y + y + 1);
@@ -349,6 +404,8 @@ public class Chunk {
         vertexAttributes.add(0);
         vertexAttributes.add(0);
         vertexAttributes.add(-1);
+        vertexAttributes.add(0); // TODO: TxCoord
+        vertexAttributes.add(0); // TODO: TxCoord
 
         vertexAttributes.add(worldOffsetPos.x + x + 1);
         vertexAttributes.add(worldOffsetPos.y + y + 1);
@@ -356,6 +413,8 @@ public class Chunk {
         vertexAttributes.add(0);
         vertexAttributes.add(0);
         vertexAttributes.add(-1);
+        vertexAttributes.add(0); // TODO: TxCoord
+        vertexAttributes.add(0); // TODO: TxCoord
 
         vertexAttributes.add(worldOffsetPos.x + x + 1);
         vertexAttributes.add(worldOffsetPos.y + y);
@@ -363,6 +422,8 @@ public class Chunk {
         vertexAttributes.add(0);
         vertexAttributes.add(0);
         vertexAttributes.add(-1);
+        vertexAttributes.add(0); // TODO: TxCoord
+        vertexAttributes.add(0); // TODO: TxCoord
     }
 
     public Renderable getRenderable(Pool<Renderable> pool) {
