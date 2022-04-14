@@ -7,11 +7,14 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Pool;
 import org.jetbrains.annotations.Nullable;
+import vc.andro.poketest.Assets;
+import vc.andro.poketest.PokeTest;
 import vc.andro.poketest.tile.BasicTile;
 
 public class Chunk {
@@ -42,13 +45,14 @@ public class Chunk {
     public final int chunkX;
     public final int chunkZ;
     public final BasicTile[][][] voxels;
+    public int voxelCount; // Amount of voxels that exist in this chunk
+
     public FloatArray vertexAttributes;
     private final Vector3 worldOffsetPos;
     public int amountVertices;
     private final Mesh mesh;
     private final Material material;
     public boolean needsRenderingUpdate;
-    public int voxelCount; // Amount of voxels that exist in this chunk
 
     public Chunk(World world, int chunkX, int chunkZ) {
         this.world = world;
@@ -66,7 +70,8 @@ public class Chunk {
                 new ColorAttribute(ColorAttribute.Diffuse,
                         MathUtils.random(0.5f, 1.0f),
                         MathUtils.random(0.5f, 1.0f),
-                        MathUtils.random(0.5f, 1.0f), 1));
+                        MathUtils.random(0.5f, 1.0f), 1),
+                new TextureAttribute(TextureAttribute.Diffuse, PokeTest.assetManager.get(Assets.tileAtlas).getTextures().first()));
         needsRenderingUpdate = true;
     }
 
@@ -176,7 +181,7 @@ public class Chunk {
             needsRenderingUpdate = false;
             Gdx.app.log("Chunk",
                     "Amount vertices: " + amountVertices
-                    + ", vertexAttributes.size = " + vertexAttributes.size);
+                            + ", vertexAttributes.size = " + vertexAttributes.size);
         }
     }
 

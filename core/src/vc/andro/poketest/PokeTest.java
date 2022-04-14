@@ -13,7 +13,8 @@ public class PokeTest extends Game {
     @Override
     public void create() {
         assetManager = new AssetManager();
-        assetManager.load(Assets.textureAtlas);
+        assetManager.load(Assets.tileAtlas);
+        assetManager.load(Assets.entityAtlas);
         assetManager.load(Assets.hackFont8pt);
         assetManager.finishLoading();
         setScreen(new PlayScreen(new WorldCreationParams()));

@@ -33,20 +33,32 @@ public class Player extends Entity {
     private float animationTime;
 
     public Player() {
-        super("player/idle-down");
+        super("entity/player/idle-down");
         direction = Direction.SOUTH;
 
-        final TextureAtlas textureAtlas = PokeTest.assetManager.get(Assets.textureAtlas);
+        TextureAtlas textureAtlas = PokeTest.assetManager.get(Assets.entityAtlas);
 
-        idleUp = AtlasUtil.findRegion(textureAtlas, "player/idle-up");
-        idleDown = AtlasUtil.findRegion(textureAtlas, "player/idle-down");
-        idleLeft = AtlasUtil.findRegion(textureAtlas, "player/idle-left");
-        idleRight = AtlasUtil.findRegion(textureAtlas, "player/idle-right");
+        idleUp = AtlasUtil.findRegion(textureAtlas, "entity/player/idle-up");
+        idleDown = AtlasUtil.findRegion(textureAtlas, "entity/player/idle-down");
+        idleLeft = AtlasUtil.findRegion(textureAtlas, "entity/player/idle-left");
+        idleRight = AtlasUtil.findRegion(textureAtlas, "entity/player/idle-right");
 
-        walkLeftAnimation = new Animation<>(WALK_ANIMATION_FRAME_DURATION, AtlasUtil.findRegions(textureAtlas, "player/walk-left"), Animation.PlayMode.LOOP_PINGPONG);
-        walkUpAnimation = new Animation<>(WALK_ANIMATION_FRAME_DURATION, AtlasUtil.findRegions(textureAtlas, "player/walk-up"), Animation.PlayMode.LOOP_PINGPONG);
-        walkDownAnimation = new Animation<>(WALK_ANIMATION_FRAME_DURATION, AtlasUtil.findRegions(textureAtlas, "player/walk-down"), Animation.PlayMode.LOOP_PINGPONG);
-        walkRightAnimation = new Animation<>(WALK_ANIMATION_FRAME_DURATION, AtlasUtil.findRegions(textureAtlas, "player/walk-right"), Animation.PlayMode.LOOP_PINGPONG);
+        walkLeftAnimation = new Animation<>(
+                WALK_ANIMATION_FRAME_DURATION,
+                AtlasUtil.findRegions(textureAtlas, "entity/player/walk-left"),
+                Animation.PlayMode.LOOP_PINGPONG);
+        walkUpAnimation = new Animation<>(
+                WALK_ANIMATION_FRAME_DURATION,
+                AtlasUtil.findRegions(textureAtlas, "entity/player/walk-up"),
+                Animation.PlayMode.LOOP_PINGPONG);
+        walkDownAnimation = new Animation<>(
+                WALK_ANIMATION_FRAME_DURATION,
+                AtlasUtil.findRegions(textureAtlas, "entity/player/walk-down"),
+                Animation.PlayMode.LOOP_PINGPONG);
+        walkRightAnimation = new Animation<>(
+                WALK_ANIMATION_FRAME_DURATION,
+                AtlasUtil.findRegions(textureAtlas, "entity/player/walk-right"),
+                Animation.PlayMode.LOOP_PINGPONG);
     }
 
     @Override

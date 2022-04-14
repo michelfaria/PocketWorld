@@ -52,6 +52,6 @@ public class BasicTile {
     }
 
     public void setSprite(String spriteId) {
-        texture = AtlasUtil.findRegion(PokeTest.assetManager.get(Assets.textureAtlas), spriteId);
+        texture = AtlasUtil.findRegion(PokeTest.assetManager.get(Assets.tileAtlas), spriteId);
     }
 }

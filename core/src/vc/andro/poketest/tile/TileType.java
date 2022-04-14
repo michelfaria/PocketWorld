@@ -1,10 +1,10 @@
 package vc.andro.poketest.tile;
 
 public enum TileType {
-    GRASS("grass", true, true),
-    WALL("wall-bottom-edge", false, false),
-    WATER("water", true, false),
-    SAND("sand", true, true);
+    GRASS("tile/grass", true, true),
+    WALL("tile/wall-bottom-edge", false, false),
+    WATER("tile/water", true, false),
+    SAND("tile/sand", true, true);
 
     public final String defaultSpriteId;
     public final boolean isFlatTile;

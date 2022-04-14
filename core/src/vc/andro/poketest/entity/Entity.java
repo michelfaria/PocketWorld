@@ -19,7 +19,7 @@ public class Entity {
     }
 
     public void draw(SpriteBatch spriteBatch) {
-        TextureRegion sprite = AtlasUtil.findRegion(PokeTest.assetManager.get(Assets.textureAtlas), spriteId);
+        TextureRegion sprite = AtlasUtil.findRegion(PokeTest.assetManager.get(Assets.entityAtlas), spriteId);
         draw(spriteBatch, sprite);
     }
 
