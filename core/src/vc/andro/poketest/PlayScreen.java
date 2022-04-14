@@ -236,7 +236,7 @@ public class PlayScreen implements Screen {
 
 
     private void clearScreen() {
-        ScreenUtils.clear(0, 0, 0, 1f, true);
+        ScreenUtils.clear(0.74f, 0.98f, 0.98f, 1f, true);
     }
 
     @Override

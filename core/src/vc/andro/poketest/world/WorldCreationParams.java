@@ -29,7 +29,8 @@ public class WorldCreationParams {
     public final int altitudeOffset;
 
     public WorldCreationParams(int seed, int waterLevel, int terraces, int beachAltitude,
-                               int treeMapRValue, boolean islandMode, float valleyFactor, float islandModeSize, float altitudeMapFrequency, int altitudeMapOctaves, int altitudeOffset) {
+                               int treeMapRValue, boolean islandMode, float valleyFactor, float islandModeSize,
+                               float altitudeMapFrequency, int altitudeMapOctaves, int altitudeOffset) {
         this.seed = seed;
         this.waterLevel = waterLevel;
         this.terraces = terraces;
