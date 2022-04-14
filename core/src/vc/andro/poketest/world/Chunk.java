@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Pool;
 import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.tile.BasicTile;
@@ -41,8 +42,7 @@ public class Chunk {
     public final int chunkX;
     public final int chunkZ;
     public final BasicTile[][][] voxels;
-    public float[] vertexAttributes;
-    private int vertexAttributes_i;
+    public FloatArray vertexAttributes;
     private final Vector3 worldOffsetPos;
     public int amountVertices;
     private final Mesh mesh;
@@ -55,8 +55,7 @@ public class Chunk {
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
         voxels = new BasicTile[CHUNK_SIZE][CHUNK_DEPTH][CHUNK_SIZE];
-        vertexAttributes = new float[VERTEX_SIZE * VERTEX_SIZE * VOXELS_PER_CHUNK];
-        vertexAttributes_i = 0;
+        vertexAttributes = new FloatArray();
         worldOffsetPos = new Vector3(World.CxWx(chunkX), 0, World.CzWz(chunkZ));
         amountVertices = 0;
         {
@@ -122,7 +121,6 @@ public class Chunk {
 
     public void updateVerticesIfDirty() {
         if (needsRenderingUpdate) {
-            vertexAttributes_i = 0;
             for (int y = 0; y < CHUNK_DEPTH; y++) {
                 for (int z = 0; z < CHUNK_SIZE; z++) {
                     for (int x = 0; x < CHUNK_SIZE; x++) {
@@ -173,191 +171,193 @@ public class Chunk {
                     }
                 }
             }
-            amountVertices = (vertexAttributes_i / VERTEX_SIZE) / 4 * 6;
-            mesh.setVertices(vertexAttributes, 0, vertexAttributes_i);
+            amountVertices = (vertexAttributes.size / VERTEX_SIZE) / 4 * 6;
+            mesh.setVertices(vertexAttributes.items, 0, vertexAttributes.size);
             needsRenderingUpdate = false;
-            Gdx.app.log("Chunk", "Amount vertices: " + amountVertices);
+            Gdx.app.log("Chunk",
+                    "Amount vertices: " + amountVertices
+                    + ", vertexAttributes.size = " + vertexAttributes.size);
         }
     }
 
     private void createTop(int x, int y, int z) {
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.x + x;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.y + y + 1;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.z + z;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = 1;
-        vertexAttributes[vertexAttributes_i++] = 0;
+        vertexAttributes.add(worldOffsetPos.x + x);
+        vertexAttributes.add(worldOffsetPos.y + y + 1);
+        vertexAttributes.add(worldOffsetPos.z + z);
+        vertexAttributes.add(0);
+        vertexAttributes.add(1);
+        vertexAttributes.add(0);
 
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.x + x + 1;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.y + y + 1;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.z + z;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = 1;
-        vertexAttributes[vertexAttributes_i++] = 0;
+        vertexAttributes.add(worldOffsetPos.x + x + 1);
+        vertexAttributes.add(worldOffsetPos.y + y + 1);
+        vertexAttributes.add(worldOffsetPos.z + z);
+        vertexAttributes.add(0);
+        vertexAttributes.add(1);
+        vertexAttributes.add(0);
 
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.x + x + 1;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.y + y + 1;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.z + z + 1;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = 1;
-        vertexAttributes[vertexAttributes_i++] = 0;
+        vertexAttributes.add(worldOffsetPos.x + x + 1);
+        vertexAttributes.add(worldOffsetPos.y + y + 1);
+        vertexAttributes.add(worldOffsetPos.z + z + 1);
+        vertexAttributes.add(0);
+        vertexAttributes.add(1);
+        vertexAttributes.add(0);
 
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.x + x;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.y + y + 1;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.z + z + 1;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = 1;
-        vertexAttributes[vertexAttributes_i++] = 0;
+        vertexAttributes.add(worldOffsetPos.x + x);
+        vertexAttributes.add(worldOffsetPos.y + y + 1);
+        vertexAttributes.add(worldOffsetPos.z + z + 1);
+        vertexAttributes.add(0);
+        vertexAttributes.add(1);
+        vertexAttributes.add(0);
     }
 
     private void createBottom(int x, int y, int z) {
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.x + x;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.y + y;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.z + z;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = -1;
-        vertexAttributes[vertexAttributes_i++] = 0;
+        vertexAttributes.add(worldOffsetPos.x + x);
+        vertexAttributes.add(worldOffsetPos.y + y);
+        vertexAttributes.add(worldOffsetPos.z + z);
+        vertexAttributes.add(0);
+        vertexAttributes.add(-1);
+        vertexAttributes.add(0);
 
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.x + x;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.y + y;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.z + z + 1;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = -1;
-        vertexAttributes[vertexAttributes_i++] = 0;
+        vertexAttributes.add(worldOffsetPos.x + x);
+        vertexAttributes.add(worldOffsetPos.y + y);
+        vertexAttributes.add(worldOffsetPos.z + z + 1);
+        vertexAttributes.add(0);
+        vertexAttributes.add(-1);
+        vertexAttributes.add(0);
 
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.x + x + 1;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.y + y;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.z + z + 1;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = -1;
-        vertexAttributes[vertexAttributes_i++] = 0;
+        vertexAttributes.add(worldOffsetPos.x + x + 1);
+        vertexAttributes.add(worldOffsetPos.y + y);
+        vertexAttributes.add(worldOffsetPos.z + z + 1);
+        vertexAttributes.add(0);
+        vertexAttributes.add(-1);
+        vertexAttributes.add(0);
 
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.x + x + 1;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.y + y;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.z + z;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = -1;
-        vertexAttributes[vertexAttributes_i++] = 0;
+        vertexAttributes.add(worldOffsetPos.x + x + 1);
+        vertexAttributes.add(worldOffsetPos.y + y);
+        vertexAttributes.add(worldOffsetPos.z + z);
+        vertexAttributes.add(0);
+        vertexAttributes.add(-1);
+        vertexAttributes.add(0);
     }
 
     private void createLeft(int x, int y, int z) {
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.x + x;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.y + y;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.z + z;
-        vertexAttributes[vertexAttributes_i++] = -1;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = 0;
+        vertexAttributes.add(worldOffsetPos.x + x);
+        vertexAttributes.add(worldOffsetPos.y + y);
+        vertexAttributes.add(worldOffsetPos.z + z);
+        vertexAttributes.add(-1);
+        vertexAttributes.add(0);
+        vertexAttributes.add(0);
 
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.x + x;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.y + y + 1;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.z + z;
-        vertexAttributes[vertexAttributes_i++] = -1;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = 0;
+        vertexAttributes.add(worldOffsetPos.x + x);
+        vertexAttributes.add(worldOffsetPos.y + y + 1);
+        vertexAttributes.add(worldOffsetPos.z + z);
+        vertexAttributes.add(-1);
+        vertexAttributes.add(0);
+        vertexAttributes.add(0);
 
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.x + x;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.y + y + 1;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.z + z + 1;
-        vertexAttributes[vertexAttributes_i++] = -1;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = 0;
+        vertexAttributes.add(worldOffsetPos.x + x);
+        vertexAttributes.add(worldOffsetPos.y + y + 1);
+        vertexAttributes.add(worldOffsetPos.z + z + 1);
+        vertexAttributes.add(-1);
+        vertexAttributes.add(0);
+        vertexAttributes.add(0);
 
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.x + x;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.y + y;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.z + z + 1;
-        vertexAttributes[vertexAttributes_i++] = -1;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = 0;
+        vertexAttributes.add(worldOffsetPos.x + x);
+        vertexAttributes.add(worldOffsetPos.y + y);
+        vertexAttributes.add(worldOffsetPos.z + z + 1);
+        vertexAttributes.add(-1);
+        vertexAttributes.add(0);
+        vertexAttributes.add(0);
     }
 
     private void createRight(int x, int y, int z) {
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.x + x + 1;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.y + y;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.z + z;
-        vertexAttributes[vertexAttributes_i++] = 1;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = 0;
+        vertexAttributes.add(worldOffsetPos.x + x + 1);
+        vertexAttributes.add(worldOffsetPos.y + y);
+        vertexAttributes.add(worldOffsetPos.z + z);
+        vertexAttributes.add(1);
+        vertexAttributes.add(0);
+        vertexAttributes.add(0);
 
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.x + x + 1;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.y + y;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.z + z + 1;
-        vertexAttributes[vertexAttributes_i++] = 1;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = 0;
+        vertexAttributes.add(worldOffsetPos.x + x + 1);
+        vertexAttributes.add(worldOffsetPos.y + y);
+        vertexAttributes.add(worldOffsetPos.z + z + 1);
+        vertexAttributes.add(1);
+        vertexAttributes.add(0);
+        vertexAttributes.add(0);
 
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.x + x + 1;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.y + y + 1;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.z + z + 1;
-        vertexAttributes[vertexAttributes_i++] = 1;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = 0;
+        vertexAttributes.add(worldOffsetPos.x + x + 1);
+        vertexAttributes.add(worldOffsetPos.y + y + 1);
+        vertexAttributes.add(worldOffsetPos.z + z + 1);
+        vertexAttributes.add(1);
+        vertexAttributes.add(0);
+        vertexAttributes.add(0);
 
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.x + x + 1;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.y + y + 1;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.z + z;
-        vertexAttributes[vertexAttributes_i++] = 1;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = 0;
+        vertexAttributes.add(worldOffsetPos.x + x + 1);
+        vertexAttributes.add(worldOffsetPos.y + y + 1);
+        vertexAttributes.add(worldOffsetPos.z + z);
+        vertexAttributes.add(1);
+        vertexAttributes.add(0);
+        vertexAttributes.add(0);
     }
 
     private void createFront(int x, int y, int z) {
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.x + x;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.y + y;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.z + z;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = 1;
+        vertexAttributes.add(worldOffsetPos.x + x);
+        vertexAttributes.add(worldOffsetPos.y + y);
+        vertexAttributes.add(worldOffsetPos.z + z);
+        vertexAttributes.add(0);
+        vertexAttributes.add(0);
+        vertexAttributes.add(1);
 
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.x + x + 1;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.y + y;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.z + z;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = 1;
+        vertexAttributes.add(worldOffsetPos.x + x + 1);
+        vertexAttributes.add(worldOffsetPos.y + y);
+        vertexAttributes.add(worldOffsetPos.z + z);
+        vertexAttributes.add(0);
+        vertexAttributes.add(0);
+        vertexAttributes.add(1);
 
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.x + x + 1;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.y + y + 1;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.z + z;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = 1;
+        vertexAttributes.add(worldOffsetPos.x + x + 1);
+        vertexAttributes.add(worldOffsetPos.y + y + 1);
+        vertexAttributes.add(worldOffsetPos.z + z);
+        vertexAttributes.add(0);
+        vertexAttributes.add(0);
+        vertexAttributes.add(1);
 
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.x + x;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.y + y + 1;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.z + z;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = 1;
+        vertexAttributes.add(worldOffsetPos.x + x);
+        vertexAttributes.add(worldOffsetPos.y + y + 1);
+        vertexAttributes.add(worldOffsetPos.z + z);
+        vertexAttributes.add(0);
+        vertexAttributes.add(0);
+        vertexAttributes.add(1);
     }
 
     private void createBack(int x, int y, int z) {
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.x + x;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.y + y;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.z + z + 1;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = -1;
+        vertexAttributes.add(worldOffsetPos.x + x);
+        vertexAttributes.add(worldOffsetPos.y + y);
+        vertexAttributes.add(worldOffsetPos.z + z + 1);
+        vertexAttributes.add(0);
+        vertexAttributes.add(0);
+        vertexAttributes.add(-1);
 
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.x + x;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.y + y + 1;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.z + z + 1;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = -1;
+        vertexAttributes.add(worldOffsetPos.x + x);
+        vertexAttributes.add(worldOffsetPos.y + y + 1);
+        vertexAttributes.add(worldOffsetPos.z + z + 1);
+        vertexAttributes.add(0);
+        vertexAttributes.add(0);
+        vertexAttributes.add(-1);
 
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.x + x + 1;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.y + y + 1;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.z + z + 1;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = -1;
+        vertexAttributes.add(worldOffsetPos.x + x + 1);
+        vertexAttributes.add(worldOffsetPos.y + y + 1);
+        vertexAttributes.add(worldOffsetPos.z + z + 1);
+        vertexAttributes.add(0);
+        vertexAttributes.add(0);
+        vertexAttributes.add(-1);
 
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.x + x + 1;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.y + y;
-        vertexAttributes[vertexAttributes_i++] = worldOffsetPos.z + z + 1;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = 0;
-        vertexAttributes[vertexAttributes_i++] = -1;
+        vertexAttributes.add(worldOffsetPos.x + x + 1);
+        vertexAttributes.add(worldOffsetPos.y + y);
+        vertexAttributes.add(worldOffsetPos.z + z + 1);
+        vertexAttributes.add(0);
+        vertexAttributes.add(0);
+        vertexAttributes.add(-1);
     }
 
     public Renderable getRenderable(Pool<Renderable> pool) {
