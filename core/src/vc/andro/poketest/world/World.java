@@ -1,19 +1,30 @@
 package vc.andro.poketest.world;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g3d.Renderable;
+import com.badlogic.gdx.graphics.g3d.RenderableProvider;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.Pool;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.entity.Entity;
 import vc.andro.poketest.tile.BasicTile;
 
+import java.util.Iterator;
+
 import static vc.andro.poketest.world.Chunk.CHUNK_DEPTH;
 import static vc.andro.poketest.world.Chunk.CHUNK_SIZE;
 
-public class World {
+public class World implements RenderableProvider {
     private final WorldCreationParams creationParams;
     private final WorldGenerator worldGenerator;
     private final CoordMat<Chunk> chunks;
     private final Array<Entity> entities;
+
+    private int renderX;
+    private int renderZ;
+    private int renderDistance = 10;
 
     public World(WorldCreationParams creationParams, WorldGenerator worldGenerator) {
         this.creationParams = creationParams;
@@ -123,18 +134,8 @@ public class World {
         return tile;
     }
 
-    @NotNull
     private Chunk getChunkAt_G_WP(int worldX, int worldZ) {
-        int chunkX = WxCx(worldX);
-        int chunkZ = WzCz(worldZ);
-        Chunk chunk = getChunkAt_CP(chunkX, chunkZ);
-        if (chunk == null) {
-            createBlankChunkAt_CP(chunkX, chunkZ);
-            worldGenerator.generateChunk(chunkX, chunkZ);
-            chunk = getChunkAt_CP(chunkX, chunkZ);
-            assert chunk != null : "chunk should have generated";
-        }
-        return chunk;
+        return getChunkAt_G_CP(WxCx(worldX), WzCz(worldZ));
     }
 
     private void createBlankChunkAt_CP(int chunkX, int chunkZ) {
@@ -155,6 +156,17 @@ public class World {
                 WxCx(worldX),
                 WzLz(worldZ)
         );
+    }
+
+    public Chunk getChunkAt_G_CP(int chunkX, int chunkZ) {
+        Chunk chunk = getChunkAt_CP(chunkX, chunkZ);
+        if (chunk == null) {
+            createBlankChunkAt_CP(chunkX, chunkZ);
+            worldGenerator.generateChunk(chunkX, chunkZ);
+            chunk = getChunkAt_CP(chunkX, chunkZ);
+            assert chunk != null : "chunk should have generated";
+        }
+        return chunk;
     }
 
     public @Nullable
@@ -219,5 +231,47 @@ public class World {
 
     public static int LzWz(int chunkZ, int localChunkZ) {
         return chunkZ * CHUNK_SIZE + localChunkZ;
+    }
+
+    @Override
+    public void getRenderables(Array<Renderable> renderables, Pool<Renderable> pool) {
+        int chunksRendered = 0;
+        int chunkX = WxCx(renderX);
+        int chunkZ = WzCz(renderZ);
+
+        for (int cx = chunkX - renderDistance; cx < chunkX + renderDistance; cx++) {
+            for (int cz = chunkZ - renderDistance; cz < chunkZ + renderDistance; cz++) {
+                Chunk chunk = getChunkAt_G_CP(cx, cz);
+                chunk.updateVerticesIfDirty();
+                if (chunk.amountVertices == 0) {
+                    return;
+                }
+                Renderable r = chunk.getRenderable(pool);
+                renderables.add(r);
+                chunksRendered++;
+            }
+        }
+        Gdx.app.log("World", "Chunks rendered: " + chunksRendered);
+    }
+
+    public void setRenderPosition(int renderX, int renderZ) {
+        // unload chunks outside of render distance
+        int chunkX = WxCx(renderX);
+        int chunkZ = WzCz(renderZ);
+
+        for (IntMap<Chunk> yMap : chunks.map.values()) {
+            Iterator<Chunk> iterChunk = yMap.values().iterator();
+            while (iterChunk.hasNext()) {
+                Chunk chunk = iterChunk.next();
+                if (Math.abs(chunkX- chunk.chunkX) > renderDistance
+                        || Math.abs(chunkZ - chunk.chunkZ) > renderDistance) {
+                    iterChunk.remove();
+                    System.out.println("removed chunk at ("+chunk.chunkX+","+chunk.chunkZ+")");
+                }
+            }
+        }
+
+        this.renderX = renderX;
+        this.renderZ = renderZ;
     }
 }

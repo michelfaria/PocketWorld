@@ -4,8 +4,18 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
+import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -26,13 +36,14 @@ public class PlayScreen implements Screen {
     private static final int TICKS_PER_SECOND = 16;
     private static final int VIEWPORT_HEIGHT = 600;
     private static final int VIEWPORT_WIDTH = 800;
-    public static final int CAMERA_CULL_LEEWAY = 50;
 
     private final Pokecam pokecam;
     private final BitmapFont bitmapFont;
     private final World world;
     private final SpriteBatch spriteBatch;
     private final ShapeRenderer shapeRenderer;
+    private final Environment environment;
+    private final ModelBatch modelBatch;
 
     private float timeSinceLastTick = 0;
     private int dbgInfo_tilesDrawn = 0;
@@ -44,19 +55,28 @@ public class PlayScreen implements Screen {
         bitmapFont = assetManager.get(Assets.hackFont8pt);
         spriteBatch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
+
+        modelBatch = new ModelBatch();
+        DefaultShader.defaultCullFace = GL20.GL_FRONT;
+
+        environment = new Environment();
+        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1.0f));
+        environment.add(new DirectionalLight().set(1, 1, 1, 0, -1, 0));
     }
 
     @Override
     public void show() {
+        pokecam.update();
     }
 
     @Override
     public void render(float delta) {
         update(delta);
         clearScreen();
-        renderTiles();
-        renderEntities();
-        renderInfo();
+        // renderTiles2D();
+        //  renderEntities2D();
+        renderTiles3D();
+        dbgInfo_renderInfo();
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
             world.updateChunk(
@@ -64,11 +84,20 @@ public class PlayScreen implements Screen {
                     World.WzCz((int) (pokecam.getPosition().y / TILE_SIZE)));
         }
 
-        renderChunkBorders();
-        renderTileYs();
+        //dbgInfo_renderChunkBorders();
+       // dbgInfo_renderTileYs();
     }
 
-    private void renderTileYs() {
+    private void renderTiles3D() {
+        dbgInfo_tilesDrawn = 0;
+        dbgInfo_iterations = 0;
+
+        modelBatch.begin(pokecam.getUnderlying());
+        modelBatch.render(world, environment);
+        modelBatch.end();
+    }
+
+    private void dbgInfo_renderTileYs() {
         spriteBatch.setColor(Color.BLUE);
         spriteBatch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         spriteBatch.begin();
@@ -90,7 +119,7 @@ public class PlayScreen implements Screen {
         spriteBatch.setColor(Color.WHITE);
     }
 
-    private void renderChunkBorders() {
+    private void dbgInfo_renderChunkBorders() {
         shapeRenderer.setProjectionMatrix(pokecam.getProjectionMatrix());
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
 
@@ -123,19 +152,20 @@ public class PlayScreen implements Screen {
         spriteBatch.end();
     }
 
-    private void renderInfo() {
+    private void dbgInfo_renderInfo() {
         spriteBatch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         spriteBatch.begin();
         bitmapFont.draw(spriteBatch,
                 "fps: " + Gdx.graphics.getFramesPerSecond()
                         + ", tiles drawn: " + dbgInfo_tilesDrawn
                         + ", iters: " + dbgInfo_iterations
-                        + ", camPos: " + pokecam.getPosition().toString(),
+                        + ", camPos: " + pokecam.getPosition().toString()
+                        + ", camRot: " + pokecam.getDirection().toString(),
                 0, 28);
         spriteBatch.end();
     }
 
-    private void renderTiles() {
+    private void renderTiles2D() {
         dbgInfo_tilesDrawn = 0;
         dbgInfo_iterations = 0;
 
@@ -163,7 +193,7 @@ public class PlayScreen implements Screen {
                 drawStack.push(surfaceTile);
                 if (surfaceTile.transparent) {
                     BasicTile under = world.getTileAt_G_WP(worldX, surfaceTile.y - 1, worldZ);
-                    while(under != null) {
+                    while (under != null) {
                         drawStack.push(under);
                         if (!under.transparent || under.y == 0) {
                             break;
@@ -181,7 +211,7 @@ public class PlayScreen implements Screen {
         spriteBatch.end();
     }
 
-    private void renderEntities() {
+    private void renderEntities2D() {
         spriteBatch.setProjectionMatrix(pokecam.getProjectionMatrix());
         spriteBatch.begin();
         for (Entity entity : world.getEntities()) {
@@ -204,6 +234,7 @@ public class PlayScreen implements Screen {
         timeSinceLastTick += delta;
         world.update(delta);
         pokecam.update();
+        world.setRenderPosition((int)pokecam.getPosition().x, (int)pokecam.getPosition().z);
     }
 
 
@@ -234,5 +265,7 @@ public class PlayScreen implements Screen {
     @Override
     public void dispose() {
         spriteBatch.dispose();
+        modelBatch.dispose();
+        shapeRenderer.dispose();
     }
 }

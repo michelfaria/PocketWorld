@@ -10,7 +10,7 @@ import java.util.stream.StreamSupport;
 
 public class CoordMat<T> {
 
-    private final IntMap<IntMap<T>> map; // (x -> y -> value)
+    public final IntMap<IntMap<T>> map; // (x -> y -> value)
 
     public CoordMat() {
         map = new IntMap<>();

@@ -2,10 +2,10 @@ package vc.andro.poketest;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import static vc.andro.poketest.PokeTest.TILE_SIZE;
 
@@ -18,8 +18,8 @@ public class Pokecam {
         camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.near = 0.5f;
         camera.far = 1000f;
-        camera.position.set(-150, 10, 500);
-        camera.direction.set(0, 0, -1);
+        camera.position.set(65, 225, 95);
+        camera.lookAt(0, 0, 0);
     }
 
     public Matrix4 getProjectionMatrix() {
@@ -53,28 +53,24 @@ public class Pokecam {
             dx = CAM_SPEED;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.I)) {
-            dy = CAM_SPEED;
+            dz = CAM_SPEED;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.K)) {
-            dy = -CAM_SPEED;
-        }
-        /*
-         * Update camera zoom
-         */
-        if (Gdx.input.isKeyPressed(Input.Keys.U)) {
             dz = -CAM_SPEED;
         }
+        if (Gdx.input.isKeyPressed(Input.Keys.U)) {
+            dy = -CAM_SPEED;
+        }
         if (Gdx.input.isKeyPressed(Input.Keys.O)) {
-            dz = CAM_SPEED;
+            dy = CAM_SPEED;
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT_BRACKET)) {
-            camera.rotate(Vector3.X, 1);
+            camera.rotate(0.01f, 1, 0, 0);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT_BRACKET)) {
-            camera.rotate(Vector3.X, -1);
+            camera.rotate(-0.01f, 1, 0, 0);
         }
-
 
         camera.translate(dx, dy, dz);
     }
@@ -87,5 +83,13 @@ public class Pokecam {
 
     public Vector3 getPosition() {
         return camera.position;
+    }
+
+    public Vector3 getDirection() {
+        return camera.direction;
+    }
+
+    public Camera getUnderlying() {
+        return camera;
     }
 }
