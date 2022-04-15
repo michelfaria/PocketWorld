@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.utils.Pool;
+import com.badlogic.gdx.utils.ShortArray;
 import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.Assets;
 import vc.andro.poketest.PokeTest;
@@ -21,22 +22,11 @@ public class Chunk {
     public static final int CHUNK_SIZE = 16; // in tiles
     public static final int CHUNK_DEPTH = 128;
     public static final int VOXELS_PER_CHUNK = CHUNK_SIZE * CHUNK_DEPTH * CHUNK_SIZE;
-    public static final int MAX_VERTICES_PER_CHUNK = VOXELS_PER_CHUNK * 6 * 4;
-    public static final int INDICES_PER_CHUNK = VOXELS_PER_CHUNK * 6 * 6 / 3;
-
-    private static final short[] INDICES = new short[INDICES_PER_CHUNK];
-
-    static {
-        short j = 0;
-        for (int i = 0; i < INDICES_PER_CHUNK; i += 6, j += 4) {
-            INDICES[i] = j;
-            INDICES[i + 1] = (short) (j + 1);
-            INDICES[i + 2] = (short) (j + 2);
-            INDICES[i + 3] = (short) (j + 2);
-            INDICES[i + 4] = (short) (j + 3);
-            INDICES[i + 5] = j;
-        }
-    }
+    public static final int FACES_IN_A_CUBE = 6;
+    public static final int POINTS_IN_A_SQUARE = 4;
+    public static final int SIDES_IN_A_TRIANGLE = 3;
+    public static final int MAX_VERTICES_PER_CHUNK = VOXELS_PER_CHUNK * FACES_IN_A_CUBE * POINTS_IN_A_SQUARE;
+    public static final int MAX_INDICES_PER_CHUNK = VOXELS_PER_CHUNK * (int)Math.pow(FACES_IN_A_CUBE, 2) / SIDES_IN_A_TRIANGLE;
 
     public final World world;
     public final int chunkX;
@@ -44,9 +34,11 @@ public class Chunk {
     public final BasicTile[][][] voxels;
     public int voxelCount; // Amount of voxels that exist in this chunk
 
-    private VertexArray vertexArray;
+    private final VertexArray vertexArray;
+    private final IndexArray indicesArray;
     private final Mesh mesh;
     private final Material material;
+
     public boolean needsRenderingUpdate;
 
     public Chunk(World world, int chunkX, int chunkZ) {
@@ -55,13 +47,11 @@ public class Chunk {
         this.chunkZ = chunkZ;
         voxels = new BasicTile[CHUNK_SIZE][CHUNK_DEPTH][CHUNK_SIZE];
         vertexArray = new VertexArray();
-        {
-            mesh = new Mesh(true, MAX_VERTICES_PER_CHUNK, INDICES_PER_CHUNK,
-                    VertexAttribute.Position(),
-                    VertexAttribute.Normal(),
-                    VertexAttribute.TexCoords(0));
-            mesh.setIndices(INDICES);
-        }
+        indicesArray = new IndexArray();
+        mesh = new Mesh(true, MAX_VERTICES_PER_CHUNK, MAX_INDICES_PER_CHUNK,
+                VertexAttribute.Position(),
+                VertexAttribute.Normal(),
+                VertexAttribute.TexCoords(0));
         material = new Material(
                 new TextureAttribute(TextureAttribute.Diffuse,
                         PokeTest.assetManager.get(Assets.tileAtlas).getTextures().first()),
@@ -121,6 +111,7 @@ public class Chunk {
     public void updateVerticesIfDirty() {
         if (needsRenderingUpdate) {
             vertexArray.clear();
+            indicesArray.clear();
             for (int y = 0; y < CHUNK_DEPTH; y++) {
                 for (int z = 0; z < CHUNK_SIZE; z++) {
                     for (int x = 0; x < CHUNK_SIZE; x++) {
@@ -131,53 +122,66 @@ public class Chunk {
                         if (y < CHUNK_DEPTH - 1) {
                             if (voxels[x][y + 1][z] == null || voxels[x][y + 1][z].transparent) {
                                 voxel.createTopVertices(vertexArray);
+                                indicesArray.addSquare();
                             }
                         } else {
                             voxel.createTopVertices(vertexArray);
+                            indicesArray.addSquare();
                         }
                         if (y > 0) {
                             if (voxels[x][y - 1][z] == null || voxels[x][y - 1][z].transparent) {
                                 voxel.createBottomVertices(vertexArray);
+                                indicesArray.addSquare();
                             }
                         } else {
                             voxel.createBottomVertices(vertexArray);
+                            indicesArray.addSquare();
                         }
                         if (x > 0) {
                             if (voxels[x - 1][y][z] == null || voxels[x - 1][y][z].transparent) {
                                 voxel.createLeftVertices(vertexArray);
+                                indicesArray.addSquare();
                             }
                         } else {
                             voxel.createLeftVertices(vertexArray);
+                            indicesArray.addSquare();
                         }
                         if (x < CHUNK_SIZE - 1) {
                             if (voxels[x + 1][y][z] == null || voxels[x + 1][y][z].transparent) {
                                 voxel.createRightVertices(vertexArray);
+                                indicesArray.addSquare();
                             }
                         } else {
                             voxel.createRightVertices(vertexArray);
+                            indicesArray.addSquare();
                         }
                         if (z > 0) {
                             if (voxels[x][y][z - 1] == null || voxels[x][y][z - 1].transparent) {
                                 voxel.createFrontVertices(vertexArray);
+                                indicesArray.addSquare();
                             }
                         } else {
                             voxel.createFrontVertices(vertexArray);
+                            indicesArray.addSquare();
                         }
                         if (z < CHUNK_SIZE - 1) {
                             if (voxels[x][y][z + 1] == null || voxels[x][y][z + 1].transparent) {
                                 voxel.createBackVertices(vertexArray);
+                                indicesArray.addSquare();
                             }
                         } else {
                             voxel.createBackVertices(vertexArray);
+                            indicesArray.addSquare();
                         }
                     }
                 }
             }
-            mesh.setVertices(vertexArray.getVertices(), 0, vertexArray.getVertices().length);
+            mesh.setVertices(vertexArray.getItems(), 0, vertexArray.getItems().length);
+            mesh.setIndices(indicesArray.getItems(), 0, indicesArray.getItems().length);
             needsRenderingUpdate = false;
             Gdx.app.log("Chunk",
                     "Amount vertices: " + vertexArray.getAmountVertices()
-                            + ", amount attributes: " + vertexArray.getVertices().length);
+                            + ", amount attributes: " + vertexArray.getItems().length);
         }
     }
 
@@ -186,7 +190,7 @@ public class Chunk {
         r.material = material;
         r.meshPart.mesh = mesh;
         r.meshPart.offset = 0;
-        r.meshPart.size = (vertexArray.getVertices().length / VERTEX_SIZE) / 4 * 6;
+        r.meshPart.size = (vertexArray.getItems().length / VERTEX_SIZE) / POINTS_IN_A_SQUARE * FACES_IN_A_CUBE;
         r.meshPart.primitiveType = GL20.GL_TRIANGLES;
         return r;
     }

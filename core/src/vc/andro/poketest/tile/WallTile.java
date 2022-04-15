@@ -134,8 +134,61 @@ public class WallTile extends BasicTile {
                     default -> throw new AssertionError();
                 }
             }
-            case SOUTHEAST_INNER_CORNER, SOUTHWEST_INNER_CORNER, NORTHEAST_INNER_CORNER, NORTHWEST_INNER_CORNER -> {
-                return 1;// todo
+            case NORTHWEST_INNER_CORNER -> {
+                switch (direction) {
+                    case NORTHWEST -> {
+                        return 0;
+                    }
+                    case NORTH, SOUTH, EAST, WEST -> {
+                        return 0.5f;
+                    }
+                    case NORTHEAST, SOUTHEAST, SOUTHWEST -> {
+                        return 1;
+                    }
+                    default -> throw new AssertionError();
+                }
+            }
+            case NORTHEAST_INNER_CORNER -> {
+                switch (direction) {
+                    case NORTHEAST -> {
+                        return 0;
+                    }
+                    case NORTH, SOUTH, EAST, WEST -> {
+                        return 0.5f;
+                    }
+                    case NORTHWEST, SOUTHWEST, SOUTHEAST -> {
+                        return 1;
+                    }
+                    default -> throw new AssertionError();
+                }
+            }
+            case SOUTHWEST_INNER_CORNER -> {
+                switch (direction) {
+                    case SOUTHWEST -> {
+                        return 0;
+                    }
+                    case NORTH, SOUTH, EAST, WEST -> {
+                        return 0.5f;
+                    }
+                    case SOUTHEAST, NORTHEAST, NORTHWEST -> {
+                        return 1;
+                    }
+                    default -> throw new AssertionError();
+                }
+            }
+            case SOUTHEAST_INNER_CORNER -> {
+                switch (direction) {
+                    case SOUTHEAST -> {
+                        return 0;
+                    }
+                    case NORTH, SOUTH, EAST, WEST -> {
+                        return 0.5f;
+                    }
+                    case SOUTHWEST, NORTHWEST, NORTHEAST -> {
+                        return 1;
+                    }
+                    default -> throw new AssertionError();
+                }
             }
             default -> throw new AssertionError();
         }

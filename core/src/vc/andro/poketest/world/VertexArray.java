@@ -26,7 +26,7 @@ public class VertexArray {
         amount += 1;
     }
 
-    public float[] getVertices() {
+    public float[] getItems() {
         return vertices.items;
     }
 
