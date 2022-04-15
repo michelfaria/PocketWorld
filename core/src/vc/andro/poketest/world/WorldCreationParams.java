@@ -10,9 +10,9 @@ public class WorldCreationParams {
     private static final int DEFAULT_WORLD_BEACH_ALTITUDE = 68;
     private static final int DEFAULT_TREE_MAP_R_VALUE = 2;
     private static final boolean DEFAULT_ISLAND_MODE = false;
-    private static final float DEFAULT_VALLEY_FACTOR = 1f;
+    private static final float DEFAULT_VALLEY_FACTOR = 1.2f;
     private static final float DEFAULT_ISLAND_MODE_SIZE = 200;
-    private static final float DEFAULT_ALTITUDE_MAP_FREQUENCY = 0.7f;
+    private static final float DEFAULT_ALTITUDE_MAP_FREQUENCY = 0.5f;
     private static final int DEFAULT_ALTITUDE_MAP_OCTAVES = 4;
     private static final int DEFAULT_ALTITUDE_OFFSET = 20;
 

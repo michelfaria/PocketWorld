@@ -29,8 +29,6 @@ import static vc.andro.poketest.world.Chunk.CHUNK_SIZE;
 public class PlayScreen implements Screen {
 
     private static final int TICKS_PER_SECOND = 16;
-    private static final int VIEWPORT_HEIGHT = 600;
-    private static final int VIEWPORT_WIDTH = 800;
 
     private final Pokecam pokecam;
     private final BitmapFont bitmapFont;
@@ -55,7 +53,7 @@ public class PlayScreen implements Screen {
         DefaultShader.defaultCullFace = GL20.GL_FRONT;
 
         environment = new Environment();
-        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1.0f));
+        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.2f, 0.2f, 0.2f, 1.0f));
         environment.add(new DirectionalLight().set(1, 1, 1, 0, -1, 0));
     }
 
@@ -68,7 +66,7 @@ public class PlayScreen implements Screen {
     public void render(float delta) {
         update(delta);
 
-        Gdx.gl.glClearColor(0.74f, 0.98f, 0.98f, 1f);
+        Gdx.gl.glClearColor(0.08235294f, 0.5411765f, 0.7411765f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
         // renderTiles2D();
@@ -235,12 +233,6 @@ public class PlayScreen implements Screen {
         world.update(delta);
         pokecam.update();
         world.setRenderPosition((int) pokecam.getPosition().x, (int) pokecam.getPosition().z);
-    }
-
-
-    private void clearScreen() {
-        Gdx.gl.glClearColor(0.74f, 0.98f, 0.98f, 1f);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
     }
 
     @Override

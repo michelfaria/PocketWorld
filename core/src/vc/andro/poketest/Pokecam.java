@@ -13,8 +13,8 @@ import static vc.andro.poketest.PokeTest.TILE_SIZE;
 
 public class Pokecam {
 
-    public static final int CAM_SPEED = 5;
-    private static final boolean doDebugFPSController = true;
+    public static final float CAM_SPEED = 0.1f;
+    private static final boolean doDebugFPSController = false;
 
     private final PerspectiveCamera camera;
     private final @Nullable
@@ -24,8 +24,8 @@ public class Pokecam {
         camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.near = 0.5f;
         camera.far = 1000f;
-        camera.position.set(0, 200, 0);
-        camera.lookAt(0, 200, -1);
+        camera.position.set(0, 50, 0);
+        camera.lookAt(0, -1, 0);
 
         if (doDebugFPSController) {
             firstPersonCameraController = new FirstPersonCameraController(camera);
@@ -61,9 +61,9 @@ public class Pokecam {
         /*
          * Update camera translation
          */
-        int dx = 0;
-        int dy = 0;
-        int dz = 0;
+        float dx = 0;
+        float dy = 0;
+        float dz = 0;
         if (Gdx.input.isKeyPressed(Input.Keys.J)) {
             dx = -CAM_SPEED;
         }
@@ -84,10 +84,10 @@ public class Pokecam {
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT_BRACKET)) {
-            camera.rotate(0.01f, 1, 0, 0);
+            camera.rotate(0.2f, 1, 0, 0);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT_BRACKET)) {
-            camera.rotate(-0.01f, 1, 0, 0);
+            camera.rotate(-0.2f, 1, 0, 0);
         }
 
         camera.translate(dx, dy, dz);
