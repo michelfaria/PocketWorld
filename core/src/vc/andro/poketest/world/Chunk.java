@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Renderable;
+import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.utils.Pool;
 import org.jetbrains.annotations.Nullable;
@@ -35,7 +36,6 @@ public class Chunk {
             INDICES[i + 4] = (short) (j + 3);
             INDICES[i + 5] = j;
         }
-
     }
 
     public final World world;
@@ -64,7 +64,8 @@ public class Chunk {
         }
         material = new Material(
                 new TextureAttribute(TextureAttribute.Diffuse,
-                        PokeTest.assetManager.get(Assets.tileAtlas).getTextures().first()));
+                        PokeTest.assetManager.get(Assets.tileAtlas).getTextures().first()),
+                new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
         needsRenderingUpdate = true;
     }
 

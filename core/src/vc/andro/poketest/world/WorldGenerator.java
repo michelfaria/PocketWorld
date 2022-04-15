@@ -149,19 +149,18 @@ public class WorldGenerator {
             return true;
         }
 
-
         if (y > northeastY && y > northY && y > eastY) {
             world.putTileAt_WP(worldX, y, worldZ, new WallTile(NORTHEAST_CORNER));
             return true;
         }
 
         if (y > southwestY && y > westY && y > southY) {
-            world.putTileAt_WP(worldX, y, worldZ, new WallTile(SOUTHWEST_EDGE));
+            world.putTileAt_WP(worldX, y, worldZ, new WallTile(SOUTHWEST_CORNER));
             return true;
         }
 
         if (y > southeastY && y > eastY && y > southY) {
-            world.putTileAt_WP(worldX, y, worldZ, new WallTile(SOUTHEAST_EDGE));
+            world.putTileAt_WP(worldX, y, worldZ, new WallTile(SOUTHEAST_CORNER));
             return true;
         }
 

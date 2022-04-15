@@ -56,6 +56,53 @@ public class BasicTile {
         textureRegion = AtlasUtil.findRegion(PokeTest.assetManager.get(Assets.tileAtlas), spriteId);
     }
 
+    public void createTopVertices(VertexArray vertices) {
+        // northwest
+        vertices.addVertex(
+                worldX,                    // x
+                y + 1,                     // y
+                worldZ,                    // z
+                0,                         // normal x
+                1,                         //        y
+                0,                         //        z
+                textureRegion.getU(),      // u
+                textureRegion.getV()      // v
+        );
+        // northeast
+        vertices.addVertex(
+                worldX + 1,                // x
+                y + 1,                     // y
+                worldZ,                    // z
+                0,                         // normal x
+                1,                         //        y
+                0,                         //        z
+                textureRegion.getU2(),     // u
+                textureRegion.getV()      // v
+        );
+        // southeast
+        vertices.addVertex(
+                worldX + 1,                // x
+                y + 1,                     // y
+                worldZ + 1,                // z
+                0,                         // normal x
+                1,                         //        y
+                0,                         //        z
+                textureRegion.getU2(),     // u
+                textureRegion.getV2()       // v
+        );
+        // southwest
+        vertices.addVertex(
+                worldX,                    // x
+                y + 1,                     // y
+                worldZ + 1,                // z
+                0,                         // normal x
+                1,                         //        y
+                0,                         //        z
+                textureRegion.getU(),      // u
+                textureRegion.getV2()       // v
+        );
+    }
+
     public void createRightVertices(VertexArray vertices) {
         vertices.addVertex(
                 worldX + 1,     // x
@@ -171,53 +218,6 @@ public class BasicTile {
                 -1,             //        z
                 0,              // u
                 0);             // v
-    }
-
-    public void createTopVertices(VertexArray vertices) {
-        // northwest
-        vertices.addVertex(
-                worldX,                    // x
-                y + 1,                     // y
-                worldZ,                    // z
-                0,                         // normal x
-                1,                         //        y
-                0,                         //        z
-                textureRegion.getU(),      // u
-                textureRegion.getV()      // v
-        );
-        // northeast
-        vertices.addVertex(
-                worldX + 1,                // x
-                y + 1,                     // y
-                worldZ,                    // z
-                0,                         // normal x
-                1,                         //        y
-                0,                         //        z
-                textureRegion.getU2(),     // u
-                textureRegion.getV()      // v
-        );
-        // southeast
-        vertices.addVertex(
-                worldX + 1,                // x
-                y + 1,                     // y
-                worldZ + 1,                // z
-                0,                         // normal x
-                1,                         //        y
-                0,                         //        z
-                textureRegion.getU2(),     // u
-                textureRegion.getV2()       // v
-        );
-        // southwest
-        vertices.addVertex(
-                worldX,                    // x
-                y + 1,                     // y
-                worldZ + 1,                // z
-                0,                         // normal x
-                1,                         //        y
-                0,                         //        z
-                textureRegion.getU(),      // u
-                textureRegion.getV2()       // v
-        );
     }
 
     public void createBottomVertices(VertexArray vertices) {

@@ -14,7 +14,6 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.ScreenUtils;
 import vc.andro.poketest.entity.Entity;
 import vc.andro.poketest.tile.BasicTile;
 import vc.andro.poketest.world.World;
@@ -68,7 +67,10 @@ public class PlayScreen implements Screen {
     @Override
     public void render(float delta) {
         update(delta);
-        clearScreen();
+
+        Gdx.gl.glClearColor(0.74f, 0.98f, 0.98f, 1f);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
         // renderTiles2D();
         //  renderEntities2D();
         renderTiles3D();
@@ -237,7 +239,8 @@ public class PlayScreen implements Screen {
 
 
     private void clearScreen() {
-        ScreenUtils.clear(0.74f, 0.98f, 0.98f, 1f, true);
+        Gdx.gl.glClearColor(0.74f, 0.98f, 0.98f, 1f);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
     }
 
     @Override
