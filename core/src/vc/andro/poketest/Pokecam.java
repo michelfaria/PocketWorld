@@ -14,7 +14,7 @@ import static vc.andro.poketest.PokeTest.TILE_SIZE;
 public class Pokecam {
 
     public static final int CAM_SPEED = 5;
-    private static final boolean doDebugFPSController = false;
+    private static final boolean doDebugFPSController = true;
 
     private final PerspectiveCamera camera;
     private final @Nullable
@@ -25,7 +25,7 @@ public class Pokecam {
         camera.near = 0.5f;
         camera.far = 1000f;
         camera.position.set(0, 200, 0);
-        camera.lookAt(0, 200, 100);
+        camera.lookAt(0, 200, -1);
 
         if (doDebugFPSController) {
             firstPersonCameraController = new FirstPersonCameraController(camera);
@@ -70,10 +70,10 @@ public class Pokecam {
         if (Gdx.input.isKeyPressed(Input.Keys.L)) {
             dx = CAM_SPEED;
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.I)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.K)) {
             dz = CAM_SPEED;
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.K)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.I)) {
             dz = -CAM_SPEED;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.U)) {

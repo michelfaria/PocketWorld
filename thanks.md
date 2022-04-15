@@ -11,3 +11,5 @@ Thanks to people who helped when I needed it.
   - Graphics programming help
 - mgsx#0202
     - LibGDX help
+- Ademas#6759
+  - Graphics programming help

@@ -135,72 +135,72 @@ public class WorldGenerator {
     private boolean generateWalls(int worldX, int y, int worldZ) {
         assert world != null;
 
-        float topLeftY = altitudeMapGenerator.altitudeAtPos(worldX - 1, worldZ + 1);
-        float topY = altitudeMapGenerator.altitudeAtPos(worldX, worldZ + 1);
-        float topRightY = altitudeMapGenerator.altitudeAtPos(worldX + 1, worldZ + 1);
-        float leftY = altitudeMapGenerator.altitudeAtPos(worldX - 1, worldZ);
-        float rightY = altitudeMapGenerator.altitudeAtPos(worldX + 1, worldZ);
-        float bottomLeftY = altitudeMapGenerator.altitudeAtPos(worldX - 1, worldZ - 1);
-        float bottomY = altitudeMapGenerator.altitudeAtPos(worldX, worldZ - 1);
-        float bottomRightY = altitudeMapGenerator.altitudeAtPos(worldX + 1, worldZ - 1);
+        float southwestY = altitudeMapGenerator.altitudeAtPos(worldX - 1, worldZ + 1);
+        float southY = altitudeMapGenerator.altitudeAtPos(worldX, worldZ + 1);
+        float southeastY = altitudeMapGenerator.altitudeAtPos(worldX + 1, worldZ + 1);
+        float westY = altitudeMapGenerator.altitudeAtPos(worldX - 1, worldZ);
+        float eastY = altitudeMapGenerator.altitudeAtPos(worldX + 1, worldZ);
+        float northwestY = altitudeMapGenerator.altitudeAtPos(worldX - 1, worldZ - 1);
+        float northY = altitudeMapGenerator.altitudeAtPos(worldX, worldZ - 1);
+        float northeastY = altitudeMapGenerator.altitudeAtPos(worldX + 1, worldZ - 1);
 
-        if (y > topLeftY && y > leftY && y > topY) {
+        if (y > northwestY && y > westY && y > northY) {
             world.putTileAt_WP(worldX, y, worldZ, new WallTile(NORTHWEST_CORNER));
             return true;
         }
 
 
-        if (y > topRightY && y > topY && y > rightY) {
+        if (y > northeastY && y > northY && y > eastY) {
             world.putTileAt_WP(worldX, y, worldZ, new WallTile(NORTHEAST_CORNER));
             return true;
         }
 
-        if (y > bottomLeftY && y > leftY && y > bottomY) {
+        if (y > southwestY && y > westY && y > southY) {
             world.putTileAt_WP(worldX, y, worldZ, new WallTile(SOUTHWEST_EDGE));
             return true;
         }
 
-        if (y > bottomRightY && y > rightY && y > bottomY) {
+        if (y > southeastY && y > eastY && y > southY) {
             world.putTileAt_WP(worldX, y, worldZ, new WallTile(SOUTHEAST_EDGE));
             return true;
         }
 
-        if (y > bottomLeftY && MathUtils.isEqual(y, leftY) && MathUtils.isEqual(y, bottomY)) {
+        if (y > southwestY && MathUtils.isEqual(y, westY) && MathUtils.isEqual(y, southY)) {
             world.putTileAt_WP(worldX, y, worldZ, new WallTile(SOUTHWEST_INNER_CORNER));
             return true;
         }
 
-        if (y > bottomRightY && MathUtils.isEqual(y, rightY) && MathUtils.isEqual(y, bottomY)) {
+        if (y > southeastY && MathUtils.isEqual(y, eastY) && MathUtils.isEqual(y, southY)) {
             world.putTileAt_WP(worldX, y, worldZ, new WallTile(SOUTHEAST_INNER_CORNER));
             return true;
         }
 
-        if (y > topLeftY && MathUtils.isEqual(y, leftY) && MathUtils.isEqual(y, topY)) {
+        if (y > northwestY && MathUtils.isEqual(y, westY) && MathUtils.isEqual(y, northY)) {
             world.putTileAt_WP(worldX, y, worldZ, new WallTile(NORTHWEST_INNER_CORNER));
             return true;
         }
 
-        if (y > topRightY && MathUtils.isEqual(y, rightY) && MathUtils.isEqual(y, topY)) {
+        if (y > northeastY && MathUtils.isEqual(y, eastY) && MathUtils.isEqual(y, northY)) {
             world.putTileAt_WP(worldX, y, worldZ, new WallTile(NORTHEAST_INNER_CORNER));
             return true;
         }
 
-        if (leftY < y) {
+        if (westY < y) {
             world.putTileAt_WP(worldX, y, worldZ, new WallTile(WEST_EDGE));
             return true;
         }
 
-        if (rightY < y) {
+        if (eastY < y) {
             world.putTileAt_WP(worldX, y, worldZ, new WallTile(EAST_EDGE));
             return true;
         }
 
-        if (bottomY < y) {
+        if (southY < y) {
             world.putTileAt_WP(worldX, y, worldZ, new WallTile(SOUTH_EDGE));
             return true;
         }
 
-        if (topY < y) {
+        if (northY < y) {
             world.putTileAt_WP(worldX, y, worldZ, new WallTile(NORTH_EDGE));
             return true;
         }
