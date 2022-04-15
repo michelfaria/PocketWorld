@@ -145,63 +145,63 @@ public class WorldGenerator {
         float bottomRightY = altitudeMapGenerator.altitudeAtPos(worldX + 1, worldZ - 1);
 
         if (y > topLeftY && y > leftY && y > topY) {
-            world.putTileAt_WP(worldX, y, worldZ, new WallTile(TOP_LEFT_CORNER));
+            world.putTileAt_WP(worldX, y, worldZ, new WallTile(NORTHWEST_CORNER));
             return true;
         }
 
 
         if (y > topRightY && y > topY && y > rightY) {
-            world.putTileAt_WP(worldX, y, worldZ, new WallTile(TOP_RIGHT_CORNER));
+            world.putTileAt_WP(worldX, y, worldZ, new WallTile(NORTHEAST_CORNER));
             return true;
         }
 
         if (y > bottomLeftY && y > leftY && y > bottomY) {
-            world.putTileAt_WP(worldX, y, worldZ, new WallTile(BOTTOM_LEFT_CORNER));
+            world.putTileAt_WP(worldX, y, worldZ, new WallTile(SOUTHWEST_EDGE));
             return true;
         }
 
         if (y > bottomRightY && y > rightY && y > bottomY) {
-            world.putTileAt_WP(worldX, y, worldZ, new WallTile(BOTTOM_RIGHT_CORNER));
+            world.putTileAt_WP(worldX, y, worldZ, new WallTile(SOUTHEAST_EDGE));
             return true;
         }
 
         if (y > bottomLeftY && MathUtils.isEqual(y, leftY) && MathUtils.isEqual(y, bottomY)) {
-            world.putTileAt_WP(worldX, y, worldZ, new WallTile(BOTTOM_LEFT_INNER_CORNER));
+            world.putTileAt_WP(worldX, y, worldZ, new WallTile(SOUTHWEST_INNER_CORNER));
             return true;
         }
 
         if (y > bottomRightY && MathUtils.isEqual(y, rightY) && MathUtils.isEqual(y, bottomY)) {
-            world.putTileAt_WP(worldX, y, worldZ, new WallTile(BOTTOM_RIGHT_INNER_CORNER));
+            world.putTileAt_WP(worldX, y, worldZ, new WallTile(SOUTHEAST_INNER_CORNER));
             return true;
         }
 
         if (y > topLeftY && MathUtils.isEqual(y, leftY) && MathUtils.isEqual(y, topY)) {
-            world.putTileAt_WP(worldX, y, worldZ, new WallTile(TOP_LEFT_INNER_CORNER));
+            world.putTileAt_WP(worldX, y, worldZ, new WallTile(NORTHWEST_INNER_CORNER));
             return true;
         }
 
         if (y > topRightY && MathUtils.isEqual(y, rightY) && MathUtils.isEqual(y, topY)) {
-            world.putTileAt_WP(worldX, y, worldZ, new WallTile(TOP_RIGHT_INNER_CORNER));
+            world.putTileAt_WP(worldX, y, worldZ, new WallTile(NORTHEAST_INNER_CORNER));
             return true;
         }
 
         if (leftY < y) {
-            world.putTileAt_WP(worldX, y, worldZ, new WallTile(LEFT_EDGE));
+            world.putTileAt_WP(worldX, y, worldZ, new WallTile(WEST_EDGE));
             return true;
         }
 
         if (rightY < y) {
-            world.putTileAt_WP(worldX, y, worldZ, new WallTile(RIGHT_EDGE));
+            world.putTileAt_WP(worldX, y, worldZ, new WallTile(EAST_EDGE));
             return true;
         }
 
         if (bottomY < y) {
-            world.putTileAt_WP(worldX, y, worldZ, new WallTile(BOTTOM_EDGE));
+            world.putTileAt_WP(worldX, y, worldZ, new WallTile(SOUTH_EDGE));
             return true;
         }
 
         if (topY < y) {
-            world.putTileAt_WP(worldX, y, worldZ, new WallTile(TOP_EDGE));
+            world.putTileAt_WP(worldX, y, worldZ, new WallTile(NORTH_EDGE));
             return true;
         }
 

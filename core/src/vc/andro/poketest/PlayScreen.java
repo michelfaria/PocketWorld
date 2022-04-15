@@ -46,7 +46,7 @@ public class PlayScreen implements Screen {
     private int dbgInfo_iterations = 0;
 
     public PlayScreen(WorldCreationParams worldCreationParams) {
-        pokecam = new Pokecam(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
+        pokecam = new Pokecam();
         world = new WorldGenerator(worldCreationParams).createWorld();
         bitmapFont = assetManager.get(Assets.hackFont8pt);
         spriteBatch = new SpriteBatch();
@@ -151,11 +151,12 @@ public class PlayScreen implements Screen {
     private void dbgInfo_renderInfo() {
         spriteBatch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         spriteBatch.begin();
+        bitmapFont.setColor(Color.PINK);
         bitmapFont.draw(spriteBatch,
                 "fps: " + Gdx.graphics.getFramesPerSecond()
                         + ", tiles drawn: " + dbgInfo_tilesDrawn
                         + ", iters: " + dbgInfo_iterations
-                        + ", camPos: " + pokecam.getPosition().toString()
+                        + ", camPos: (%.2f, %.2f, %.2f)".formatted(pokecam.getPosition().x, pokecam.getPosition().y, pokecam.getPosition().z)
                         + ", camRot: " + pokecam.getDirection().toString()
                         + ", chunksRendered: " + world.getChunksRendered(),
                 0, 28);

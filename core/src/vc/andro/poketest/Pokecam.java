@@ -14,17 +14,18 @@ import static vc.andro.poketest.PokeTest.TILE_SIZE;
 public class Pokecam {
 
     public static final int CAM_SPEED = 5;
-    private static final boolean doDebugFPSController = true;
+    private static final boolean doDebugFPSController = false;
 
     private final PerspectiveCamera camera;
-    private final @Nullable FirstPersonCameraController firstPersonCameraController;
+    private final @Nullable
+    FirstPersonCameraController firstPersonCameraController;
 
-    public Pokecam(float worldWidth, float worldHeight) {
+    public Pokecam() {
         camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.near = 0.5f;
         camera.far = 1000f;
-        camera.position.set(65, 225, 95);
-        camera.lookAt(0, 0, 0);
+        camera.position.set(0, 200, 0);
+        camera.lookAt(0, 200, 100);
 
         if (doDebugFPSController) {
             firstPersonCameraController = new FirstPersonCameraController(camera);
