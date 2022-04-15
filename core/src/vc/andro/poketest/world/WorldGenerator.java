@@ -76,9 +76,9 @@ public class WorldGenerator {
         int worldZ = LzWz(chunkZ, chunkLocalZ);
         y = y < 0 ? altitudeMapGenerator.altitudeAtPos(worldX, worldZ) : y;
 
-        if (y <= world.getCreationParams().waterLevel) {
+        if (y <= params.waterLevel) {
             // Is water tile
-            world.putTileAt_WP(worldX, y, worldZ, new BasicTile(TileType.WATER));
+            world.putTileAt_WP(worldX, params.waterLevel, worldZ, new BasicTile(TileType.WATER));
             return;
         }
 
