@@ -24,7 +24,6 @@ public class Pokecam {
         camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.near = 0.5f;
         camera.far = 1000f;
-        camera.position.set(0, 50, 0);
         camera.lookAt(0, -1, 0);
 
         if (doDebugFPSController) {
@@ -82,12 +81,17 @@ public class Pokecam {
         if (Gdx.input.isKeyPressed(Input.Keys.O)) {
             dy = CAM_SPEED;
         }
-
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT_BRACKET)) {
             camera.rotate(0.2f, 1, 0, 0);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT_BRACKET)) {
             camera.rotate(-0.2f, 1, 0, 0);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.COMMA)) {
+            camera.rotate(-0.2f, 0, 1, 0);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.PERIOD)) {
+            camera.rotate(0.2f, 0, 1, 0);
         }
 
         camera.translate(dx, dy, dz);
@@ -109,5 +113,9 @@ public class Pokecam {
 
     public Camera getUnderlying() {
         return camera;
+    }
+
+    public Vector3 getUp() {
+        return camera.up;
     }
 }

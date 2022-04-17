@@ -3,25 +3,25 @@ package vc.andro.poketest.tile;
 import vc.andro.poketest.Direction;
 import vc.andro.poketest.world.VertexArray;
 
-public class WallTile extends BasicTile {
+public class SlopeVoxel extends BasicVoxel {
 
-    private WallType wallType;
+    private SlopeType slopeType;
 
-    public WallTile(WallType wallType) {
-        super(TileType.WALL);
-        this.wallType = wallType;
-        updateWallType(wallType);
+    public SlopeVoxel(SlopeType slopeType) {
+        super(VoxelType.SLOPE);
+        this.slopeType = slopeType;
+        updateSlopeType(slopeType);
         transparent = true;
     }
 
-    public void updateWallType(WallType newType) {
-        wallType = newType;
+    public void updateSlopeType(SlopeType newType) {
+        slopeType = newType;
         setSprite(newType.spriteId);
     }
 
     @SuppressWarnings("DuplicatedCode")
     private float getHeightInDirection(Direction direction) {
-        switch (wallType) {
+        switch (slopeType) {
             case NORTHWEST_CORNER -> {
                 switch (direction) {
                     case NORTHWEST, NORTHEAST, SOUTHWEST -> {
@@ -197,7 +197,7 @@ public class WallTile extends BasicTile {
     @Override
     public void createTopVertices(VertexArray vertices) {
         // northwest
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX,                    // x
                 y + getHeightInDirection(Direction.NORTHWEST),                     // y
                 worldZ,                    // z
@@ -208,7 +208,7 @@ public class WallTile extends BasicTile {
                 textureRegion.getV()      // v
         );
         // northeast
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX + 1,                // x
                 y + getHeightInDirection(Direction.NORTHEAST),                     // y
                 worldZ,                    // z
@@ -219,7 +219,7 @@ public class WallTile extends BasicTile {
                 textureRegion.getV()      // v
         );
         // southeast
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX + 1,                // x
                 y + getHeightInDirection(Direction.SOUTHEAST),                     // y
                 worldZ + 1,                // z
@@ -230,7 +230,7 @@ public class WallTile extends BasicTile {
                 textureRegion.getV2()       // v
         );
         // southwest
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX,                    // x
                 y + getHeightInDirection(Direction.SOUTHWEST),                     // y
                 worldZ + 1,                // z
@@ -243,7 +243,7 @@ public class WallTile extends BasicTile {
     }
 
     public void createRightVertices(VertexArray vertices) {
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX + 1,     // x
                 y + getHeightInDirection(Direction.NORTHEAST),              // y
                 worldZ,         // z
@@ -252,7 +252,7 @@ public class WallTile extends BasicTile {
                 0,              //        z
                 0,              // u
                 0);             // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX + 1,     // x
                 y + getHeightInDirection(Direction.SOUTHEAST),              // y
                 worldZ + 1,     // z
@@ -261,7 +261,7 @@ public class WallTile extends BasicTile {
                 0,              //        z
                 0,              // u
                 0);             // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX + 1,     // x
                 y,              // y
                 worldZ + 1,     // z
@@ -270,7 +270,7 @@ public class WallTile extends BasicTile {
                 0,              //        z
                 0,              // u
                 0);             // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX + 1,     // x
                 y + getHeightInDirection(Direction.NORTHEAST),          // y
                 worldZ,         // z
@@ -283,7 +283,7 @@ public class WallTile extends BasicTile {
 
     @Override
     public void createFrontVertices(VertexArray vertices) {
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX,         // x
                 y + getHeightInDirection(Direction.NORTHWEST),              // y
                 worldZ,         // z
@@ -292,7 +292,7 @@ public class WallTile extends BasicTile {
                 1,              //        z
                 0,              // u
                 0);             // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX + 1,     // x
                 y + getHeightInDirection(Direction.NORTHEAST),              // y
                 worldZ,         // z
@@ -301,7 +301,7 @@ public class WallTile extends BasicTile {
                 1,              //        z
                 0,              // u
                 0);             // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX + 1,     // x
                 y,          // y
                 worldZ,         // z
@@ -310,7 +310,7 @@ public class WallTile extends BasicTile {
                 1,              //        z
                 0,              // u
                 0);             // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX,         // x
                 y,          // y
                 worldZ,         // z
@@ -323,7 +323,7 @@ public class WallTile extends BasicTile {
 
     @Override
     public void createBackVertices(VertexArray vertices) {
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX,         // x
                 y + getHeightInDirection(Direction.SOUTHWEST),              // y
                 worldZ + 1,     // z
@@ -332,7 +332,7 @@ public class WallTile extends BasicTile {
                 -1,             //        z
                 0,              // u
                 0);             // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX,         // x
                 y,          // y
                 worldZ + 1,     // z
@@ -341,7 +341,7 @@ public class WallTile extends BasicTile {
                 -1,             //        z
                 0,              // u
                 0);             // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX + 1,     // x
                 y + getHeightInDirection(Direction.SOUTHEAST),          // y
                 worldZ + 1,     // z
@@ -350,7 +350,7 @@ public class WallTile extends BasicTile {
                 -1,             //        z
                 0,              // u
                 0);             // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX + 1,     // x
                 y,              // y
                 worldZ + 1,     // z
@@ -363,7 +363,7 @@ public class WallTile extends BasicTile {
 
     @Override
     public void createLeftVertices(VertexArray vertices) {
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX,        // x
                 y + getHeightInDirection(Direction.NORTHWEST),             // y
                 worldZ,        // z
@@ -372,7 +372,7 @@ public class WallTile extends BasicTile {
                 0,             //        z
                 0,             // u
                 0);            // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX,        // x
                 y,         // y
                 worldZ,        // z
@@ -381,7 +381,7 @@ public class WallTile extends BasicTile {
                 0,             //        z
                 0,             // u
                 0);            // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX,        // x
                 y + getHeightInDirection(Direction.SOUTHWEST),         // y
                 worldZ + 1,    // z
@@ -390,7 +390,7 @@ public class WallTile extends BasicTile {
                 0,             //        z
                 0,             // u
                 0);            // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX,        // x
                 y,             // y
                 worldZ + 1,    // z

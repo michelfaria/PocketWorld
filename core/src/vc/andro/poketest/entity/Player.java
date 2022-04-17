@@ -108,6 +108,8 @@ public class Player extends Entity {
     }
 
     public void updateMovement() {
+        float worldX = getWorldX();
+        float worldZ = getWorldZ();
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             direction = Direction.WEST;
             worldX -= 0.5f;
@@ -127,5 +129,6 @@ public class Player extends Entity {
         } else {
             playerMoving = false;
         }
+        setPosition(worldX, getY(), worldZ);
     }
 }

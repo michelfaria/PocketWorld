@@ -11,7 +11,7 @@ import vc.andro.poketest.world.World;
 
 import static vc.andro.poketest.PokeTest.TILE_SIZE;
 
-public class BasicTile {
+public class BasicVoxel {
 
     public World world;
     public Chunk chunk;
@@ -22,10 +22,10 @@ public class BasicTile {
     public Integer chunkLocalZ;
     public boolean transparent;
 
-    public TileType type;
+    public VoxelType type;
     public TextureRegion textureRegion;
 
-    public BasicTile(TileType type) {
+    public BasicVoxel(VoxelType type) {
         this.type = type;
         setSprite(type.defaultSpriteId);
     }
@@ -42,7 +42,7 @@ public class BasicTile {
         world.broadcastTileUpdateToAdjacentTiles(this);
     }
 
-    public void receiveTileUpdate(BasicTile updateOrigin) {
+    public void receiveTileUpdate(BasicVoxel updateOrigin) {
     }
 
     public void tick() {
@@ -58,7 +58,7 @@ public class BasicTile {
 
     public void createTopVertices(VertexArray vertices) {
         // northwest
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX,                    // x
                 y + 1,                     // y
                 worldZ,                    // z
@@ -69,7 +69,7 @@ public class BasicTile {
                 textureRegion.getV()      // v
         );
         // northeast
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX + 1,                // x
                 y + 1,                     // y
                 worldZ,                    // z
@@ -80,7 +80,7 @@ public class BasicTile {
                 textureRegion.getV()      // v
         );
         // southeast
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX + 1,                // x
                 y + 1,                     // y
                 worldZ + 1,                // z
@@ -91,7 +91,7 @@ public class BasicTile {
                 textureRegion.getV2()       // v
         );
         // southwest
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX,                    // x
                 y + 1,                     // y
                 worldZ + 1,                // z
@@ -104,7 +104,7 @@ public class BasicTile {
     }
 
     public void createRightVertices(VertexArray vertices) {
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX + 1,     // x
                 y,              // y
                 worldZ,         // z
@@ -113,7 +113,7 @@ public class BasicTile {
                 0,              //        z
                 0,              // u
                 0);             // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX + 1,     // x
                 y,              // y
                 worldZ + 1,     // z
@@ -122,7 +122,7 @@ public class BasicTile {
                 0,              //        z
                 0,              // u
                 0);             // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX + 1,     // x
                 y + 1,          // y
                 worldZ + 1,     // z
@@ -131,7 +131,7 @@ public class BasicTile {
                 0,              //        z
                 0,              // u
                 0);             // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX + 1,     // x
                 y + 1,          // y
                 worldZ,         // z
@@ -143,7 +143,7 @@ public class BasicTile {
     }
 
     public void createFrontVertices(VertexArray vertices) {
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX,         // x
                 y,              // y
                 worldZ,         // z
@@ -152,7 +152,7 @@ public class BasicTile {
                 1,              //        z
                 0,              // u
                 0);             // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX + 1,     // x
                 y,              // y
                 worldZ,         // z
@@ -161,7 +161,7 @@ public class BasicTile {
                 1,              //        z
                 0,              // u
                 0);             // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX + 1,     // x
                 y + 1,          // y
                 worldZ,         // z
@@ -170,7 +170,7 @@ public class BasicTile {
                 1,              //        z
                 0,              // u
                 0);             // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX,         // x
                 y + 1,          // y
                 worldZ,         // z
@@ -182,7 +182,7 @@ public class BasicTile {
     }
 
     public void createBackVertices(VertexArray vertices) {
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX,         // x
                 y,              // y
                 worldZ + 1,     // z
@@ -191,7 +191,7 @@ public class BasicTile {
                 -1,             //        z
                 0,              // u
                 0);             // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX,         // x
                 y + 1,          // y
                 worldZ + 1,     // z
@@ -200,7 +200,7 @@ public class BasicTile {
                 -1,             //        z
                 0,              // u
                 0);             // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX + 1,     // x
                 y + 1,          // y
                 worldZ + 1,     // z
@@ -209,7 +209,7 @@ public class BasicTile {
                 -1,             //        z
                 0,              // u
                 0);             // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX + 1,     // x
                 y,              // y
                 worldZ + 1,     // z
@@ -221,7 +221,7 @@ public class BasicTile {
     }
 
     public void createBottomVertices(VertexArray vertices) {
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX,         // x
                 y,              // y
                 worldZ,         // z
@@ -230,7 +230,7 @@ public class BasicTile {
                 0,              //        z
                 0,              // u
                 0);             // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX,         // x
                 y,              // y
                 worldZ + 1,     // z
@@ -239,7 +239,7 @@ public class BasicTile {
                 0,              //        z
                 0,              // u
                 0);             // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX + 1,     // x
                 y,              // y
                 worldZ + 1,     // z
@@ -248,7 +248,7 @@ public class BasicTile {
                 0,              //        z
                 0,              // u
                 0);             // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX + 1,    // x
                 y,             // y
                 worldZ,        // z
@@ -260,7 +260,7 @@ public class BasicTile {
     }
 
     public void createLeftVertices(VertexArray vertices) {
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX,        // x
                 y,             // y
                 worldZ,        // z
@@ -269,7 +269,7 @@ public class BasicTile {
                 0,             //        z
                 0,             // u
                 0);            // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX,        // x
                 y + 1,         // y
                 worldZ,        // z
@@ -278,7 +278,7 @@ public class BasicTile {
                 0,             //        z
                 0,             // u
                 0);            // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX,        // x
                 y + 1,         // y
                 worldZ + 1,    // z
@@ -287,7 +287,7 @@ public class BasicTile {
                 0,             //        z
                 0,             // u
                 0);            // v
-        vertices.addVertex(
+        vertices.addVertex8f(
                 worldX,        // x
                 y,             // y
                 worldZ + 1,    // z

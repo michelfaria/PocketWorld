@@ -1,6 +1,6 @@
 package vc.andro.poketest.tile;
 
-public enum WallType {
+public enum SlopeType {
     NORTHWEST_CORNER("tile/wall-top-left-corner"),
     NORTH_EDGE("tile/wall-top-edge"),
     NORTHEAST_CORNER("tile/wall-top-right-corner"),
@@ -16,7 +16,7 @@ public enum WallType {
 
     public final String spriteId;
 
-    WallType(String spriteId) {
+    SlopeType(String spriteId) {
         this.spriteId = spriteId;
     }
 

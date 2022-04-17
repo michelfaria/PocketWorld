@@ -2,13 +2,15 @@ package vc.andro.poketest.world;
 
 import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.RenderableProvider;
+import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Pool;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import vc.andro.poketest.Pokecam;
 import vc.andro.poketest.entity.Entity;
-import vc.andro.poketest.tile.BasicTile;
+import vc.andro.poketest.tile.BasicVoxel;
 
 import java.util.Iterator;
 
@@ -24,7 +26,9 @@ public class World implements RenderableProvider {
     private int renderX;
     private int renderZ;
     public int renderDistance = 10;
-    private int chunksRendered;
+
+    private int dbgInfo_chunksRendered;
+    private int dbgInfo_entitiesRendered;
 
     public World(WorldCreationParams creationParams, WorldGenerator worldGenerator) {
         this.creationParams = creationParams;
@@ -77,7 +81,7 @@ public class World implements RenderableProvider {
             0, 0, 1
     };
 
-    public void broadcastTileUpdateToAdjacentTiles(BasicTile updateOrigin) {
+    public void broadcastTileUpdateToAdjacentTiles(BasicVoxel updateOrigin) {
         int ox = updateOrigin.worldX;
         int oy = updateOrigin.y;
         int oz = updateOrigin.worldZ;
@@ -88,14 +92,14 @@ public class World implements RenderableProvider {
             if (oy + dy >= CHUNK_DEPTH || oy - dy < 0) {
                 continue;
             }
-            BasicTile tile = getTileAt_WP(ox + dx, oy + dy, oz + dz);
+            BasicVoxel tile = getTileAt_WP(ox + dx, oy + dy, oz + dz);
             if (tile != null) {
                 tile.receiveTileUpdate(updateOrigin);
             }
         }
     }
 
-    public void putTileAt_WP(int worldX, int y, int worldZ, @NotNull BasicTile tile) {
+    public void putTileAt_WP(int worldX, int y, int worldZ, @NotNull BasicVoxel tile) {
         Chunk chunk = getChunkAt_G_WP(worldX, worldZ);
         chunk.putTileAt(
                 WxLx(worldX),
@@ -106,7 +110,7 @@ public class World implements RenderableProvider {
     }
 
     @Nullable
-    public BasicTile getTileAt_WP(int worldX, int y, int worldZ) {
+    public BasicVoxel getTileAt_WP(int worldX, int y, int worldZ) {
         Chunk chunk = getChunkAt_CP(
                 WxCx(worldX),
                 WzCz(worldZ)
@@ -121,9 +125,9 @@ public class World implements RenderableProvider {
         );
     }
 
-    public BasicTile getTileAt_G_WP(int worldX, int y, int worldZ) {
+    public BasicVoxel getTileAt_G_WP(int worldX, int y, int worldZ) {
         Chunk chunk = getChunkAt_G_WP(worldX, worldZ);
-        BasicTile tile = chunk.getTileAt(
+        BasicVoxel tile = chunk.getTileAt(
                 WxLx(worldX),
                 y,
                 WzLz(worldZ)
@@ -175,7 +179,7 @@ public class World implements RenderableProvider {
     }
 
     public @Nullable
-    BasicTile getSurfaceTile(int worldX, int worldZ) {
+    BasicVoxel getSurfaceTile(int worldX, int worldZ) {
         Chunk chunk = getChunkAt_CP(
                 WxCx(worldX),
                 WzCz(worldZ)
@@ -190,7 +194,7 @@ public class World implements RenderableProvider {
     }
 
     public @Nullable
-    BasicTile getSurfaceTile_G(int worldX, int worldZ) {
+    BasicVoxel getSurfaceTile_G(int worldX, int worldZ) {
         Chunk chunk = getChunkAt_G_WP(worldX, worldZ);
         return chunk.getSurfaceTile(WxLx(worldX), WzLz(worldZ));
     }
@@ -235,43 +239,52 @@ public class World implements RenderableProvider {
 
     @Override
     public void getRenderables(Array<Renderable> renderables, Pool<Renderable> pool) {
-        chunksRendered = 0;
+        dbgInfo_chunksRendered = 0;
         int chunkX = WxCx(renderX);
         int chunkZ = WzCz(renderZ);
         for (int cx = chunkX - renderDistance; cx < chunkX + renderDistance; cx++) {
             for (int cz = chunkZ - renderDistance; cz < chunkZ + renderDistance; cz++) {
                 Chunk chunk = getChunkAt_G_CP(cx, cz);
-                chunk.updateVerticesIfDirty();
-                if (chunk.getAmountVertices() == 0) {
-                    return;
-                }
-                Renderable r = chunk.getRenderable(pool);
-                renderables.add(r);
-                chunksRendered++;
+                chunk.getRenderables(renderables, pool);
+                dbgInfo_chunksRendered++;
             }
         }
     }
 
+    public void renderEntities(DecalBatch decalBatch, Pokecam pokecam) {
+        dbgInfo_entitiesRendered = 0;
+        for (Entity entity : entities) {
+            entity.draw(decalBatch, pokecam);
+            dbgInfo_entitiesRendered++;
+        }
+    }
+
     public void setRenderPosition(int renderX, int renderZ) {
-        // unload chunks outside of render distance
+        unloadChunksOutsideOfRenderDistance(renderX, renderZ);
+        this.renderX = renderX;
+        this.renderZ = renderZ;
+    }
+
+    private void unloadChunksOutsideOfRenderDistance(int renderX, int renderZ) {
         int chunkX = WxCx(renderX);
         int chunkZ = WzCz(renderZ);
         for (IntMap<Chunk> yMap : chunks.map.values()) {
             Iterator<Chunk> iterChunk = yMap.values().iterator();
             while (iterChunk.hasNext()) {
                 Chunk chunk = iterChunk.next();
-                if (Math.abs(chunkX - chunk.chunkX) > renderDistance
-                        || Math.abs(chunkZ - chunk.chunkZ) > renderDistance) {
+                if (Math.abs(chunkX - chunk.chunkX) > renderDistance || Math.abs(chunkZ - chunk.chunkZ) > renderDistance) {
                     iterChunk.remove();
                     System.out.println("removed chunk at (" + chunk.chunkX + "," + chunk.chunkZ + ")");
                 }
             }
         }
-        this.renderX = renderX;
-        this.renderZ = renderZ;
     }
 
-    public int getChunksRendered() {
-        return chunksRendered;
+    public int getDbgInfo_chunksRendered() {
+        return dbgInfo_chunksRendered;
+    }
+
+    public int getDbgInfo_entitiesRendered() {
+        return dbgInfo_entitiesRendered;
     }
 }
