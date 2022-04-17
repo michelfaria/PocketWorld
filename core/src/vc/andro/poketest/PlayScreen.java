@@ -60,7 +60,10 @@ public class PlayScreen implements Screen {
             environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.2f, 0.2f, 0.2f, 1.0f));
             environment.add(new DirectionalLight().set(1, 1, 1, 0, -1, 0));
         }
-        decalBatch = new DecalBatch(new CameraGroupStrategy(pokecam.getUnderlying()));
+        {
+            CameraGroupStrategy groupStrategy = new CameraGroupStrategy(pokecam.getUnderlying());
+            decalBatch = new DecalBatch(groupStrategy);
+        }
         {
             BasicVoxel t00 = world.getSurfaceTile(0, 0);
             if (t00 != null) {
@@ -111,11 +114,12 @@ public class PlayScreen implements Screen {
                         + ", tiles drawn: " + dbgInfo_tilesDrawn
                         + ", iters: " + dbgInfo_iterations
                         + ", camPos: (%.2f, %.2f, %.2f)".formatted(pokecam.getPosition().x, pokecam.getPosition().y, pokecam.getPosition().z)
-                        + ", camRot: " + pokecam.getDirection().toString()
+                        + ", camDir: " + pokecam.getDirection().toString()
                         + ", chunksRendered: " + world.getDbgInfo_chunksRendered(),
                 0, 40);
         bitmapFont.draw(spriteBatch,
-                "entities rendered: " + world.getDbgInfo_entitiesRendered(),
+                "entities rendered: " + world.getDbgInfo_entitiesRendered() +
+                ", camUp: " + pokecam.getUp(),
                 0, 28);
         spriteBatch.end();
     }

@@ -118,6 +118,7 @@ public class Chunk implements RenderableProvider {
     }
 
     private void updateVerticesIfDirty() {
+        // FIXME: Transparent blocks have missing faces
         if (needsRenderingUpdate) {
             vertexArray8f.clear();
             indicesArray.clear();
@@ -128,57 +129,27 @@ public class Chunk implements RenderableProvider {
                         if (voxel == null) {
                             continue;
                         }
-                        if (y < CHUNK_DEPTH - 1) {
-                            if (voxels[x][y + 1][z] == null || voxels[x][y + 1][z].transparent) {
-                                voxel.createTopVertices(vertexArray8f);
-                                indicesArray.addSquare();
-                            }
-                        } else {
+                        if (voxel.transparent || (y < CHUNK_DEPTH - 1 && (voxels[x][y + 1][z] == null || voxels[x][y + 1][z].transparent))) {
                             voxel.createTopVertices(vertexArray8f);
                             indicesArray.addSquare();
                         }
-                        if (y > 0) {
-                            if (voxels[x][y - 1][z] == null || voxels[x][y - 1][z].transparent) {
-                                voxel.createBottomVertices(vertexArray8f);
-                                indicesArray.addSquare();
-                            }
-                        } else {
+                        if (voxel.transparent || (y > 0 && (voxels[x][y - 1][z] == null || voxels[x][y - 1][z].transparent))) {
                             voxel.createBottomVertices(vertexArray8f);
                             indicesArray.addSquare();
                         }
-                        if (x > 0) {
-                            if (voxels[x - 1][y][z] == null || voxels[x - 1][y][z].transparent) {
-                                voxel.createLeftVertices(vertexArray8f);
-                                indicesArray.addSquare();
-                            }
-                        } else {
+                        if (voxel.transparent || (x > 0 && (voxels[x - 1][y][z] == null || voxels[x - 1][y][z].transparent))) {
                             voxel.createLeftVertices(vertexArray8f);
                             indicesArray.addSquare();
                         }
-                        if (x < CHUNK_SIZE - 1) {
-                            if (voxels[x + 1][y][z] == null || voxels[x + 1][y][z].transparent) {
-                                voxel.createRightVertices(vertexArray8f);
-                                indicesArray.addSquare();
-                            }
-                        } else {
+                        if (voxel.transparent || (x < CHUNK_SIZE - 1 && (voxels[x + 1][y][z] == null || voxels[x + 1][y][z].transparent))) {
                             voxel.createRightVertices(vertexArray8f);
                             indicesArray.addSquare();
                         }
-                        if (z > 0) {
-                            if (voxels[x][y][z - 1] == null || voxels[x][y][z - 1].transparent) {
-                                voxel.createFrontVertices(vertexArray8f);
-                                indicesArray.addSquare();
-                            }
-                        } else {
+                        if (voxel.transparent || (z > 0 && (voxels[x][y][z - 1] == null || voxels[x][y][z - 1].transparent))) {
                             voxel.createFrontVertices(vertexArray8f);
                             indicesArray.addSquare();
                         }
-                        if (z < CHUNK_SIZE - 1) {
-                            if (voxels[x][y][z + 1] == null || voxels[x][y][z + 1].transparent) {
-                                voxel.createBackVertices(vertexArray8f);
-                                indicesArray.addSquare();
-                            }
-                        } else {
+                        if (voxel.transparent || (z < CHUNK_SIZE - 1 && (voxels[x][y][z + 1] == null || voxels[x][y][z + 1].transparent))) {
                             voxel.createBackVertices(vertexArray8f);
                             indicesArray.addSquare();
                         }
@@ -204,7 +175,7 @@ public class Chunk implements RenderableProvider {
         r.material = material;
         r.meshPart.mesh = mesh;
         r.meshPart.offset = 0;
-        r.meshPart.size = (vertexArray8f.getItems().length / VERTEX_SIZE) / POINTS_IN_A_SQUARE * FACES_IN_A_CUBE;
+        r.meshPart.size = vertexArray8f.getItems().length / VERTEX_SIZE / POINTS_IN_A_SQUARE * FACES_IN_A_CUBE;
         r.meshPart.primitiveType = GL20.GL_TRIANGLES;
         renderables.add(r);
     }

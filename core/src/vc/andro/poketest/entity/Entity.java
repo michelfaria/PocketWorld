@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
+import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector3;
 import vc.andro.poketest.Assets;
 import vc.andro.poketest.PokeTest;
 import vc.andro.poketest.Pokecam;
@@ -41,9 +43,7 @@ public class Entity {
     }
 
     public void draw(DecalBatch decalBatch, Pokecam pokecam) {
-        decal.lookAt(pokecam.getPosition(), pokecam.getUp());
-        decal.setRotation(0, -90 + pokecam.getDirection().z * -90, 0);
-        decal.setPosition(worldX, y + Math.abs(pokecam.getDirection().z) + 0.3f, worldZ);
+        decal.setRotation(Vector3.Y, pokecam.getUp());
         decalBatch.add(decal);
     }
 
@@ -58,7 +58,7 @@ public class Entity {
         this.y = y;
         this.worldZ = worldZ;
 
-        decal.setPosition(worldX, y, worldZ);
+        decal.setPosition(worldX, y + 0.1f, worldZ);
     }
 
     public float getWorldX() {

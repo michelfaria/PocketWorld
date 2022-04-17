@@ -87,14 +87,19 @@ public class Pokecam {
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT_BRACKET)) {
             camera.rotate(-0.2f, 1, 0, 0);
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.COMMA)) {
-            camera.rotate(-0.2f, 0, 1, 0);
+        if (Gdx.input.isKeyJustPressed(Input.Keys.COMMA)) {
+            camera.rotate(-90f, 0, 1, 0);
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.PERIOD)) {
-            camera.rotate(0.2f, 0, 1, 0);
+        if (Gdx.input.isKeyJustPressed(Input.Keys.PERIOD)) {
+            camera.rotate(90f, 0, 1, 0);
         }
 
         camera.translate(dx, dy, dz);
+        camera.up.set(
+                Math.round(camera.up.x),
+                Math.round(camera.up.y),
+                Math.round(camera.up.z)
+        );
     }
 
     public void resize(int width, int height) {
