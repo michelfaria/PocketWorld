@@ -1,17 +1,19 @@
-package vc.andro.poketest.world;
+package vc.andro.poketest.world.map;
 
-public class TreeMapGenerator {
+import vc.andro.poketest.world.NoiseGenerator;
+
+public abstract class VegetationMapGenerator {
 
     private final NoiseGenerator noiseGenerator;
-    private final WorldCreationParams creationParams;
 
-    public TreeMapGenerator(NoiseGenerator noiseGenerator, WorldCreationParams creationParams) {
+    public VegetationMapGenerator(NoiseGenerator noiseGenerator) {
         this.noiseGenerator = noiseGenerator;
-        this.creationParams = creationParams;
     }
 
-    public int getTreeAtPos(int worldX, int worldZ) {
-        var r = creationParams.treeMapRValue;
+    public abstract int getRValue();
+
+    public int getAtPosition(int worldX, int worldZ) {
+        var r = getRValue();
         double max = 0;
         for (int xn = worldX - r; xn <= worldX + r; xn++) {
             for (int zn = worldZ - r; zn <= worldZ + r; zn++) {

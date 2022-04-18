@@ -16,7 +16,9 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Disposable;
 import vc.andro.poketest.entity.Entity;
+import vc.andro.poketest.graphics.MyCameraGroupStrategy;
 import vc.andro.poketest.tile.BasicVoxel;
 import vc.andro.poketest.world.World;
 import vc.andro.poketest.world.WorldCreationParams;
@@ -39,6 +41,8 @@ public class PlayScreen implements Screen {
     private final ShapeRenderer shapeRenderer;
     private final Environment environment;
     private final ModelBatch modelBatch;
+
+    private final MyCameraGroupStrategy cameraGroupStrategy;
     private final DecalBatch decalBatch;
 
     private float timeSinceLastTick = 0;
@@ -61,8 +65,8 @@ public class PlayScreen implements Screen {
             environment.add(new DirectionalLight().set(1, 1, 1, 0, -1, 0));
         }
         {
-            CameraGroupStrategy groupStrategy = new CameraGroupStrategy(pokecam.getUnderlying());
-            decalBatch = new DecalBatch(groupStrategy);
+            cameraGroupStrategy = new MyCameraGroupStrategy(pokecam.getUnderlying());
+            decalBatch = new DecalBatch(cameraGroupStrategy);
         }
         {
             BasicVoxel t00 = world.getSurfaceTile(0, 0);
@@ -83,6 +87,8 @@ public class PlayScreen implements Screen {
 
         Gdx.gl.glClearColor(0.08235294f, 0.5411765f, 0.7411765f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+        Gdx.gl.glEnable(GL20.GL_CULL_FACE);
 
         renderTiles3D();
         world.renderEntities(decalBatch, pokecam);
@@ -94,6 +100,9 @@ public class PlayScreen implements Screen {
                     World.WxCx((int) (pokecam.getPosition().x / TILE_SIZE)),
                     World.WzCz((int) (pokecam.getPosition().y / TILE_SIZE)));
         }
+
+        Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
+        Gdx.gl.glDisable(GL20.GL_CULL_FACE);
     }
 
     private void renderTiles3D() {
@@ -103,6 +112,62 @@ public class PlayScreen implements Screen {
         modelBatch.begin(pokecam.getUnderlying());
         modelBatch.render(world, environment);
         modelBatch.end();
+    }
+
+
+    private void dbgInfo_renderTileYs() {
+        spriteBatch.setColor(Color.BLUE);
+        spriteBatch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        spriteBatch.begin();
+
+        int curTileWorldX = (int) pokecam.getPosition().x / TILE_SIZE;
+        int curTileWorldZ = (int) pokecam.getPosition().y / TILE_SIZE;
+
+        for (int wx = curTileWorldX - 10; wx < curTileWorldX + 10; wx++) {
+            for (int wz = curTileWorldZ - 10; wz < curTileWorldZ + 10; wz++) {
+                BasicVoxel surfaceTile = world.getSurfaceTile(wx, wz);
+                if (surfaceTile == null) {
+                    continue;
+                }
+                Vector3 renderPos = pokecam.project(new Vector3(wx * TILE_SIZE + 8, wz * TILE_SIZE + 8, 0));
+                bitmapFont.draw(spriteBatch, "" + surfaceTile.y, renderPos.x, renderPos.y);
+            }
+        }
+        spriteBatch.end();
+        spriteBatch.setColor(Color.WHITE);
+    }
+
+    private void dbgInfo_renderChunkBorders() {
+        shapeRenderer.setProjectionMatrix(pokecam.getProjectionMatrix());
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+
+        int curChunkX = World.WxCx((int) (pokecam.getPosition().x / TILE_SIZE));
+        int curChunkZ = World.WzCz((int) (pokecam.getPosition().y / TILE_SIZE));
+
+        for (int cx = curChunkX - 5; cx < curChunkX + 5; cx++) {
+            for (int cz = curChunkZ - 5; cz < curChunkZ + 5; cz++) {
+                int renderX = World.CxWx(cx) * TILE_SIZE;
+                int renderY = World.CzWz(cz) * TILE_SIZE;
+                int renderWidth = CHUNK_SIZE * TILE_SIZE;
+                int renderHeight = CHUNK_SIZE * TILE_SIZE;
+                shapeRenderer.rect(renderX, renderY, renderWidth, renderHeight);
+            }
+        }
+
+        shapeRenderer.end();
+
+        spriteBatch.setProjectionMatrix(pokecam.getProjectionMatrix());
+        spriteBatch.begin();
+
+        for (int cx = curChunkX - 5; cx < curChunkX + 5; cx++) {
+            for (int cz = curChunkZ - 5; cz < curChunkZ + 5; cz++) {
+                int renderX = World.CxWx(cx) * TILE_SIZE;
+                int renderY = World.CzWz(cz) * TILE_SIZE;
+                bitmapFont.draw(spriteBatch, "" + cx + ", " + cz, renderX + 5, renderY - 5);
+            }
+        }
+
+        spriteBatch.end();
     }
 
     private void dbgInfo_renderInfo() {
@@ -121,6 +186,67 @@ public class PlayScreen implements Screen {
                 "entities rendered: " + world.getDbgInfo_entitiesRendered() +
                 ", camUp: " + pokecam.getUp(),
                 0, 28);
+        spriteBatch.end();
+    }
+
+
+    private void renderTiles2D() {
+        dbgInfo_tilesDrawn = 0;
+        dbgInfo_iterations = 0;
+
+        spriteBatch.setProjectionMatrix(pokecam.getProjectionMatrix());
+        spriteBatch.begin();
+
+        int renderDistanceTiles = 8 * CHUNK_SIZE;
+        float camWorldX = pokecam.getPosition().x / TILE_SIZE;
+        float camWorldZ = pokecam.getPosition().y / TILE_SIZE;
+
+        for (int worldX = (int) (camWorldX - renderDistanceTiles);
+             worldX < camWorldX + renderDistanceTiles;
+             worldX++
+        ) {
+            for (int worldZ = (int) (camWorldZ - renderDistanceTiles);
+                 worldZ < camWorldZ + renderDistanceTiles;
+                 worldZ++
+            ) {
+                dbgInfo_iterations++;
+                BasicVoxel surfaceTile = world.getSurfaceTile_G(worldX, worldZ);
+                if (surfaceTile == null) {
+                    continue;
+                }
+                Stack<BasicVoxel> drawStack = new Stack<>();
+                drawStack.push(surfaceTile);
+                if (surfaceTile.transparent) {
+                    BasicVoxel under = world.getTileAt_G_WP(worldX, surfaceTile.y - 1, worldZ);
+                    while (under != null) {
+                        drawStack.push(under);
+                        if (!under.transparent || under.y == 0) {
+                            break;
+                        }
+                        under = world.getTileAt_G_WP(worldX, under.y - 1, worldZ);
+                    }
+                }
+                while (!drawStack.empty()) {
+                    BasicVoxel tile = drawStack.pop();
+                    tile.draw(spriteBatch);
+                    dbgInfo_tilesDrawn++;
+                }
+            }
+        }
+        spriteBatch.end();
+    }
+
+    private void renderEntities2D() {
+        spriteBatch.setProjectionMatrix(pokecam.getProjectionMatrix());
+        spriteBatch.begin();
+        for (Entity entity : world.getEntities()) {
+            float nx = entity.getWorldX() * TILE_SIZE;
+            float ny = entity.getWorldZ() * TILE_SIZE;
+            if (pokecam.isPosOutsideOfCameraView(nx, ny)) {
+                continue;
+            }
+            entity.draw(spriteBatch);
+        }
         spriteBatch.end();
     }
 
@@ -161,5 +287,6 @@ public class PlayScreen implements Screen {
         modelBatch.dispose();
         shapeRenderer.dispose();
         decalBatch.dispose();
+        cameraGroupStrategy.dispose();
     }
 }

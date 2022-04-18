@@ -23,7 +23,7 @@ public class Pokecam {
     public Pokecam() {
         camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.near = 0.5f;
-        camera.far = 1000f;
+        camera.far = 100f;
         camera.lookAt(0, -1, 0);
 
         if (doDebugFPSController) {

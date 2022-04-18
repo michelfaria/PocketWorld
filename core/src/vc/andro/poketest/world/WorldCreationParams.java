@@ -15,6 +15,7 @@ public class WorldCreationParams {
     private static final float DEFAULT_ALTITUDE_MAP_FREQUENCY = 0.5f;
     private static final int DEFAULT_ALTITUDE_MAP_OCTAVES = 4;
     private static final int DEFAULT_ALTITUDE_OFFSET = 20;
+    private static final int DEFAULT_FLOWER_MAP_R_VALUE = 2;
 
     public final int seed;
     public final int waterLevel;
@@ -27,10 +28,12 @@ public class WorldCreationParams {
     public final float altitudeMapFrequency;
     public final int altitudeMapOctaves;
     public final int altitudeOffset;
+    public final int flowerMapRValue;
 
     public WorldCreationParams(int seed, int waterLevel, int terraces, int beachAltitude,
                                int treeMapRValue, boolean islandMode, float valleyFactor, float islandModeSize,
-                               float altitudeMapFrequency, int altitudeMapOctaves, int altitudeOffset) {
+                               float altitudeMapFrequency, int altitudeMapOctaves, int altitudeOffset,
+                               int flowerMapRValue) {
         this.seed = seed;
         this.waterLevel = waterLevel;
         this.terraces = terraces;
@@ -42,12 +45,14 @@ public class WorldCreationParams {
         this.altitudeMapFrequency = altitudeMapFrequency;
         this.altitudeMapOctaves = altitudeMapOctaves;
         this.altitudeOffset = altitudeOffset;
+        this.flowerMapRValue = flowerMapRValue;
     }
 
     public WorldCreationParams() {
         this(DEFAULT_WORLD_SEED, DEFAULT_WORLD_WATER_LEVEL,
                 DEFAULT_WORLD_TERRACES, DEFAULT_WORLD_BEACH_ALTITUDE, DEFAULT_TREE_MAP_R_VALUE,
                 DEFAULT_ISLAND_MODE, DEFAULT_VALLEY_FACTOR, DEFAULT_ISLAND_MODE_SIZE,
-                DEFAULT_ALTITUDE_MAP_FREQUENCY, DEFAULT_ALTITUDE_MAP_OCTAVES, DEFAULT_ALTITUDE_OFFSET);
+                DEFAULT_ALTITUDE_MAP_FREQUENCY, DEFAULT_ALTITUDE_MAP_OCTAVES, DEFAULT_ALTITUDE_OFFSET,
+                DEFAULT_FLOWER_MAP_R_VALUE);
     }
 }

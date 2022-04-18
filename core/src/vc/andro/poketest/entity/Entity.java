@@ -2,12 +2,12 @@ package vc.andro.poketest.entity;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g3d.decals.Decal;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.Vector2;
 import vc.andro.poketest.Assets;
 import vc.andro.poketest.PokeTest;
 import vc.andro.poketest.Pokecam;
+import vc.andro.poketest.graphics.Duocal;
 import vc.andro.poketest.util.AtlasUtil;
 
 import static vc.andro.poketest.PokeTest.TILE_SIZE;
@@ -16,19 +16,23 @@ public class Entity {
     private float worldX;
     private float y;
     private float worldZ;
-    public float collisionWidth;
-    public float collisionHeight;
 
+    protected Vector2 collisionDims;
     protected TextureRegion textureRegion;
-    protected Decal decal;
+    protected Duocal decal;
 
     public Entity(String spriteId) {
+        this(spriteId, new Vector2(0, 0));
+    }
+
+    public Entity(String spriteId, Vector2 collisionDims) {
         textureRegion = AtlasUtil.findRegion(PokeTest.assetManager.get(Assets.entityAtlas), spriteId);
-        decal = Decal.newDecal(textureRegion, true);
+        decal = new Duocal(textureRegion, true);
         decal.setDimensions(
                 textureRegion.getRegionWidth() / (float) TILE_SIZE,
                 textureRegion.getRegionHeight() / (float) TILE_SIZE
         );
+        this.collisionDims = collisionDims;
     }
 
     public void draw(SpriteBatch spriteBatch) {
@@ -44,8 +48,8 @@ public class Entity {
     }
 
     public void draw(DecalBatch decalBatch, Pokecam pokecam) {
-        decal.setRotation(Vector3.Y, pokecam.getUp());
-        decalBatch.add(decal);
+        decal.setRotation(0, 0, 0);
+        decal.addToBatch(decalBatch);
     }
 
     public void tick() {
@@ -61,7 +65,7 @@ public class Entity {
 
         decal.setPosition(
                 worldX + (textureRegion.getRegionWidth() / (float) TILE_SIZE / 2f),
-                y + 0.1f,
+                y + (textureRegion.getRegionHeight() / (float) TILE_SIZE / 2f),
                 worldZ + (textureRegion.getRegionHeight() / (float) TILE_SIZE / 2f)
         );
     }

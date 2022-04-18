@@ -1,6 +1,8 @@
-package vc.andro.poketest.world;
+package vc.andro.poketest.world.map;
 
 import com.badlogic.gdx.math.MathUtils;
+import vc.andro.poketest.world.NoiseGenerator;
+import vc.andro.poketest.world.WorldCreationParams;
 
 import static vc.andro.poketest.world.Chunk.CHUNK_DEPTH;
 
