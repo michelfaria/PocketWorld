@@ -111,7 +111,7 @@ public class WorldGenerator {
                 }
                 int worldZ = LzWz(chunkZ, chunkLocalZ);
 
-                if (shouldTreeBeSpawnedAtPosition(worldX, surfaceTile.y, worldZ)) {
+                if (shouldTreeBeSpawnedAtPosition(worldX, surfaceTile.y + 1, worldZ)) {
                     var tree = new TreeEntity();
                     tree.setPosition(worldX, surfaceTile.y + 1, worldZ);
                     world.addEntity(tree);
@@ -122,9 +122,17 @@ public class WorldGenerator {
 
     private boolean shouldTreeBeSpawnedAtPosition(int worldX, int y, int worldZ) {
         assert world != null;
-        BasicVoxel tile = world.getTileAt_WP(worldX, y, worldZ);
-        if (tile == null || !tile.type.equals(VoxelType.GRASS)) {
-            return false;
+        for (int ix = 0; ix < TreeEntity.COLLISION_WIDTH; ix++ ){
+            for (int iz = 0; iz < TreeEntity.COLLISION_HEIGHT; iz++) {
+                BasicVoxel tileY0 = world.getTileAt_WP(worldX + ix, y - 1, worldZ + iz);
+                BasicVoxel tileY1 = world.getTileAt_WP(worldX + ix, y, worldZ + iz);
+                if (tileY0 == null || !tileY0.type.equals(VoxelType.GRASS)) {
+                    return false;
+                }
+                if (tileY1 != null) {
+                    return false;
+                }
+            }
         }
         int treeType = treeMapGenerator.getTreeAtPos(worldX, worldZ);
         return treeType > 0;

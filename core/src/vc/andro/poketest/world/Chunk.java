@@ -118,7 +118,6 @@ public class Chunk implements RenderableProvider {
     }
 
     private void updateVerticesIfDirty() {
-        // FIXME: Transparent blocks have missing faces
         if (needsRenderingUpdate) {
             vertexArray8f.clear();
             indicesArray.clear();

@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
-import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import vc.andro.poketest.Assets;
 import vc.andro.poketest.PokeTest;
@@ -17,6 +16,8 @@ public class Entity {
     private float worldX;
     private float y;
     private float worldZ;
+    public float collisionWidth;
+    public float collisionHeight;
 
     protected TextureRegion textureRegion;
     protected Decal decal;
@@ -58,7 +59,11 @@ public class Entity {
         this.y = y;
         this.worldZ = worldZ;
 
-        decal.setPosition(worldX, y + 0.1f, worldZ);
+        decal.setPosition(
+                worldX + (textureRegion.getRegionWidth() / (float) TILE_SIZE / 2f),
+                y + 0.1f,
+                worldZ + (textureRegion.getRegionHeight() / (float) TILE_SIZE / 2f)
+        );
     }
 
     public float getWorldX() {
