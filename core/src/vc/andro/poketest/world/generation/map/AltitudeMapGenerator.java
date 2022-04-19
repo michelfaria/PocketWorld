@@ -1,17 +1,17 @@
 package vc.andro.poketest.world.generation.map;
 
 import com.badlogic.gdx.math.MathUtils;
-import vc.andro.poketest.world.generation.NoiseGenerator;
+import vc.andro.poketest.world.generation.FloatNoiseGenerator;
 import vc.andro.poketest.world.WorldCreationParams;
 
 import static vc.andro.poketest.world.Chunk.CHUNK_DEPTH;
 
 public class AltitudeMapGenerator {
 
-    private final NoiseGenerator noiseGenerator;
+    private final FloatNoiseGenerator noiseGenerator;
     private final WorldCreationParams creationParams;
 
-    public AltitudeMapGenerator(NoiseGenerator noiseGenerator, WorldCreationParams creationParams) {
+    public AltitudeMapGenerator(FloatNoiseGenerator noiseGenerator, WorldCreationParams creationParams) {
         this.noiseGenerator = noiseGenerator;
         this.creationParams = creationParams;
     }
@@ -22,7 +22,7 @@ public class AltitudeMapGenerator {
             float amplitudeSum = 0.0f;
             for (int octave = 1; octave <= creationParams.altitudeMapOctaves; octave++) {
                 float amplitude = 1.0f / (float) octave;
-                elevation += amplitude * noiseGenerator.getNoise(
+                elevation += amplitude * noiseGenerator.getAtPosition(
                         wx * creationParams.altitudeMapFrequency * octave,
                         wz * creationParams.altitudeMapFrequency * octave
                 );

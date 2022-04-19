@@ -1,12 +1,12 @@
 package vc.andro.poketest.util;
 
-import vc.andro.poketest.world.generation.NoiseGenerator;
+import vc.andro.poketest.world.generation.FloatNoiseGenerator;
 
 @SuppressWarnings("ALL")
-public class FastNoise implements NoiseGenerator {
+public class FastNoise implements FloatNoiseGenerator {
 
     @Override
-    public float getNoise(float x, float y) {
+    public float getAtPosition(float x, float y) {
         return GetNoise(x, y);
     }
 
@@ -166,6 +166,11 @@ public class FastNoise implements NoiseGenerator {
     /// </summary>
     public FastNoise(int seed) {
         SetSeed(seed);
+    }
+
+    public FastNoise(int seed, NoiseType noiseType) {
+        this(seed);
+        SetNoiseType(noiseType);
     }
 
     /// <summary>

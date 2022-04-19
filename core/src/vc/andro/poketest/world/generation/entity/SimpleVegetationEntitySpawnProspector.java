@@ -3,21 +3,21 @@ package vc.andro.poketest.world.generation.entity;
 import vc.andro.poketest.tile.BasicVoxel;
 import vc.andro.poketest.tile.VoxelType;
 import vc.andro.poketest.world.Chunk;
-import vc.andro.poketest.world.generation.map.FlowerMapGenerator;
+import vc.andro.poketest.world.generation.IntNoiseGenerator;
 
-public class FlowerEntitySpawnProspector implements SpawnProspector<ProspectorResult> {
+public class SimpleVegetationEntitySpawnProspector implements SpawnProspector<ProspectorResult> {
 
-    private final FlowerMapGenerator flowerMapGenerator;
+    private final IntNoiseGenerator noiseGenerator;
 
-    public FlowerEntitySpawnProspector(FlowerMapGenerator flowerMapGenerator) {
-        this.flowerMapGenerator = flowerMapGenerator;
+    public SimpleVegetationEntitySpawnProspector(IntNoiseGenerator noiseGenerator) {
+        this.noiseGenerator = noiseGenerator;
     }
 
     @Override
     public ProspectorResult prospect(Chunk chunk, int wx, int wz, int cx, int cz, int lx, int lz) {
         var result = new ProspectorResult();
 
-        if (flowerMapGenerator.getAtPosition(wx, wz) == 0) {
+        if (noiseGenerator.getAtPosition(wx, wz) == 0) {
             return result;
         }
         BasicVoxel surfaceTile = chunk.getSurfaceTile(lx, lz);
