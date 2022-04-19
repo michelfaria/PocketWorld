@@ -1,5 +1,5 @@
 package vc.andro.poketest.entity;
-
+/*
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -122,6 +122,7 @@ public class Player extends Entity {
         } else {
             playerMoving = false;
         }
-        setPosition(wx, getY(), wz);
+        setPosition(wx, getWy(), wz);
     }
 }
+*/

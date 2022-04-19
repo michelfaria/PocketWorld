@@ -3,40 +3,48 @@ package vc.andro.poketest.entity;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.math.Vector2;
-import vc.andro.poketest.Assets;
-import vc.andro.poketest.PocketWorld;
-import vc.andro.poketest.PocketCamera;
-import vc.andro.poketest.graphics.Duocal;
-import vc.andro.poketest.util.AtlasUtil;
+import com.badlogic.gdx.utils.Array;
+import org.jetbrains.annotations.Nullable;
 
 import static vc.andro.poketest.PocketWorld.TILE_SIZE;
 
 public class Entity {
     private float wx;
-    private float y;
+    private float wy;
     private float wz;
 
-    protected Vector2 collisionDims;
-    protected TextureRegion textureRegion;
-    protected Duocal decal;
+    protected Vector2 dimensions;
+    protected Array<EntityDecal> decals;
 
-    public Entity(String spriteId) {
-        this(spriteId, new Vector2(0, 0));
+    public Entity() {
+        this(new Vector2(1, 1));
     }
 
-    public Entity(String spriteId, Vector2 collisionDims) {
-        textureRegion = AtlasUtil.findRegion(PocketWorld.assetManager.get(Assets.entityAtlas), spriteId);
-        decal = new Duocal(textureRegion, true);
-        decal.setDimensions(
-                textureRegion.getRegionWidth() / (float) TILE_SIZE,
-                textureRegion.getRegionHeight() / (float) TILE_SIZE
+    public Entity(Vector2 dimensions) {
+        this.dimensions = dimensions;
+        decals = new Array<>(EntityDecal.class);
+    }
+
+    protected void addDecal(EntityDecal eDecal) {
+        TextureRegion txReg = eDecal.getTextureRegion();
+        eDecal.decal.setDimensions(
+                txReg.getRegionWidth() / TILE_SIZE,
+                txReg.getRegionHeight() / TILE_SIZE
         );
-        this.collisionDims = collisionDims;
+        eDecal.decal.setRotation(eDecal.yaw, eDecal.pitch, eDecal.roll);
+        decals.add(eDecal);
     }
 
-    public void draw(DecalBatch decalBatch, PocketCamera pocketCamera) {
-        decal.setRotation(0, 0, 0);
-        decal.addToBatch(decalBatch);
+    protected void addDecals(EntityDecal... decals) {
+        for (EntityDecal decal : decals) {
+            addDecal(decal);
+        }
+    }
+
+    public void draw(DecalBatch decalBatch) {
+        for (EntityDecal eDecal : decals) {
+            decalBatch.add(eDecal.decal);
+        }
     }
 
     public void tick() {
@@ -45,24 +53,26 @@ public class Entity {
     public void update(float delta) {
     }
 
-    public void setPosition(float wx, float y, float wz) {
+    public void setPosition(float wx, float wy, float wz) {
         this.wx = wx;
-        this.y = y;
+        this.wy = wy;
         this.wz = wz;
 
-        decal.setPosition(
-                wx + (textureRegion.getRegionWidth() / (float) TILE_SIZE / 2f),
-                y + (textureRegion.getRegionHeight() / (float) TILE_SIZE / 2f),
-                wz + (textureRegion.getRegionHeight() / (float) TILE_SIZE / 2f)
-        );
+        for (EntityDecal eDecal : decals) {
+            eDecal.decal.setPosition(
+                    wx + eDecal.offsetWx + dimensions.x / 2.0f,
+                    wy + eDecal.offsetWy,
+                    wz + eDecal.offsetWz + dimensions.y / 2.0f
+            );
+        }
     }
 
     public float getWx() {
         return wx;
     }
 
-    public float getY() {
-        return y;
+    public float getWy() {
+        return wy;
     }
 
     public float getWz() {

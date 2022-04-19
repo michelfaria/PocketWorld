@@ -3,6 +3,9 @@ package vc.andro.poketest.world.generation;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import org.jetbrains.annotations.Nullable;
+import vc.andro.poketest.entity.FlowerEntity;
+import vc.andro.poketest.entity.TallGrassEntity;
+import vc.andro.poketest.entity.TreeEntity;
 import vc.andro.poketest.tile.BasicVoxel;
 import vc.andro.poketest.tile.SlopeVoxel;
 import vc.andro.poketest.tile.VoxelType;
@@ -11,10 +14,11 @@ import vc.andro.poketest.util.FastNoise;
 import vc.andro.poketest.world.Chunk;
 import vc.andro.poketest.world.World;
 import vc.andro.poketest.world.WorldCreationParams;
-import vc.andro.poketest.world.generation.entity.*;
+import vc.andro.poketest.world.generation.entity.SimpleEntitySpawner;
+import vc.andro.poketest.world.generation.entity.SimpleVegetationEntitySpawnProspector;
+import vc.andro.poketest.world.generation.entity.WorldGenEntitySpawner;
 import vc.andro.poketest.world.generation.map.AltitudeMapGenerator;
-import vc.andro.poketest.world.generation.map.FlowerMapGenerator;
-import vc.andro.poketest.world.generation.map.TreeMapGenerator;
+import vc.andro.poketest.world.generation.map.VegetationMapGenerator;
 
 import java.util.Random;
 
@@ -30,6 +34,7 @@ public class WorldGenerator {
 
     public final WorldGenEntitySpawner<?> treeSpawner;
     public final WorldGenEntitySpawner<?> flowerSpawner;
+    public final WorldGenEntitySpawner<?> tallGrassSpawner;
 
     private @Nullable
     World world = null;
@@ -43,12 +48,37 @@ public class WorldGenerator {
                 params
         );
         treeSpawner = new WorldGenEntitySpawner<>(
-                new SimpleVegetationEntitySpawnProspector(new TreeMapGenerator(new BlueNoise(params.seed), params)),
-                new TreeEntitySpawner()
+                new SimpleVegetationEntitySpawnProspector(
+                        new VegetationMapGenerator(new BlueNoise(params.seed)) {
+                            @Override
+                            public int getRValue() {
+                                return params.treeMapRValue;
+                            }
+                        },
+                        2, 2
+                ),
+                new SimpleEntitySpawner<>(TreeEntity.class)
         );
         flowerSpawner = new WorldGenEntitySpawner<>(
-                new SimpleVegetationEntitySpawnProspector(new FlowerMapGenerator(new BlueNoise(params.seed + 1), params)),
-                new FlowerEntitySpawner()
+                new SimpleVegetationEntitySpawnProspector(
+                        new VegetationMapGenerator(new BlueNoise(params.seed + 1)) {
+                            @Override
+                            public int getRValue() {
+                                return params.flowerMapRValue;
+                            }
+                        }),
+                new SimpleEntitySpawner<>(FlowerEntity.class)
+        );
+        tallGrassSpawner = new WorldGenEntitySpawner<>(
+                new SimpleVegetationEntitySpawnProspector(
+                        new VegetationMapGenerator(new BlueNoise(params.seed + 2)) {
+                            @Override
+                            public int getRValue() {
+                                return 2;
+                            }
+                        }
+                ),
+                new SimpleEntitySpawner<>(TallGrassEntity.class)
         );
     }
 
@@ -82,6 +112,8 @@ public class WorldGenerator {
 
         treeSpawner.spawnEntitiesInChunk(chunk);
         flowerSpawner.spawnEntitiesInChunk(chunk);
+        tallGrassSpawner.spawnEntitiesInChunk(chunk);
+
         world.updateChunk(cx, cz);
     }
 

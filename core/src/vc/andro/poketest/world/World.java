@@ -255,7 +255,7 @@ public class World implements RenderableProvider {
     public void renderEntities(DecalBatch decalBatch, PocketCamera pocketCamera) {
         dbgEntitiesRendered = 0;
         for (Entity entity : entities) {
-            entity.draw(decalBatch, pocketCamera);
+            entity.draw(decalBatch);
             dbgEntitiesRendered++;
         }
     }

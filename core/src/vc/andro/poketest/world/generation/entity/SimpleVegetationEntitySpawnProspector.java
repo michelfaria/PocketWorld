@@ -9,8 +9,17 @@ public class SimpleVegetationEntitySpawnProspector implements SpawnProspector<Pr
 
     private final IntNoiseGenerator noiseGenerator;
 
+    private final int entityCollisionWidth;
+    private final int entityCollisionHeight;
+
     public SimpleVegetationEntitySpawnProspector(IntNoiseGenerator noiseGenerator) {
+        this(noiseGenerator, 1, 1);
+    }
+
+    public SimpleVegetationEntitySpawnProspector(IntNoiseGenerator noiseGenerator, int entityCollisionWidth, int entityCollisionHeight) {
         this.noiseGenerator = noiseGenerator;
+        this.entityCollisionWidth = entityCollisionWidth;
+        this.entityCollisionHeight = entityCollisionHeight;
     }
 
     @Override
@@ -27,15 +36,19 @@ public class SimpleVegetationEntitySpawnProspector implements SpawnProspector<Pr
 
         int y = surfaceTile.y + 1;
 
-        BasicVoxel tile = chunk.world.getTileAt_WP(wx, y, wz);
-        if (tile != null) {
-            return result;
-        }
+        for (int ix = 0; ix < entityCollisionWidth; ix++) {
+            for (int iz = 0; iz < entityCollisionHeight; iz++) {
+                BasicVoxel tile = chunk.world.getTileAt_WP(wx + ix, y, wz + iz);
+                if (tile != null) {
+                    return result;
+                }
 
-        BasicVoxel ty1 = chunk.world.getTileAt_WP(wx, y - 1, wz);
+                BasicVoxel ty1 = chunk.world.getTileAt_WP(wx + ix, y - 1, wz + iz);
 
-        if (ty1 == null || !ty1.type.equals(VoxelType.GRASS)) {
-            return result;
+                if (ty1 == null || !ty1.type.equals(VoxelType.GRASS)) {
+                    return result;
+                }
+            }
         }
 
         result.shouldSpawn = true;

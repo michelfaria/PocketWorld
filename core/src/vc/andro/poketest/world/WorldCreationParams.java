@@ -1,10 +1,8 @@
 package vc.andro.poketest.world;
 
-import java.util.Random;
-
 public class WorldCreationParams {
 
-    private static final int DEFAULT_WORLD_SEED = new Random().nextInt();
+    private static final int DEFAULT_WORLD_SEED = 0;
     private static final int DEFAULT_WORLD_WATER_LEVEL = 64;
     private static final int DEFAULT_WORLD_TERRACES = 0;
     private static final int DEFAULT_WORLD_BEACH_ALTITUDE = 68;
