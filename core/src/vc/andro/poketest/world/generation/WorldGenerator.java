@@ -3,7 +3,6 @@ package vc.andro.poketest.world.generation;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import org.jetbrains.annotations.Nullable;
-import vc.andro.poketest.entity.FlowerEntity;
 import vc.andro.poketest.tile.BasicVoxel;
 import vc.andro.poketest.tile.SlopeVoxel;
 import vc.andro.poketest.tile.VoxelType;
@@ -12,6 +11,7 @@ import vc.andro.poketest.util.FastNoise;
 import vc.andro.poketest.world.Chunk;
 import vc.andro.poketest.world.World;
 import vc.andro.poketest.world.WorldCreationParams;
+import vc.andro.poketest.world.generation.entity.*;
 import vc.andro.poketest.world.generation.map.AltitudeMapGenerator;
 import vc.andro.poketest.world.generation.map.FlowerMapGenerator;
 import vc.andro.poketest.world.generation.map.TreeMapGenerator;
@@ -32,8 +32,8 @@ public class WorldGenerator {
 
     public final TreeMapGenerator treeMapGenerator;
     public final FlowerMapGenerator flowerMapGenerator;
-    public final WorldGenEntitySpawner treeSpawner;
-    public final WorldGenEntitySpawner flowerSpawner;
+    public final WorldGenEntitySpawner<?> treeSpawner;
+    public final WorldGenEntitySpawner<?> flowerSpawner;
 
     private @Nullable
     World world = null;
@@ -47,8 +47,8 @@ public class WorldGenerator {
         altitudeMapGenerator = new AltitudeMapGenerator(perlinNoiseGenerator, params);
         treeMapGenerator = new TreeMapGenerator(blueNoiseGenerator, params);
         flowerMapGenerator = new FlowerMapGenerator(blueNoiseGenerator, params);
-        treeSpawner = new WorldGenEntitySpawner(new TreeEntitySpawnProspector(treeMapGenerator), new TreeEntitySpawner());
-        flowerSpawner = new WorldGenEntitySpawner(new FlowerEntitySpawnProspector(flowerMapGenerator), new FlowerEntitySpawner());
+        treeSpawner = new WorldGenEntitySpawner<>(new TreeEntitySpawnProspector(treeMapGenerator), new TreeEntitySpawner());
+        flowerSpawner = new WorldGenEntitySpawner<>(new FlowerEntitySpawnProspector(flowerMapGenerator), new FlowerEntitySpawner());
     }
 
     public World createWorld() {
