@@ -13,7 +13,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.Assets;
-import vc.andro.poketest.PokeTest;
+import vc.andro.poketest.PocketWorld;
 import vc.andro.poketest.tile.BasicVoxel;
 
 import static vc.andro.poketest.world.VertexArray.VERTEX_SIZE;
@@ -61,7 +61,7 @@ public class Chunk implements RenderableProvider {
                 new TextureAttribute(
                         TextureAttribute.Diffuse,
                         // TODO: This might be insufficient when the Tile atlas grows to have more than one texture
-                        PokeTest.assetManager.get(Assets.tileAtlas).getTextures().first()
+                        PocketWorld.assetManager.get(Assets.tileAtlas).getTextures().first()
                 ),
                 new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
         );
@@ -128,30 +128,30 @@ public class Chunk implements RenderableProvider {
                         if (voxel == null) {
                             continue;
                         }
-                        if (voxel.transparent || (y < CHUNK_DEPTH - 1 && (voxels[x][y + 1][z] == null || voxels[x][y + 1][z].transparent))) {
+               //         if (voxel.transparent || (y < CHUNK_DEPTH - 1 && (voxels[x][y + 1][z] == null || voxels[x][y + 1][z].transparent))) {
                             voxel.createTopVertices(vertexArray8f);
                             indicesArray.addSquare();
-                        }
-                        if (voxel.transparent || (y > 0 && (voxels[x][y - 1][z] == null || voxels[x][y - 1][z].transparent))) {
+                //        }
+               //         if (voxel.transparent || (y > 0 && (voxels[x][y - 1][z] == null || voxels[x][y - 1][z].transparent))) {
                             voxel.createBottomVertices(vertexArray8f);
                             indicesArray.addSquare();
-                        }
-                        if (voxel.transparent || (x > 0 && (voxels[x - 1][y][z] == null || voxels[x - 1][y][z].transparent))) {
+               //         }
+              //          if (voxel.transparent || (x > 0 && (voxels[x - 1][y][z] == null || voxels[x - 1][y][z].transparent))) {
                             voxel.createLeftVertices(vertexArray8f);
                             indicesArray.addSquare();
-                        }
-                        if (voxel.transparent || (x < CHUNK_SIZE - 1 && (voxels[x + 1][y][z] == null || voxels[x + 1][y][z].transparent))) {
+                //        }
+               //         if (voxel.transparent || (x < CHUNK_SIZE - 1 && (voxels[x + 1][y][z] == null || voxels[x + 1][y][z].transparent))) {
                             voxel.createRightVertices(vertexArray8f);
                             indicesArray.addSquare();
-                        }
-                        if (voxel.transparent || (z > 0 && (voxels[x][y][z - 1] == null || voxels[x][y][z - 1].transparent))) {
+                 //       }
+              //          if (voxel.transparent || (z > 0 && (voxels[x][y][z - 1] == null || voxels[x][y][z - 1].transparent))) {
                             voxel.createFrontVertices(vertexArray8f);
                             indicesArray.addSquare();
-                        }
-                        if (voxel.transparent || (z < CHUNK_SIZE - 1 && (voxels[x][y][z + 1] == null || voxels[x][y][z + 1].transparent))) {
+              //          }
+              //          if (voxel.transparent || (z < CHUNK_SIZE - 1 && (voxels[x][y][z + 1] == null || voxels[x][y][z + 1].transparent))) {
                             voxel.createBackVertices(vertexArray8f);
                             indicesArray.addSquare();
-                        }
+              //          }
                     }
                 }
             }

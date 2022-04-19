@@ -3,13 +3,13 @@ package vc.andro.poketest.tile;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import vc.andro.poketest.Assets;
-import vc.andro.poketest.PokeTest;
+import vc.andro.poketest.PocketWorld;
 import vc.andro.poketest.util.AtlasUtil;
 import vc.andro.poketest.world.Chunk;
 import vc.andro.poketest.world.VertexArray;
 import vc.andro.poketest.world.World;
 
-import static vc.andro.poketest.PokeTest.TILE_SIZE;
+import static vc.andro.poketest.PocketWorld.TILE_SIZE;
 
 public class BasicVoxel {
 
@@ -53,7 +53,7 @@ public class BasicVoxel {
     }
 
     public void setSprite(String spriteId) {
-        textureRegion = AtlasUtil.findRegion(PokeTest.assetManager.get(Assets.tileAtlas), spriteId);
+        textureRegion = AtlasUtil.findRegion(PocketWorld.assetManager.get(Assets.tileAtlas), spriteId);
     }
 
     public void createTopVertices(VertexArray vertices) {

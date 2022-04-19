@@ -133,7 +133,7 @@ public class MyCameraGroupStrategy implements GroupStrategy, Disposable {
                 + "void main()\n"//
                 + "{\n" //
                 + "  vec4 texel = v_color * texture2D(u_texture, v_texCoords);\n" +
-                "  if (texel.a < 1.0) {\n" +
+                "  if (texel.a < 0.01) {\n" +
                 "    discard;\n" +
                 "  " +
                 "}\n" +

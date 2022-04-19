@@ -1,16 +1,15 @@
 package vc.andro.poketest.entity;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.math.Vector2;
 import vc.andro.poketest.Assets;
-import vc.andro.poketest.PokeTest;
-import vc.andro.poketest.Pokecam;
+import vc.andro.poketest.PocketWorld;
+import vc.andro.poketest.PocketCamera;
 import vc.andro.poketest.graphics.Duocal;
 import vc.andro.poketest.util.AtlasUtil;
 
-import static vc.andro.poketest.PokeTest.TILE_SIZE;
+import static vc.andro.poketest.PocketWorld.TILE_SIZE;
 
 public class Entity {
     private float worldX;
@@ -26,7 +25,7 @@ public class Entity {
     }
 
     public Entity(String spriteId, Vector2 collisionDims) {
-        textureRegion = AtlasUtil.findRegion(PokeTest.assetManager.get(Assets.entityAtlas), spriteId);
+        textureRegion = AtlasUtil.findRegion(PocketWorld.assetManager.get(Assets.entityAtlas), spriteId);
         decal = new Duocal(textureRegion, true);
         decal.setDimensions(
                 textureRegion.getRegionWidth() / (float) TILE_SIZE,
@@ -35,19 +34,7 @@ public class Entity {
         this.collisionDims = collisionDims;
     }
 
-    public void draw(SpriteBatch spriteBatch) {
-        draw(spriteBatch, textureRegion);
-    }
-
-    protected void draw(SpriteBatch spriteBatch, TextureRegion sprite) {
-        spriteBatch.draw(
-                sprite,
-                worldX * TILE_SIZE,
-                worldZ * TILE_SIZE
-        );
-    }
-
-    public void draw(DecalBatch decalBatch, Pokecam pokecam) {
+    public void draw(DecalBatch decalBatch, PocketCamera pocketCamera) {
         decal.setRotation(0, 0, 0);
         decal.addToBatch(decalBatch);
     }

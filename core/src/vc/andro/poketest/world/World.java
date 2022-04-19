@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Pool;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import vc.andro.poketest.Pokecam;
+import vc.andro.poketest.PocketCamera;
 import vc.andro.poketest.entity.Entity;
 import vc.andro.poketest.tile.BasicVoxel;
 
@@ -251,10 +251,10 @@ public class World implements RenderableProvider {
         }
     }
 
-    public void renderEntities(DecalBatch decalBatch, Pokecam pokecam) {
+    public void renderEntities(DecalBatch decalBatch, PocketCamera pocketCamera) {
         dbgInfo_entitiesRendered = 0;
         for (Entity entity : entities) {
-            entity.draw(decalBatch, pokecam);
+            entity.draw(decalBatch, pocketCamera);
             dbgInfo_entitiesRendered++;
         }
     }

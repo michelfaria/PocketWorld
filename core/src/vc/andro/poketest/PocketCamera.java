@@ -9,30 +9,19 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import org.jetbrains.annotations.Nullable;
 
-import static vc.andro.poketest.PokeTest.TILE_SIZE;
+import static vc.andro.poketest.PocketWorld.TILE_SIZE;
 
-public class Pokecam {
+public class PocketCamera  {
 
-    public static final float CAM_SPEED = 0.1f;
-    private static final boolean doDebugFPSController = false;
+    public static final float CAM_SPEED = 0.5f;
 
     private final PerspectiveCamera camera;
-    private final @Nullable
-    FirstPersonCameraController firstPersonCameraController;
 
-    public Pokecam() {
+    public PocketCamera() {
         camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.near = 0.5f;
         camera.far = 100f;
         camera.lookAt(0, -1, 0);
-
-        if (doDebugFPSController) {
-            firstPersonCameraController = new FirstPersonCameraController(camera);
-            firstPersonCameraController.setVelocity(100);
-            Gdx.input.setInputProcessor(firstPersonCameraController);
-        } else {
-            firstPersonCameraController = null;
-        }
     }
 
     public Matrix4 getProjectionMatrix() {
@@ -53,10 +42,6 @@ public class Pokecam {
     }
 
     private void updatePosition() {
-        if (firstPersonCameraController != null) {
-            firstPersonCameraController.update();
-            return;
-        }
         /*
          * Update camera translation
          */

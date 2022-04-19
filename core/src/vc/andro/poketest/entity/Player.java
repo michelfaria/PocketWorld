@@ -3,13 +3,12 @@ package vc.andro.poketest.entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import org.jetbrains.annotations.NotNull;
 import vc.andro.poketest.Assets;
 import vc.andro.poketest.Direction;
-import vc.andro.poketest.PokeTest;
+import vc.andro.poketest.PocketWorld;
 import vc.andro.poketest.util.AtlasUtil;
 
 public class Player extends Entity {
@@ -36,7 +35,7 @@ public class Player extends Entity {
         super("entity/player/idle-down");
         direction = Direction.SOUTH;
 
-        TextureAtlas textureAtlas = PokeTest.assetManager.get(Assets.entityAtlas);
+        TextureAtlas textureAtlas = PocketWorld.assetManager.get(Assets.entityAtlas);
 
         idleUp = AtlasUtil.findRegion(textureAtlas, "entity/player/idle-up");
         idleDown = AtlasUtil.findRegion(textureAtlas, "entity/player/idle-down");
@@ -99,12 +98,6 @@ public class Player extends Entity {
             case EAST -> currentTexture = idleRight;
             case SOUTH -> currentTexture = idleDown;
         }
-    }
-
-    @Override
-    public void draw(SpriteBatch spriteBatch) {
-        assert currentTexture != null : "no texture set for player";
-        draw(spriteBatch, currentTexture);
     }
 
     public void updateMovement() {

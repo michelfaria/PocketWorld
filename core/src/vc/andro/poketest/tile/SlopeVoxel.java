@@ -242,6 +242,7 @@ public class SlopeVoxel extends BasicVoxel {
         );
     }
 
+    @Override
     public void createRightVertices(VertexArray vertices) {
         vertices.addVertex8f(
                 worldX + 1,     // x
@@ -254,7 +255,7 @@ public class SlopeVoxel extends BasicVoxel {
                 0);             // v
         vertices.addVertex8f(
                 worldX + 1,     // x
-                y + getHeightInDirection(Direction.SOUTHEAST),              // y
+                y,              // y
                 worldZ + 1,     // z
                 1,              // normal x
                 0,              //        y
@@ -263,7 +264,7 @@ public class SlopeVoxel extends BasicVoxel {
                 0);             // v
         vertices.addVertex8f(
                 worldX + 1,     // x
-                y,              // y
+                y + getHeightInDirection(Direction.SOUTHEAST),          // y
                 worldZ + 1,     // z
                 1,              // normal x
                 0,              //        y
