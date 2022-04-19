@@ -1,6 +1,6 @@
-package vc.andro.poketest.world.map;
+package vc.andro.poketest.world.generation.map;
 
-import vc.andro.poketest.world.NoiseGenerator;
+import vc.andro.poketest.world.generation.NoiseGenerator;
 
 public abstract class VegetationMapGenerator {
 

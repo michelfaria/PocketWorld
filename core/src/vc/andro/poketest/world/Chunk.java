@@ -69,8 +69,8 @@ public class Chunk implements RenderableProvider {
     }
 
     public @Nullable
-    BasicVoxel getTileAt(int chunkLocalX, int y, int chunkLocalZ) {
-        return voxels[chunkLocalX][y][chunkLocalZ];
+    BasicVoxel getTileAt(int lx, int y, int lz) {
+        return voxels[lx][y][lz];
     }
 
     public void putTileAt(int chunkLocalX, int y, int chunkLocalZ, @Nullable BasicVoxel tile) {

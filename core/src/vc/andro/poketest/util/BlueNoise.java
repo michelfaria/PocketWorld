@@ -2,7 +2,7 @@
 
 package vc.andro.poketest.util;
 
-import vc.andro.poketest.world.NoiseGenerator;
+import vc.andro.poketest.world.generation.NoiseGenerator;
 
 import java.nio.charset.StandardCharsets;
 

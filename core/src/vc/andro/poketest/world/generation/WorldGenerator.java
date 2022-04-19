@@ -1,19 +1,20 @@
-package vc.andro.poketest.world;
+package vc.andro.poketest.world.generation;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.entity.FlowerEntity;
-import vc.andro.poketest.entity.TreeEntity;
 import vc.andro.poketest.tile.BasicVoxel;
 import vc.andro.poketest.tile.SlopeVoxel;
 import vc.andro.poketest.tile.VoxelType;
 import vc.andro.poketest.util.BlueNoise;
 import vc.andro.poketest.util.FastNoise;
-import vc.andro.poketest.world.map.AltitudeMapGenerator;
-import vc.andro.poketest.world.map.FlowerMapGenerator;
-import vc.andro.poketest.world.map.TreeMapGenerator;
-import vc.andro.poketest.world.map.VegetationMapGenerator;
+import vc.andro.poketest.world.Chunk;
+import vc.andro.poketest.world.World;
+import vc.andro.poketest.world.WorldCreationParams;
+import vc.andro.poketest.world.generation.map.AltitudeMapGenerator;
+import vc.andro.poketest.world.generation.map.FlowerMapGenerator;
+import vc.andro.poketest.world.generation.map.TreeMapGenerator;
 
 import java.util.Random;
 
@@ -29,8 +30,10 @@ public class WorldGenerator {
     public final BlueNoise blueNoiseGenerator;
     public final AltitudeMapGenerator altitudeMapGenerator;
 
-    public final VegetationMapGenerator treeMapGenerator;
-    public final VegetationMapGenerator flowerMapGenerator;
+    public final TreeMapGenerator treeMapGenerator;
+    public final FlowerMapGenerator flowerMapGenerator;
+    public final WorldGenEntitySpawner treeSpawner;
+    public final WorldGenEntitySpawner flowerSpawner;
 
     private @Nullable
     World world = null;
@@ -44,6 +47,8 @@ public class WorldGenerator {
         altitudeMapGenerator = new AltitudeMapGenerator(perlinNoiseGenerator, params);
         treeMapGenerator = new TreeMapGenerator(blueNoiseGenerator, params);
         flowerMapGenerator = new FlowerMapGenerator(blueNoiseGenerator, params);
+        treeSpawner = new WorldGenEntitySpawner(new TreeEntitySpawnProspector(treeMapGenerator), new TreeEntitySpawner());
+        flowerSpawner = new WorldGenEntitySpawner(new FlowerEntitySpawnProspector(flowerMapGenerator), new FlowerEntitySpawner());
     }
 
     public World createWorld() {
@@ -74,8 +79,8 @@ public class WorldGenerator {
         Chunk chunk = world.getChunkAt_CP(cx, cz);
         assert chunk != null;
 
-        spawnTrees(chunk);
-        spawnFlowers(chunk);
+        treeSpawner.spawnEntitiesInChunk(chunk);
+        flowerSpawner.spawnEntitiesInChunk(chunk);
         world.updateChunk(cx, cz);
     }
 
@@ -109,75 +114,6 @@ public class WorldGenerator {
 
         // Spawn grass
         world.putTileAt_WP(wx, y, wz, new BasicVoxel(VoxelType.GRASS));
-    }
-
-    private void spawnTrees(Chunk chunk) {
-        assert world != null;
-        for (int chunkLocalX = 0; chunkLocalX < CHUNK_SIZE; chunkLocalX++) {
-            for (int chunkLocalZ = 0; chunkLocalZ < CHUNK_SIZE; chunkLocalZ++) {
-                BasicVoxel surfaceTile = chunk.getSurfaceTile(chunkLocalX, chunkLocalZ);
-                if (surfaceTile == null) {
-                    continue;
-                }
-                int wx = LxWx(chunk.cx, chunkLocalX);
-                int wz = LzWz(chunk.cz, chunkLocalZ);
-                if (shouldTreeBeSpawnedAtPosition(wx, surfaceTile.y + 1, wz)) {
-                    var tree = new TreeEntity();
-                    tree.setPosition(wx, surfaceTile.y + 1, wz);
-                    world.addEntity(tree);
-                }
-            }
-        }
-    }
-
-    private void spawnFlowers(Chunk chunk) {
-        assert world != null;
-
-        for (int lx = 0; lx < CHUNK_SIZE; lx++) {
-            for (int lz = 0; lz < CHUNK_SIZE; lz++) {
-                BasicVoxel surfaceTile = chunk.getSurfaceTile(lx, lz);
-                if (surfaceTile == null) {
-                    continue;
-                }
-                int wx = LxWx(chunk.cx, lx);
-                int wz = LzWz(chunk.cz, lz);
-                if (shouldFlowerBeSpawnedAtPosition(wx, surfaceTile.y + 1, wz)) {
-                    var flower = new FlowerEntity();
-                    flower.setPosition(wx, surfaceTile.y + 1, wz);
-                    world.addEntity(flower);
-                }
-            }
-        }
-    }
-
-    private boolean shouldTreeBeSpawnedAtPosition(int wx, int y, int wz) {
-        assert world != null;
-        for (int ix = 0; ix < TreeEntity.COLLISION_WIDTH; ix++) {
-            for (int iz = 0; iz < TreeEntity.COLLISION_HEIGHT; iz++) {
-                BasicVoxel tileY0 = world.getTileAt_WP(wx + ix, y - 1, wz + iz);
-                BasicVoxel tileY1 = world.getTileAt_WP(wx + ix, y, wz + iz);
-                if (tileY0 == null || !tileY0.type.equals(VoxelType.GRASS)) {
-                    return false;
-                }
-                if (tileY1 != null) {
-                    return false;
-                }
-            }
-        }
-        return treeMapGenerator.getAtPosition(wx, wz) > 0;
-    }
-
-    private boolean shouldFlowerBeSpawnedAtPosition(int wx, int y, int wz) {
-        assert world != null;
-        BasicVoxel ty0 = world.getTileAt_WP(wx, y, wz);
-        if (ty0 != null) {
-            return false;
-        }
-        BasicVoxel ty1 = world.getTileAt_WP(wx, y - 1, wz);
-        if (ty1 == null || !ty1.type.equals(VoxelType.GRASS)) {
-            return false;
-        }
-        return flowerMapGenerator.getAtPosition(wx, wz) > 0;
     }
 
     @SuppressWarnings("DuplicatedCode")

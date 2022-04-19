@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.PocketCamera;
 import vc.andro.poketest.entity.Entity;
 import vc.andro.poketest.tile.BasicVoxel;
+import vc.andro.poketest.world.generation.WorldGenerator;
 
 import java.util.Iterator;
 

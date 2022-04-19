@@ -18,7 +18,7 @@ import vc.andro.poketest.graphics.MyCameraGroupStrategy;
 import vc.andro.poketest.tile.BasicVoxel;
 import vc.andro.poketest.world.World;
 import vc.andro.poketest.world.WorldCreationParams;
-import vc.andro.poketest.world.WorldGenerator;
+import vc.andro.poketest.world.generation.WorldGenerator;
 
 import static vc.andro.poketest.PocketWorld.TILE_SIZE;
 import static vc.andro.poketest.PocketWorld.assetManager;
