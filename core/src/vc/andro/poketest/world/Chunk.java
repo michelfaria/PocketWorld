@@ -30,8 +30,8 @@ public class Chunk implements RenderableProvider {
     public static final int MAX_INDICES_PER_CHUNK = VOXELS_PER_CHUNK * (int) Math.pow(FACES_IN_A_CUBE, 2) / SIDES_IN_A_TRIANGLE;
 
     public final World world;
-    public final int chunkX;
-    public final int chunkZ;
+    public final int cx;
+    public final int cz;
     public final BasicVoxel[][][] voxels;
     public int voxelCount; // Amount of voxels that exist in this chunk
 
@@ -42,10 +42,10 @@ public class Chunk implements RenderableProvider {
 
     public boolean needsRenderingUpdate;
 
-    public Chunk(World world, int chunkX, int chunkZ) {
+    public Chunk(World world, int cx, int cz) {
         this.world = world;
-        this.chunkX = chunkX;
-        this.chunkZ = chunkZ;
+        this.cx = cx;
+        this.cz = cz;
         voxels = new BasicVoxel[CHUNK_SIZE][CHUNK_DEPTH][CHUNK_SIZE];
         vertexArray8f = new VertexArray();
         indicesArray = new IndexArray();
@@ -83,11 +83,11 @@ public class Chunk implements RenderableProvider {
         if (tile != null) {
             tile.world = world;
             tile.chunk = this;
-            tile.worldX = chunkX * CHUNK_SIZE + chunkLocalX;
-            tile.worldZ = chunkZ * CHUNK_SIZE + chunkLocalZ;
+            tile.wx = cx * CHUNK_SIZE + chunkLocalX;
+            tile.wz = cz * CHUNK_SIZE + chunkLocalZ;
             tile.y = y;
-            tile.chunkLocalX = chunkLocalX;
-            tile.chunkLocalZ = chunkLocalZ;
+            tile.cx = chunkLocalX;
+            tile.lz = chunkLocalZ;
         }
         voxels[chunkLocalX][y][chunkLocalZ] = tile;
     }
@@ -107,9 +107,9 @@ public class Chunk implements RenderableProvider {
     }
 
     public @Nullable
-    BasicVoxel getSurfaceTile(int localChunkX, int localChunkZ) {
+    BasicVoxel getSurfaceTile(int lx, int lz) {
         for (int y = CHUNK_DEPTH - 1; y >= 0; y--) {
-            BasicVoxel tile = getTileAt(localChunkX, y, localChunkZ);
+            BasicVoxel tile = getTileAt(lx, y, lz);
             if (tile != null) {
                 return tile;
             }

@@ -60,18 +60,18 @@ public class TreeEntity extends Entity {
     }
 
     @Override
-    public void setPosition(float worldX, float y, float worldZ) {
-        super.setPosition(worldX, y, worldZ);
+    public void setPosition(float wx, float y, float wz) {
+        super.setPosition(wx, y, wz);
         treeLeafBase.setPosition(
-                worldX + treeLeafBaseRegion.getRegionWidth() / (float) TILE_SIZE / 2f,
+                wx + treeLeafBaseRegion.getRegionWidth() / (float) TILE_SIZE / 2f,
                 y + 26 / (float) TILE_SIZE,
-                worldZ + treeLeafBaseRegion.getRegionHeight() / (float) TILE_SIZE);
-        treeLeafTop.setPosition(worldX + treeLeafTopRegion.getRegionWidth() / (float) TILE_SIZE / 2f,
+                wz + treeLeafBaseRegion.getRegionHeight() / (float) TILE_SIZE);
+        treeLeafTop.setPosition(wx + treeLeafTopRegion.getRegionWidth() / (float) TILE_SIZE / 2f,
                 y + 53 / (float) TILE_SIZE,
-                worldZ + treeLeafTopRegion.getRegionHeight() / (float) TILE_SIZE);
+                wz + treeLeafTopRegion.getRegionHeight() / (float) TILE_SIZE);
         treeTrunk.setPosition(
-                worldX + treeTrunkRegion.getRegionWidth() / (float) TILE_SIZE / 2f,
+                wx + treeTrunkRegion.getRegionWidth() / (float) TILE_SIZE / 2f,
                 y + 1 / (float) TILE_SIZE,
-                worldZ + treeTrunkRegion.getRegionHeight() / (float) TILE_SIZE);
+                wz + treeTrunkRegion.getRegionHeight() / (float) TILE_SIZE);
     }
 }

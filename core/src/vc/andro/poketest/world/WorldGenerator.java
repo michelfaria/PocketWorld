@@ -49,9 +49,9 @@ public class WorldGenerator {
     public World createWorld() {
         log("Generating world...");
         world = new World(params, this);
-        for (int chunkX = 0; chunkX < 10; chunkX++) {
-            for (int chunkZ = 0; chunkZ < 10; chunkZ++) {
-                generateChunk(chunkX, chunkZ);
+        for (int cx = 0; cx < 10; cx++) {
+            for (int cz = 0; cz < 10; cz++) {
+                generateChunk(cx, cz);
             }
         }
         log("World gen is done!");
@@ -62,53 +62,53 @@ public class WorldGenerator {
         Gdx.app.log("WorldGen", message);
     }
 
-    public void generateChunk(int chunkX, int chunkZ) {
-        log("Generating chunk: " + chunkX + ", " + chunkZ);
+    public void generateChunk(int cx, int cz) {
+        log("Generating chunk: " + cx + ", " + cz);
         assert world != null;
         for (int chunkLocalX = 0; chunkLocalX < CHUNK_SIZE; chunkLocalX++) {
             for (int chunkLocalZ = 0; chunkLocalZ < CHUNK_SIZE; chunkLocalZ++) {
-                generateTileAtPosition(chunkX, chunkZ, chunkLocalX, chunkLocalZ);
+                generateTileAtPosition(cx, cz, chunkLocalX, chunkLocalZ);
             }
         }
 
-        Chunk chunk = world.getChunkAt_CP(chunkX, chunkZ);
+        Chunk chunk = world.getChunkAt_CP(cx, cz);
         assert chunk != null;
 
         spawnTrees(chunk);
         spawnFlowers(chunk);
-        world.updateChunk(chunkX, chunkZ);
+        world.updateChunk(cx, cz);
     }
 
-    private void generateTileAtPosition(int chunkX, int chunkZ, int chunkLocalX, int chunkLocalZ) {
-        generateTileAtPosition(chunkX, chunkZ, chunkLocalX, chunkLocalZ, -1);
+    private void generateTileAtPosition(int cx, int cz, int lx, int lz) {
+        generateTileAtPosition(cx, cz, lx, lz, -1);
     }
 
-    private void generateTileAtPosition(int chunkX, int chunkZ, int chunkLocalX, int chunkLocalZ, int y) {
+    private void generateTileAtPosition(int cx, int cz, int lx, int lz, int y) {
         assert world != null;
-        int worldX = LxWx(chunkX, chunkLocalX);
-        int worldZ = LzWz(chunkZ, chunkLocalZ);
-        y = y < 0 ? altitudeMapGenerator.altitudeAtPos(worldX, worldZ) : y;
+        int wx = LxWx(cx, lx);
+        int wz = LzWz(cz, lz);
+        y = y < 0 ? altitudeMapGenerator.altitudeAtPos(wx, wz) : y;
 
         if (y <= params.waterLevel) {
             // Is water tile
-            world.putTileAt_WP(worldX, params.waterLevel, worldZ, new BasicVoxel(VoxelType.WATER));
+            world.putTileAt_WP(wx, params.waterLevel, wz, new BasicVoxel(VoxelType.WATER));
             return;
         }
 
-        if (generateWalls(worldX, y, worldZ)) {
+        if (generateWalls(wx, y, wz)) {
             // Wall tile generated
-            generateTileAtPosition(chunkX, chunkZ, chunkLocalX, chunkLocalZ, y - 1);
+            generateTileAtPosition(cx, cz, lx, lz, y - 1);
             return;
         }
 
         if (y <= params.beachAltitude) {
             // Is sand tile
-            world.putTileAt_WP(worldX, y, worldZ, new BasicVoxel(VoxelType.SAND));
+            world.putTileAt_WP(wx, y, wz, new BasicVoxel(VoxelType.SAND));
             return;
         }
 
         // Spawn grass
-        world.putTileAt_WP(worldX, y, worldZ, new BasicVoxel(VoxelType.GRASS));
+        world.putTileAt_WP(wx, y, wz, new BasicVoxel(VoxelType.GRASS));
     }
 
     private void spawnTrees(Chunk chunk) {
@@ -119,11 +119,11 @@ public class WorldGenerator {
                 if (surfaceTile == null) {
                     continue;
                 }
-                int worldX = LxWx(chunk.chunkX, chunkLocalX);
-                int worldZ = LzWz(chunk.chunkZ, chunkLocalZ);
-                if (shouldTreeBeSpawnedAtPosition(worldX, surfaceTile.y + 1, worldZ)) {
+                int wx = LxWx(chunk.cx, chunkLocalX);
+                int wz = LzWz(chunk.cz, chunkLocalZ);
+                if (shouldTreeBeSpawnedAtPosition(wx, surfaceTile.y + 1, wz)) {
                     var tree = new TreeEntity();
-                    tree.setPosition(worldX, surfaceTile.y + 1, worldZ);
+                    tree.setPosition(wx, surfaceTile.y + 1, wz);
                     world.addEntity(tree);
                 }
             }
@@ -133,29 +133,29 @@ public class WorldGenerator {
     private void spawnFlowers(Chunk chunk) {
         assert world != null;
 
-        for (int chunkLocalX = 0; chunkLocalX < CHUNK_SIZE; chunkLocalX++) {
-            for (int chunkLocalZ = 0; chunkLocalZ < CHUNK_SIZE; chunkLocalZ++) {
-                BasicVoxel surfaceTile = chunk.getSurfaceTile(chunkLocalX, chunkLocalZ);
+        for (int lx = 0; lx < CHUNK_SIZE; lx++) {
+            for (int lz = 0; lz < CHUNK_SIZE; lz++) {
+                BasicVoxel surfaceTile = chunk.getSurfaceTile(lx, lz);
                 if (surfaceTile == null) {
                     continue;
                 }
-                int worldX = LxWx(chunk.chunkX, chunkLocalX);
-                int worldZ = LzWz(chunk.chunkZ, chunkLocalZ);
-                if (shouldFlowerBeSpawnedAtPosition(worldX, surfaceTile.y + 1, worldZ)) {
+                int wx = LxWx(chunk.cx, lx);
+                int wz = LzWz(chunk.cz, lz);
+                if (shouldFlowerBeSpawnedAtPosition(wx, surfaceTile.y + 1, wz)) {
                     var flower = new FlowerEntity();
-                    flower.setPosition(worldX, surfaceTile.y + 1, worldZ);
+                    flower.setPosition(wx, surfaceTile.y + 1, wz);
                     world.addEntity(flower);
                 }
             }
         }
     }
 
-    private boolean shouldTreeBeSpawnedAtPosition(int worldX, int y, int worldZ) {
+    private boolean shouldTreeBeSpawnedAtPosition(int wx, int y, int wz) {
         assert world != null;
         for (int ix = 0; ix < TreeEntity.COLLISION_WIDTH; ix++) {
             for (int iz = 0; iz < TreeEntity.COLLISION_HEIGHT; iz++) {
-                BasicVoxel tileY0 = world.getTileAt_WP(worldX + ix, y - 1, worldZ + iz);
-                BasicVoxel tileY1 = world.getTileAt_WP(worldX + ix, y, worldZ + iz);
+                BasicVoxel tileY0 = world.getTileAt_WP(wx + ix, y - 1, wz + iz);
+                BasicVoxel tileY1 = world.getTileAt_WP(wx + ix, y, wz + iz);
                 if (tileY0 == null || !tileY0.type.equals(VoxelType.GRASS)) {
                     return false;
                 }
@@ -164,92 +164,92 @@ public class WorldGenerator {
                 }
             }
         }
-        return treeMapGenerator.getAtPosition(worldX, worldZ) > 0;
+        return treeMapGenerator.getAtPosition(wx, wz) > 0;
     }
 
-    private boolean shouldFlowerBeSpawnedAtPosition(int worldX, int y, int worldZ) {
+    private boolean shouldFlowerBeSpawnedAtPosition(int wx, int y, int wz) {
         assert world != null;
-        BasicVoxel ty0 = world.getTileAt_WP(worldX, y, worldZ);
+        BasicVoxel ty0 = world.getTileAt_WP(wx, y, wz);
         if (ty0 != null) {
             return false;
         }
-        BasicVoxel ty1 = world.getTileAt_WP(worldX, y - 1, worldZ);
+        BasicVoxel ty1 = world.getTileAt_WP(wx, y - 1, wz);
         if (ty1 == null || !ty1.type.equals(VoxelType.GRASS)) {
             return false;
         }
-        return flowerMapGenerator.getAtPosition(worldX, worldZ) > 0;
+        return flowerMapGenerator.getAtPosition(wx, wz) > 0;
     }
 
     @SuppressWarnings("DuplicatedCode")
-    private boolean generateWalls(int worldX, int y, int worldZ) {
+    private boolean generateWalls(int wx, int y, int wz) {
         assert world != null;
 
-        float southwestY = altitudeMapGenerator.altitudeAtPos(worldX - 1, worldZ + 1);
-        float southY = altitudeMapGenerator.altitudeAtPos(worldX, worldZ + 1);
-        float southeastY = altitudeMapGenerator.altitudeAtPos(worldX + 1, worldZ + 1);
-        float westY = altitudeMapGenerator.altitudeAtPos(worldX - 1, worldZ);
-        float eastY = altitudeMapGenerator.altitudeAtPos(worldX + 1, worldZ);
-        float northwestY = altitudeMapGenerator.altitudeAtPos(worldX - 1, worldZ - 1);
-        float northY = altitudeMapGenerator.altitudeAtPos(worldX, worldZ - 1);
-        float northeastY = altitudeMapGenerator.altitudeAtPos(worldX + 1, worldZ - 1);
+        float southwestY = altitudeMapGenerator.altitudeAtPos(wx - 1, wz + 1);
+        float southY = altitudeMapGenerator.altitudeAtPos(wx, wz + 1);
+        float southeastY = altitudeMapGenerator.altitudeAtPos(wx + 1, wz + 1);
+        float westY = altitudeMapGenerator.altitudeAtPos(wx - 1, wz);
+        float eastY = altitudeMapGenerator.altitudeAtPos(wx + 1, wz);
+        float northwestY = altitudeMapGenerator.altitudeAtPos(wx - 1, wz - 1);
+        float northY = altitudeMapGenerator.altitudeAtPos(wx, wz - 1);
+        float northeastY = altitudeMapGenerator.altitudeAtPos(wx + 1, wz - 1);
 
         if (y > northwestY && y > westY && y > northY) {
-            world.putTileAt_WP(worldX, y, worldZ, new SlopeVoxel(NORTHWEST_CORNER));
+            world.putTileAt_WP(wx, y, wz, new SlopeVoxel(NORTHWEST_CORNER));
             return true;
         }
 
         if (y > northeastY && y > northY && y > eastY) {
-            world.putTileAt_WP(worldX, y, worldZ, new SlopeVoxel(NORTHEAST_CORNER));
+            world.putTileAt_WP(wx, y, wz, new SlopeVoxel(NORTHEAST_CORNER));
             return true;
         }
 
         if (y > southwestY && y > westY && y > southY) {
-            world.putTileAt_WP(worldX, y, worldZ, new SlopeVoxel(SOUTHWEST_CORNER));
+            world.putTileAt_WP(wx, y, wz, new SlopeVoxel(SOUTHWEST_CORNER));
             return true;
         }
 
         if (y > southeastY && y > eastY && y > southY) {
-            world.putTileAt_WP(worldX, y, worldZ, new SlopeVoxel(SOUTHEAST_CORNER));
+            world.putTileAt_WP(wx, y, wz, new SlopeVoxel(SOUTHEAST_CORNER));
             return true;
         }
 
         if (y > southwestY && MathUtils.isEqual(y, westY) && MathUtils.isEqual(y, southY)) {
-            world.putTileAt_WP(worldX, y, worldZ, new SlopeVoxel(SOUTHWEST_INNER_CORNER));
+            world.putTileAt_WP(wx, y, wz, new SlopeVoxel(SOUTHWEST_INNER_CORNER));
             return true;
         }
 
         if (y > southeastY && MathUtils.isEqual(y, eastY) && MathUtils.isEqual(y, southY)) {
-            world.putTileAt_WP(worldX, y, worldZ, new SlopeVoxel(SOUTHEAST_INNER_CORNER));
+            world.putTileAt_WP(wx, y, wz, new SlopeVoxel(SOUTHEAST_INNER_CORNER));
             return true;
         }
 
         if (y > northwestY && MathUtils.isEqual(y, westY) && MathUtils.isEqual(y, northY)) {
-            world.putTileAt_WP(worldX, y, worldZ, new SlopeVoxel(NORTHWEST_INNER_CORNER));
+            world.putTileAt_WP(wx, y, wz, new SlopeVoxel(NORTHWEST_INNER_CORNER));
             return true;
         }
 
         if (y > northeastY && MathUtils.isEqual(y, eastY) && MathUtils.isEqual(y, northY)) {
-            world.putTileAt_WP(worldX, y, worldZ, new SlopeVoxel(NORTHEAST_INNER_CORNER));
+            world.putTileAt_WP(wx, y, wz, new SlopeVoxel(NORTHEAST_INNER_CORNER));
             return true;
         }
 
         if (westY < y) {
-            world.putTileAt_WP(worldX, y, worldZ, new SlopeVoxel(WEST_EDGE));
+            world.putTileAt_WP(wx, y, wz, new SlopeVoxel(WEST_EDGE));
             return true;
         }
 
         if (eastY < y) {
-            world.putTileAt_WP(worldX, y, worldZ, new SlopeVoxel(EAST_EDGE));
+            world.putTileAt_WP(wx, y, wz, new SlopeVoxel(EAST_EDGE));
             return true;
         }
 
         if (southY < y) {
-            world.putTileAt_WP(worldX, y, worldZ, new SlopeVoxel(SOUTH_EDGE));
+            world.putTileAt_WP(wx, y, wz, new SlopeVoxel(SOUTH_EDGE));
             return true;
         }
 
         if (northY < y) {
-            world.putTileAt_WP(worldX, y, worldZ, new SlopeVoxel(NORTH_EDGE));
+            world.putTileAt_WP(wx, y, wz, new SlopeVoxel(NORTH_EDGE));
             return true;
         }
 

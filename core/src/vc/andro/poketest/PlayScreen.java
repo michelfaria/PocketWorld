@@ -118,10 +118,10 @@ public class PlayScreen implements Screen {
                         + ", iters: " + dbgInfo_iterations
                         + ", camPos: (%.2f, %.2f, %.2f)".formatted(pocketCamera.getPosition().x, pocketCamera.getPosition().y, pocketCamera.getPosition().z)
                         + ", camDir: " + pocketCamera.getDirection().toString()
-                        + ", chunksRendered: " + world.getDbgInfo_chunksRendered(),
+                        + ", chunksRendered: " + world.getDbgChunksRendered(),
                 0, 40);
         bitmapFont.draw(spriteBatch,
-                "entities rendered: " + world.getDbgInfo_entitiesRendered() +
+                "entities rendered: " + world.getDbgEntitiesRendered() +
                 ", camUp: " + pocketCamera.getUp(),
                 0, 28);
         spriteBatch.end();

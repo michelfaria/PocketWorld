@@ -101,27 +101,27 @@ public class Player extends Entity {
     }
 
     public void updateMovement() {
-        float worldX = getWorldX();
-        float worldZ = getWorldZ();
+        float wx = getWx();
+        float wz = getWz();
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             direction = Direction.WEST;
-            worldX -= 0.5f;
+            wx -= 0.5f;
             playerMoving = true;
         } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             direction = Direction.EAST;
-            worldX += 0.5f;
+            wx += 0.5f;
             playerMoving = true;
         } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             direction = Direction.SOUTH;
             playerMoving = true;
-            worldZ -= 0.5f;
+            wz -= 0.5f;
         } else if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
             direction = Direction.NORTH;
             playerMoving = true;
-            worldZ += 0.5f;
+            wz += 0.5f;
         } else {
             playerMoving = false;
         }
-        setPosition(worldX, getY(), worldZ);
+        setPosition(wx, getY(), wz);
     }
 }

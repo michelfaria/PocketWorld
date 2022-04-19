@@ -12,9 +12,9 @@ import vc.andro.poketest.util.AtlasUtil;
 import static vc.andro.poketest.PocketWorld.TILE_SIZE;
 
 public class Entity {
-    private float worldX;
+    private float wx;
     private float y;
-    private float worldZ;
+    private float wz;
 
     protected Vector2 collisionDims;
     protected TextureRegion textureRegion;
@@ -45,27 +45,27 @@ public class Entity {
     public void update(float delta) {
     }
 
-    public void setPosition(float worldX, float y, float worldZ) {
-        this.worldX = worldX;
+    public void setPosition(float wx, float y, float wz) {
+        this.wx = wx;
         this.y = y;
-        this.worldZ = worldZ;
+        this.wz = wz;
 
         decal.setPosition(
-                worldX + (textureRegion.getRegionWidth() / (float) TILE_SIZE / 2f),
+                wx + (textureRegion.getRegionWidth() / (float) TILE_SIZE / 2f),
                 y + (textureRegion.getRegionHeight() / (float) TILE_SIZE / 2f),
-                worldZ + (textureRegion.getRegionHeight() / (float) TILE_SIZE / 2f)
+                wz + (textureRegion.getRegionHeight() / (float) TILE_SIZE / 2f)
         );
     }
 
-    public float getWorldX() {
-        return worldX;
+    public float getWx() {
+        return wx;
     }
 
     public float getY() {
         return y;
     }
 
-    public float getWorldZ() {
-        return worldZ;
+    public float getWz() {
+        return wz;
     }
 }

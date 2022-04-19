@@ -23,12 +23,12 @@ public class World implements RenderableProvider {
     private final CoordMat<Chunk> chunks;
     private final Array<Entity> entities;
 
-    private int renderX;
-    private int renderZ;
+    private int rx;
+    private int rz;
     public int renderDistance = 10;
 
-    private int dbgInfo_chunksRendered;
-    private int dbgInfo_entitiesRendered;
+    private int dbgChunksRendered;
+    private int dbgEntitiesRendered;
 
     public World(WorldCreationParams creationParams, WorldGenerator worldGenerator) {
         this.creationParams = creationParams;
@@ -63,10 +63,10 @@ public class World implements RenderableProvider {
         }
     }
 
-    public void updateChunk(int chunkX, int chunkZ) {
-        Chunk chunk = getChunkAt_CP(chunkX, chunkZ);
+    public void updateChunk(int cx, int cz) {
+        Chunk chunk = getChunkAt_CP(cx, cz);
         if (chunk == null) {
-            throw new NullPointerException("no such chunk (" + chunkX + ", " + chunkZ + ")");
+            throw new NullPointerException("no such chunk (" + cx + ", " + cz + ")");
         }
         chunk.updateTiles();
     }
@@ -82,9 +82,9 @@ public class World implements RenderableProvider {
     };
 
     public void broadcastTileUpdateToAdjacentTiles(BasicVoxel updateOrigin) {
-        int ox = updateOrigin.worldX;
+        int ox = updateOrigin.wx;
         int oy = updateOrigin.y;
-        int oz = updateOrigin.worldZ;
+        int oz = updateOrigin.wz;
         for (int i = 0; i < ADJACENT_POSITIONS.length; i += 3) {
             int dx = ADJACENT_POSITIONS[i];
             int dy = ADJACENT_POSITIONS[i + 1];
@@ -99,55 +99,55 @@ public class World implements RenderableProvider {
         }
     }
 
-    public void putTileAt_WP(int worldX, int y, int worldZ, @NotNull BasicVoxel tile) {
-        Chunk chunk = getChunkAt_G_WP(worldX, worldZ);
+    public void putTileAt_WP(int wx, int y, int wz, @NotNull BasicVoxel tile) {
+        Chunk chunk = getChunkAt_G_WP(wx, wz);
         chunk.putTileAt(
-                WxLx(worldX),
+                WxLx(wx),
                 y,
-                WzLz(worldZ),
+                WzLz(wz),
                 tile
         );
     }
 
     @Nullable
-    public BasicVoxel getTileAt_WP(int worldX, int y, int worldZ) {
+    public BasicVoxel getTileAt_WP(int wx, int y, int wz) {
         Chunk chunk = getChunkAt_CP(
-                WxCx(worldX),
-                WzCz(worldZ)
+                WxCx(wx),
+                WzCz(wz)
         );
         if (chunk == null) {
             return null;
         }
         return chunk.getTileAt(
-                WxLx(worldX),
+                WxLx(wx),
                 y,
-                WzLz(worldZ)
+                WzLz(wz)
         );
     }
 
-    public BasicVoxel getTileAt_G_WP(int worldX, int y, int worldZ) {
-        Chunk chunk = getChunkAt_G_WP(worldX, worldZ);
+    public BasicVoxel getTileAt_G_WP(int wx, int y, int wz) {
+        Chunk chunk = getChunkAt_G_WP(wx, wz);
         BasicVoxel tile = chunk.getTileAt(
-                WxLx(worldX),
+                WxLx(wx),
                 y,
-                WzLz(worldZ)
+                WzLz(wz)
         );
         if (tile == null) {
-            throw new IllegalStateException("No tile at position (%d, %d, %d)".formatted(worldX, y, worldZ));
+            throw new IllegalStateException("No tile at position (%d, %d, %d)".formatted(wx, y, wz));
         }
         return tile;
     }
 
-    private Chunk getChunkAt_G_WP(int worldX, int worldZ) {
-        return getChunkAt_G_CP(WxCx(worldX), WzCz(worldZ));
+    private Chunk getChunkAt_G_WP(int wx, int wz) {
+        return getChunkAt_G_CP(WxCx(wx), WzCz(wz));
     }
 
-    private void createBlankChunkAt_CP(int chunkX, int chunkZ) {
-        if (getChunkAt_CP(chunkX, chunkZ) != null) {
-            throw new IllegalArgumentException("chunk already exists at %d,%d".formatted(chunkX, chunkZ));
+    private void createBlankChunkAt_CP(int cx, int cz) {
+        if (getChunkAt_CP(cx, cz) != null) {
+            throw new IllegalArgumentException("chunk already exists at %d,%d".formatted(cx, cz));
         }
-        Chunk emptyChunk = new Chunk(this, chunkX, chunkZ);
-        chunks.set(chunkX, chunkZ, emptyChunk);
+        Chunk emptyChunk = new Chunk(this, cx, cz);
+        chunks.set(cx, cz, emptyChunk);
     }
 
     public Array<Entity> getEntities() {
@@ -155,136 +155,136 @@ public class World implements RenderableProvider {
     }
 
     public @Nullable
-    Chunk getChunkAt_WP(int worldX, int worldZ) {
+    Chunk getChunkAt_WP(int wx, int wz) {
         return getChunkAt_CP(
-                WxCx(worldX),
-                WzLz(worldZ)
+                WxCx(wx),
+                WzLz(wz)
         );
     }
 
-    public Chunk getChunkAt_G_CP(int chunkX, int chunkZ) {
-        Chunk chunk = getChunkAt_CP(chunkX, chunkZ);
+    public Chunk getChunkAt_G_CP(int cx, int cz) {
+        Chunk chunk = getChunkAt_CP(cx, cz);
         if (chunk == null) {
-            createBlankChunkAt_CP(chunkX, chunkZ);
-            worldGenerator.generateChunk(chunkX, chunkZ);
-            chunk = getChunkAt_CP(chunkX, chunkZ);
+            createBlankChunkAt_CP(cx, cz);
+            worldGenerator.generateChunk(cx, cz);
+            chunk = getChunkAt_CP(cx, cz);
             assert chunk != null : "chunk should have generated";
         }
         return chunk;
     }
 
     public @Nullable
-    Chunk getChunkAt_CP(int chunkX, int chunkZ) {
-        return chunks.get(chunkX, chunkZ);
+    Chunk getChunkAt_CP(int cx, int cz) {
+        return chunks.get(cx, cz);
     }
 
     public @Nullable
-    BasicVoxel getSurfaceTile(int worldX, int worldZ) {
+    BasicVoxel getSurfaceTile(int wx, int wz) {
         Chunk chunk = getChunkAt_CP(
-                WxCx(worldX),
-                WzCz(worldZ)
+                WxCx(wx),
+                WzCz(wz)
         );
         if (chunk == null) {
             return null;
         }
         return chunk.getSurfaceTile(
-                WxLx(worldX),
-                WzLz(worldZ)
+                WxLx(wx),
+                WzLz(wz)
         );
     }
 
     public @Nullable
-    BasicVoxel getSurfaceTile_G(int worldX, int worldZ) {
-        Chunk chunk = getChunkAt_G_WP(worldX, worldZ);
-        return chunk.getSurfaceTile(WxLx(worldX), WzLz(worldZ));
+    BasicVoxel getSurfaceTile_G(int wx, int wz) {
+        Chunk chunk = getChunkAt_G_WP(wx, wz);
+        return chunk.getSurfaceTile(WxLx(wx), WzLz(wz));
     }
 
-    public static int WxCx(int worldX) {
-        return (int) Math.floor(worldX / (float) CHUNK_SIZE);
+    public static int WxCx(int wx) {
+        return (int) Math.floor(wx / (float) CHUNK_SIZE);
     }
 
-    public static int WzCz(int worldZ) {
-        return (int) Math.floor(worldZ / (float) CHUNK_SIZE);
+    public static int WzCz(int wz) {
+        return (int) Math.floor(wz / (float) CHUNK_SIZE);
     }
 
-    public static int CxWx(int chunkX) {
-        return chunkX * CHUNK_SIZE;
+    public static int CxWx(int cx) {
+        return cx * CHUNK_SIZE;
     }
 
-    public static int CzWz(int chunkZ) {
-        return chunkZ * CHUNK_SIZE;
+    public static int CzWz(int cz) {
+        return cz * CHUNK_SIZE;
     }
 
-    public static int WxLx(int worldX) {
-        if (worldX >= 0) {
-            return worldX % CHUNK_SIZE;
+    public static int WxLx(int wx) {
+        if (wx >= 0) {
+            return wx % CHUNK_SIZE;
         }
-        return (CHUNK_SIZE + (worldX % CHUNK_SIZE)) % CHUNK_SIZE;
+        return (CHUNK_SIZE + (wx % CHUNK_SIZE)) % CHUNK_SIZE;
     }
 
-    public static int WzLz(int worldZ) {
-        if (worldZ >= 0) {
-            return worldZ % CHUNK_SIZE;
+    public static int WzLz(int wz) {
+        if (wz >= 0) {
+            return wz % CHUNK_SIZE;
         }
-        return (CHUNK_SIZE + (worldZ % CHUNK_SIZE)) % CHUNK_SIZE;
+        return (CHUNK_SIZE + (wz % CHUNK_SIZE)) % CHUNK_SIZE;
     }
 
-    public static int LxWx(int chunkX, int localChunkX) {
-        return chunkX * CHUNK_SIZE + localChunkX;
+    public static int LxWx(int cx, int lx) {
+        return cx * CHUNK_SIZE + lx;
     }
 
-    public static int LzWz(int chunkZ, int localChunkZ) {
-        return chunkZ * CHUNK_SIZE + localChunkZ;
+    public static int LzWz(int cz, int lz) {
+        return cz * CHUNK_SIZE + lz;
     }
 
     @Override
     public void getRenderables(Array<Renderable> renderables, Pool<Renderable> pool) {
-        dbgInfo_chunksRendered = 0;
-        int chunkX = WxCx(renderX);
-        int chunkZ = WzCz(renderZ);
-        for (int cx = chunkX - renderDistance; cx < chunkX + renderDistance; cx++) {
-            for (int cz = chunkZ - renderDistance; cz < chunkZ + renderDistance; cz++) {
-                Chunk chunk = getChunkAt_G_CP(cx, cz);
+        dbgChunksRendered = 0;
+        int cx = WxCx(rx);
+        int cz = WzCz(rz);
+        for (int ix = cx - renderDistance; ix < cx + renderDistance; ix++) {
+            for (int iz = cz - renderDistance; iz < cz + renderDistance; iz++) {
+                Chunk chunk = getChunkAt_G_CP(ix, iz);
                 chunk.getRenderables(renderables, pool);
-                dbgInfo_chunksRendered++;
+                dbgChunksRendered++;
             }
         }
     }
 
     public void renderEntities(DecalBatch decalBatch, PocketCamera pocketCamera) {
-        dbgInfo_entitiesRendered = 0;
+        dbgEntitiesRendered = 0;
         for (Entity entity : entities) {
             entity.draw(decalBatch, pocketCamera);
-            dbgInfo_entitiesRendered++;
+            dbgEntitiesRendered++;
         }
     }
 
     public void setRenderPosition(int renderX, int renderZ) {
         unloadChunksOutsideOfRenderDistance(renderX, renderZ);
-        this.renderX = renderX;
-        this.renderZ = renderZ;
+        this.rx = renderX;
+        this.rz = renderZ;
     }
 
     private void unloadChunksOutsideOfRenderDistance(int renderX, int renderZ) {
-        int chunkX = WxCx(renderX);
-        int chunkZ = WzCz(renderZ);
+        int cx = WxCx(renderX);
+        int cz = WzCz(renderZ);
         for (IntMap<Chunk> yMap : chunks.map.values()) {
             Iterator<Chunk> iterChunk = yMap.values().iterator();
             while (iterChunk.hasNext()) {
                 Chunk chunk = iterChunk.next();
-                if (Math.abs(chunkX - chunk.chunkX) > renderDistance || Math.abs(chunkZ - chunk.chunkZ) > renderDistance) {
+                if (Math.abs(cx - chunk.cx) > renderDistance || Math.abs(cz - chunk.cz) > renderDistance) {
                     iterChunk.remove();
-                    System.out.println("removed chunk at (" + chunk.chunkX + "," + chunk.chunkZ + ")");
+                    System.out.println("removed chunk at (" + chunk.cx + "," + chunk.cz + ")");
                 }
             }
         }
     }
 
-    public int getDbgInfo_chunksRendered() {
-        return dbgInfo_chunksRendered;
+    public int getDbgChunksRendered() {
+        return dbgChunksRendered;
     }
 
-    public int getDbgInfo_entitiesRendered() {
-        return dbgInfo_entitiesRendered;
+    public int getDbgEntitiesRendered() {
+        return dbgEntitiesRendered;
     }
 }

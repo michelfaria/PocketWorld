@@ -12,18 +12,18 @@ public abstract class VegetationMapGenerator {
 
     public abstract int getRValue();
 
-    public int getAtPosition(int worldX, int worldZ) {
+    public int getAtPosition(int wx, int wz) {
         var r = getRValue();
         double max = 0;
-        for (int xn = worldX - r; xn <= worldX + r; xn++) {
-            for (int zn = worldZ - r; zn <= worldZ + r; zn++) {
-                double e = noiseGenerator.getNoise(xn, zn);
+        for (int ix = wx - r; ix <= wx + r; ix++) {
+            for (int iz = wz - r; iz <= wz + r; iz++) {
+                double e = noiseGenerator.getNoise(ix, iz);
                 if (e > max) {
                     max = e;
                 }
             }
         }
-        if (noiseGenerator.getNoise(worldX, worldZ) == max) {
+        if (noiseGenerator.getNoise(wx, wz) == max) {
             return 1;
         }
         return 0;
