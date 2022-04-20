@@ -22,7 +22,7 @@ public class WorldRenderingStrategy implements RenderableProvider {
 
     private float viewpointWx;
     private float viewpointWz;
-    private int renderDistanceInChunks = 10;
+    private int renderDistanceInChunks = 12;
 
     public WorldRenderingStrategy(PocketCamera cam, World world) {
         this.cam = cam;
@@ -36,6 +36,9 @@ public class WorldRenderingStrategy implements RenderableProvider {
         int cz = WzCz(viewpointWz);
         for (int ix = cx - renderDistanceInChunks; ix < cx + renderDistanceInChunks; ix++) {
             for (int iz = cz - renderDistanceInChunks; iz < cz + renderDistanceInChunks; iz++) {
+                if (!cam.isChunkVisible(ix, iz)) {
+                    continue;
+                }
                 Chunk chunk = world.getChunkAt_G_CP(ix, iz);
                 chunk.getRenderables(renderables, pool);
                 chunksRendered++;
@@ -47,15 +50,18 @@ public class WorldRenderingStrategy implements RenderableProvider {
     public void renderEntities(DecalBatch decalBatch) {
         int rendered = 0;
         for (Entity entity : world.getEntities()) {
+            if (!cam.isVisible(entity)) {
+                continue;
+            }
             entity.draw(decalBatch);
             rendered++;
         }
         Registry.debugInfoMap.put("entitiesRendered", Integer.toString(rendered));
     }
 
-    public void setCameraPosition_WP(float wx, float wz) {
-        viewpointWx = wx;
-        viewpointWz = wz;
+    public void updateViewpoint() {
+        viewpointWx = cam.getPosition().x;
+        viewpointWz = cam.getPosition().z;
         unloadChunksOutsideOfRenderDistance();
         deleteEntitiesOutsideOfRenderDistance();
     }

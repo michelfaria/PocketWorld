@@ -7,13 +7,16 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import vc.andro.poketest.entity.Entity;
-import vc.andro.poketest.tile.BasicVoxel;
 
 import static vc.andro.poketest.PocketWorld.PPU;
+import static vc.andro.poketest.world.Chunk.CHUNK_DEPTH;
+import static vc.andro.poketest.world.Chunk.CHUNK_SIZE;
+import static vc.andro.poketest.world.World.CxWx;
+import static vc.andro.poketest.world.World.CzWz;
 
 public class PocketCamera {
 
-    public static final float CAM_SPEED = 0.5f;
+    public static final float CAM_SPEED = 0.25f;
 
     private final PerspectiveCamera camera;
 
@@ -109,15 +112,17 @@ public class PocketCamera {
         return camera.up;
     }
 
-    public boolean isVisible(BasicVoxel voxel) {
-        return isVisible(voxel.wx, voxel.wy, voxel.wz);
+    public boolean isChunkVisible(int cx, int cz) {
+        return camera.frustum.boundsInFrustum(CxWx(cx), 0, CzWz(cz),
+                CHUNK_SIZE / 2.0f, CHUNK_DEPTH / 2.0f, CHUNK_SIZE / 2.0f);
     }
 
     public boolean isVisible(Entity entity) {
-        return isVisible((int) entity.getWx(), (int) entity.getWy(), (int) entity.getWz());
+        return isVisible(entity.getWx(), entity.getWy(), entity.getWz());
     }
 
-    public boolean isVisible(int wx, int wy, int wz) {
-        return camera.frustum.pointInFrustum(wx * PPU, wy * PPU, wz * PPU);
+    public boolean isVisible(float wx, float wy, float wz) {
+        return camera.frustum.pointInFrustum(wx, wy, wz);
     }
+
 }

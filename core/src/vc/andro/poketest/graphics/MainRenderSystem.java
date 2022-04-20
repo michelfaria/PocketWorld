@@ -30,8 +30,8 @@ public class MainRenderSystem implements Disposable {
         this.world = world;
         this.cam = cam;
         env = new Environment();
-        env.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.2f, 0.2f, 0.2f, 1.0f));
-        env.add(new DirectionalLight().set(1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f));
+        env.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1.0f));
+        env.add(new DirectionalLight().set(1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 1.0f));
         cameraGroupStrategy = new MyCameraGroupStrategy(cam.getUnderlying());
         decalBatch = new DecalBatch(cameraGroupStrategy);
         modelBatch = new ModelBatch();
@@ -56,7 +56,7 @@ public class MainRenderSystem implements Disposable {
         modelBatch.render(worldRenderingStrategy, env);
         modelBatch.end();
 
-        worldRenderingStrategy.setCameraPosition_WP(cam.getPosition().x, cam.getPosition().z);
+        worldRenderingStrategy.updateViewpoint();
         worldRenderingStrategy.renderEntities(decalBatch);
 
         decalBatch.flush();

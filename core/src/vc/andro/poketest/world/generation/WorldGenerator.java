@@ -56,8 +56,7 @@ public class WorldGenerator {
                                 return params.treeMapRValue;
                             }
                         },
-                        2, 2
-                ),
+                        2, 2),
                 new SimpleEntitySpawner<>(TreeEntity.class)
         );
         flowerSpawner = new WorldGenEntitySpawner<>(
@@ -74,9 +73,7 @@ public class WorldGenerator {
                 new SimpleVegetationEntitySpawnProspector(
                         new GrassPatchMapGenerator(
                                 new FastNoise(params.seed + 1, FastNoise.NoiseType.Perlin),
-                                params
-                        )
-                ),
+                                params)),
                 new SimpleEntitySpawner<>(TallGrassEntity.class)
         );
     }
