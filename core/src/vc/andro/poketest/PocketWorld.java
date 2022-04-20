@@ -6,7 +6,8 @@ import vc.andro.poketest.world.WorldCreationParams;
 
 public class PocketWorld extends Game {
 
-    public static final float TILE_SIZE = 16;
+    public static final float PPU = 16; // Pixels per unit (Tile size, basically)
+    public static final int TICKS_PER_SECOND = 16;
 
     public static AssetManager assetManager;
 

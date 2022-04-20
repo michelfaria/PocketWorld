@@ -4,14 +4,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
-import org.jetbrains.annotations.Nullable;
+import vc.andro.poketest.entity.Entity;
+import vc.andro.poketest.tile.BasicVoxel;
 
-import static vc.andro.poketest.PocketWorld.TILE_SIZE;
+import static vc.andro.poketest.PocketWorld.PPU;
 
-public class PocketCamera  {
+public class PocketCamera {
 
     public static final float CAM_SPEED = 0.5f;
 
@@ -20,7 +20,7 @@ public class PocketCamera  {
     public PocketCamera() {
         camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.near = 0.5f;
-        camera.far = 100f;
+        camera.far = 10000f;
         camera.lookAt(0, -1, 0);
     }
 
@@ -33,7 +33,7 @@ public class PocketCamera  {
     }
 
     public boolean isPosOutsideOfCameraView(float x, float z) {
-        return !camera.frustum.boundsInFrustum(x, z, 0, TILE_SIZE, TILE_SIZE, 0);
+        return !camera.frustum.boundsInFrustum(x, z, 0, PPU, PPU, 0);
     }
 
     public void update() {
@@ -107,5 +107,17 @@ public class PocketCamera  {
 
     public Vector3 getUp() {
         return camera.up;
+    }
+
+    public boolean isVisible(BasicVoxel voxel) {
+        return isVisible(voxel.wx, voxel.wy, voxel.wz);
+    }
+
+    public boolean isVisible(Entity entity) {
+        return isVisible((int) entity.getWx(), (int) entity.getWy(), (int) entity.getWz());
+    }
+
+    public boolean isVisible(int wx, int wy, int wz) {
+        return camera.frustum.pointInFrustum(wx * PPU, wy * PPU, wz * PPU);
     }
 }

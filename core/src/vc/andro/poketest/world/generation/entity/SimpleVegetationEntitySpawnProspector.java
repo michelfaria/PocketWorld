@@ -29,12 +29,12 @@ public class SimpleVegetationEntitySpawnProspector implements SpawnProspector<Pr
         if (noiseGenerator.getAtPosition(wx, wz) == 0) {
             return result;
         }
-        BasicVoxel surfaceTile = chunk.getSurfaceTile(lx, lz);
+        BasicVoxel surfaceTile = chunk.getSurfaceTile_LP(lx, lz);
         if (surfaceTile == null) {
             return result;
         }
 
-        int y = surfaceTile.y + 1;
+        int y = surfaceTile.wy + 1;
 
         for (int ix = 0; ix < entityCollisionWidth; ix++) {
             for (int iz = 0; iz < entityCollisionHeight; iz++) {

@@ -69,12 +69,12 @@ public class Chunk implements RenderableProvider {
     }
 
     public @Nullable
-    BasicVoxel getTileAt(int lx, int y, int lz) {
+    BasicVoxel getTileAt_LP(int lx, int y, int lz) {
         return voxels[lx][y][lz];
     }
 
     public void putTileAt(int chunkLocalX, int y, int chunkLocalZ, @Nullable BasicVoxel tile) {
-        BasicVoxel previousTile = getTileAt(chunkLocalX, y, chunkLocalZ);
+        BasicVoxel previousTile = getTileAt_LP(chunkLocalX, y, chunkLocalZ);
         if (previousTile == null && tile != null) {
             voxelCount++;
         } else if (previousTile != null && tile == null) {
@@ -85,7 +85,7 @@ public class Chunk implements RenderableProvider {
             tile.chunk = this;
             tile.wx = cx * CHUNK_SIZE + chunkLocalX;
             tile.wz = cz * CHUNK_SIZE + chunkLocalZ;
-            tile.y = y;
+            tile.wy = y;
             tile.cx = chunkLocalX;
             tile.lz = chunkLocalZ;
         }
@@ -96,7 +96,7 @@ public class Chunk implements RenderableProvider {
         for (int chunkLocalX = 0; chunkLocalX < CHUNK_SIZE; chunkLocalX++) {
             for (int y = 0; y < CHUNK_DEPTH; y++) {
                 for (int chunkLocalZ = 0; chunkLocalZ < CHUNK_SIZE; chunkLocalZ++) {
-                    BasicVoxel tile = getTileAt(chunkLocalX, y, chunkLocalZ);
+                    BasicVoxel tile = getTileAt_LP(chunkLocalX, y, chunkLocalZ);
                     if (tile == null) {
                         continue;
                     }
@@ -107,9 +107,9 @@ public class Chunk implements RenderableProvider {
     }
 
     public @Nullable
-    BasicVoxel getSurfaceTile(int lx, int lz) {
+    BasicVoxel getSurfaceTile_LP(int lx, int lz) {
         for (int y = CHUNK_DEPTH - 1; y >= 0; y--) {
-            BasicVoxel tile = getTileAt(lx, y, lz);
+            BasicVoxel tile = getTileAt_LP(lx, y, lz);
             if (tile != null) {
                 return tile;
             }
@@ -128,30 +128,30 @@ public class Chunk implements RenderableProvider {
                         if (voxel == null) {
                             continue;
                         }
-               //         if (voxel.transparent || (y < CHUNK_DEPTH - 1 && (voxels[x][y + 1][z] == null || voxels[x][y + 1][z].transparent))) {
+                        if (voxel.transparent || (y < CHUNK_DEPTH - 1 && (voxels[x][y + 1][z] == null || voxels[x][y + 1][z].transparent))) {
                             voxel.createTopVertices(vertexArray8f);
                             indicesArray.addSquare();
-                //        }
-               //         if (voxel.transparent || (y > 0 && (voxels[x][y - 1][z] == null || voxels[x][y - 1][z].transparent))) {
+                        }
+                        if (voxel.transparent || (y > 0 && (voxels[x][y - 1][z] == null || voxels[x][y - 1][z].transparent))) {
                             voxel.createBottomVertices(vertexArray8f);
                             indicesArray.addSquare();
-               //         }
-              //          if (voxel.transparent || (x > 0 && (voxels[x - 1][y][z] == null || voxels[x - 1][y][z].transparent))) {
+                                     }
+                        if (voxel.transparent || (x > 0 && (voxels[x - 1][y][z] == null || voxels[x - 1][y][z].transparent))) {
                             voxel.createLeftVertices(vertexArray8f);
                             indicesArray.addSquare();
-                //        }
-               //         if (voxel.transparent || (x < CHUNK_SIZE - 1 && (voxels[x + 1][y][z] == null || voxels[x + 1][y][z].transparent))) {
+                       }
+                       if (voxel.transparent || (x < CHUNK_SIZE - 1 && (voxels[x + 1][y][z] == null || voxels[x + 1][y][z].transparent))) {
                             voxel.createRightVertices(vertexArray8f);
                             indicesArray.addSquare();
-                 //       }
-              //          if (voxel.transparent || (z > 0 && (voxels[x][y][z - 1] == null || voxels[x][y][z - 1].transparent))) {
+                        }
+                        if (voxel.transparent || (z > 0 && (voxels[x][y][z - 1] == null || voxels[x][y][z - 1].transparent))) {
                             voxel.createFrontVertices(vertexArray8f);
                             indicesArray.addSquare();
-              //          }
-              //          if (voxel.transparent || (z < CHUNK_SIZE - 1 && (voxels[x][y][z + 1] == null || voxels[x][y][z + 1].transparent))) {
+                        }
+                        if (voxel.transparent || (z < CHUNK_SIZE - 1 && (voxels[x][y][z + 1] == null || voxels[x][y][z + 1].transparent))) {
                             voxel.createBackVertices(vertexArray8f);
                             indicesArray.addSquare();
-              //          }
+                       }
                     }
                 }
             }

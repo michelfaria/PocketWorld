@@ -4,9 +4,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import org.jetbrains.annotations.Nullable;
 
-import static vc.andro.poketest.PocketWorld.TILE_SIZE;
+import static vc.andro.poketest.PocketWorld.PPU;
 
 public class Entity {
     private float wx;
@@ -28,8 +27,8 @@ public class Entity {
     protected void addDecal(EntityDecal eDecal) {
         TextureRegion txReg = eDecal.getTextureRegion();
         eDecal.decal.setDimensions(
-                txReg.getRegionWidth() / TILE_SIZE,
-                txReg.getRegionHeight() / TILE_SIZE
+                txReg.getRegionWidth() / PPU,
+                txReg.getRegionHeight() / PPU
         );
         eDecal.decal.setRotation(eDecal.yaw, eDecal.pitch, eDecal.roll);
         decals.add(eDecal);

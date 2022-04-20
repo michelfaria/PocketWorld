@@ -9,7 +9,7 @@ import vc.andro.poketest.world.Chunk;
 import vc.andro.poketest.world.VertexArray;
 import vc.andro.poketest.world.World;
 
-import static vc.andro.poketest.PocketWorld.TILE_SIZE;
+import static vc.andro.poketest.PocketWorld.PPU;
 
 public class BasicVoxel {
 
@@ -18,7 +18,7 @@ public class BasicVoxel {
     public Integer wx;
     public Integer wz;
     public Integer cx;
-    public Integer y;
+    public Integer wy;
     public Integer lz;
     public boolean transparent;
 
@@ -35,7 +35,7 @@ public class BasicVoxel {
     }
 
     protected void draw(SpriteBatch spriteBatch, int atX, int atZ) {
-        spriteBatch.draw(textureRegion, atX * TILE_SIZE, atZ * TILE_SIZE);
+        spriteBatch.draw(textureRegion, atX * PPU, atZ * PPU);
     }
 
     public void doTileUpdate() {
@@ -60,7 +60,7 @@ public class BasicVoxel {
         // northwest
         vertices.addVertex8f(
                 wx,                    // x
-                y + 1,                     // y
+                wy + 1,                     // y
                 wz,                    // z
                 0,                         // normal x
                 1,                         //        y
@@ -71,7 +71,7 @@ public class BasicVoxel {
         // northeast
         vertices.addVertex8f(
                 wx + 1,                // x
-                y + 1,                     // y
+                wy + 1,                     // y
                 wz,                    // z
                 0,                         // normal x
                 1,                         //        y
@@ -82,7 +82,7 @@ public class BasicVoxel {
         // southeast
         vertices.addVertex8f(
                 wx + 1,                // x
-                y + 1,                     // y
+                wy + 1,                     // y
                 wz + 1,                // z
                 0,                         // normal x
                 1,                         //        y
@@ -93,7 +93,7 @@ public class BasicVoxel {
         // southwest
         vertices.addVertex8f(
                 wx,                    // x
-                y + 1,                     // y
+                wy + 1,                     // y
                 wz + 1,                // z
                 0,                         // normal x
                 1,                         //        y
@@ -106,7 +106,7 @@ public class BasicVoxel {
     public void createRightVertices(VertexArray vertices) {
         vertices.addVertex8f(
                 wx + 1,     // x
-                y,              // y
+                wy,              // y
                 wz,         // z
                 1,              // normal x
                 0,              //        y
@@ -115,7 +115,7 @@ public class BasicVoxel {
                 0);             // v
         vertices.addVertex8f(
                 wx + 1,     // x
-                y,              // y
+                wy,              // y
                 wz + 1,     // z
                 1,              // normal x
                 0,              //        y
@@ -124,7 +124,7 @@ public class BasicVoxel {
                 0);             // v
         vertices.addVertex8f(
                 wx + 1,     // x
-                y + 1,          // y
+                wy + 1,          // y
                 wz + 1,     // z
                 1,              // normal x
                 0,              //        y
@@ -133,7 +133,7 @@ public class BasicVoxel {
                 0);             // v
         vertices.addVertex8f(
                 wx + 1,     // x
-                y + 1,          // y
+                wy + 1,          // y
                 wz,         // z
                 1,              // normal x
                 0,              //        y
@@ -145,7 +145,7 @@ public class BasicVoxel {
     public void createFrontVertices(VertexArray vertices) {
         vertices.addVertex8f(
                 wx,         // x
-                y,              // y
+                wy,              // y
                 wz,         // z
                 0,              // normal x
                 0,              //        y
@@ -154,7 +154,7 @@ public class BasicVoxel {
                 0);             // v
         vertices.addVertex8f(
                 wx + 1,     // x
-                y,              // y
+                wy,              // y
                 wz,         // z
                 0,              // normal x
                 0,              //        y
@@ -163,7 +163,7 @@ public class BasicVoxel {
                 0);             // v
         vertices.addVertex8f(
                 wx + 1,     // x
-                y + 1,          // y
+                wy + 1,          // y
                 wz,         // z
                 0,              // normal x
                 0,              //        y
@@ -172,7 +172,7 @@ public class BasicVoxel {
                 0);             // v
         vertices.addVertex8f(
                 wx,         // x
-                y + 1,          // y
+                wy + 1,          // y
                 wz,         // z
                 0,              // normal x
                 0,              //        y
@@ -184,7 +184,7 @@ public class BasicVoxel {
     public void createBackVertices(VertexArray vertices) {
         vertices.addVertex8f(
                 wx,         // x
-                y,              // y
+                wy,              // y
                 wz + 1,     // z
                 0,              // normal x
                 0,              //        y
@@ -193,7 +193,7 @@ public class BasicVoxel {
                 0);             // v
         vertices.addVertex8f(
                 wx,         // x
-                y + 1,          // y
+                wy + 1,          // y
                 wz + 1,     // z
                 0,              // normal x
                 0,              //        y
@@ -202,7 +202,7 @@ public class BasicVoxel {
                 0);             // v
         vertices.addVertex8f(
                 wx + 1,     // x
-                y + 1,          // y
+                wy + 1,          // y
                 wz + 1,     // z
                 0,              // normal x
                 0,              //        y
@@ -211,7 +211,7 @@ public class BasicVoxel {
                 0);             // v
         vertices.addVertex8f(
                 wx + 1,     // x
-                y,              // y
+                wy,              // y
                 wz + 1,     // z
                 0,              // normal x
                 0,              //        y
@@ -223,7 +223,7 @@ public class BasicVoxel {
     public void createBottomVertices(VertexArray vertices) {
         vertices.addVertex8f(
                 wx,         // x
-                y,              // y
+                wy,              // y
                 wz,         // z
                 0,              // normal x
                 -1,             //        y
@@ -232,7 +232,7 @@ public class BasicVoxel {
                 0);             // v
         vertices.addVertex8f(
                 wx,         // x
-                y,              // y
+                wy,              // y
                 wz + 1,     // z
                 0,              // normal x
                 -1,             //        y
@@ -241,7 +241,7 @@ public class BasicVoxel {
                 0);             // v
         vertices.addVertex8f(
                 wx + 1,     // x
-                y,              // y
+                wy,              // y
                 wz + 1,     // z
                 0,              // normal x
                 -1,             //        y
@@ -250,7 +250,7 @@ public class BasicVoxel {
                 0);             // v
         vertices.addVertex8f(
                 wx + 1,    // x
-                y,             // y
+                wy,             // y
                 wz,        // z
                 0,             // normal x
                 -1,            //        y
@@ -262,7 +262,7 @@ public class BasicVoxel {
     public void createLeftVertices(VertexArray vertices) {
         vertices.addVertex8f(
                 wx,        // x
-                y,             // y
+                wy,             // y
                 wz,        // z
                 -1,            // normal x
                 0,             //        y
@@ -271,7 +271,7 @@ public class BasicVoxel {
                 0);            // v
         vertices.addVertex8f(
                 wx,        // x
-                y + 1,         // y
+                wy + 1,         // y
                 wz,        // z
                 -1,            // normal x
                 0,             //        y
@@ -280,7 +280,7 @@ public class BasicVoxel {
                 0);            // v
         vertices.addVertex8f(
                 wx,        // x
-                y + 1,         // y
+                wy + 1,         // y
                 wz + 1,    // z
                 -1,            // normal x
                 0,             //        y
@@ -289,7 +289,7 @@ public class BasicVoxel {
                 0);            // v
         vertices.addVertex8f(
                 wx,        // x
-                y,             // y
+                wy,             // y
                 wz + 1,    // z
                 -1,            // normal x
                 0,             //        y

@@ -8,7 +8,7 @@ import vc.andro.poketest.Assets;
 import vc.andro.poketest.PocketWorld;
 import vc.andro.poketest.util.AtlasUtil;
 
-import static vc.andro.poketest.PocketWorld.TILE_SIZE;
+import static vc.andro.poketest.PocketWorld.PPU;
 
 public class TallGrassEntity extends Entity {
     public TallGrassEntity() {
@@ -23,7 +23,7 @@ public class TallGrassEntity extends Entity {
                     true
             ));
             decal.pitch = 90.0f;
-            decal.offsetWy = i * 2.0f / TILE_SIZE;
+            decal.offsetWy = i * 2.0f / PPU;
             addDecal(decal);
         }
     }

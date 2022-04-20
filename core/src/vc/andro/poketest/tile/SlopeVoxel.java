@@ -199,7 +199,7 @@ public class SlopeVoxel extends BasicVoxel {
         // northwest
         vertices.addVertex8f(
                 wx,                    // x
-                y + getHeightInDirection(Direction.NORTHWEST),                     // y
+                wy + getHeightInDirection(Direction.NORTHWEST),                     // y
                 wz,                    // z
                 0,                         // normal x
                 1,                         //        y
@@ -210,7 +210,7 @@ public class SlopeVoxel extends BasicVoxel {
         // northeast
         vertices.addVertex8f(
                 wx + 1,                // x
-                y + getHeightInDirection(Direction.NORTHEAST),                     // y
+                wy + getHeightInDirection(Direction.NORTHEAST),                     // y
                 wz,                    // z
                 0,                         // normal x
                 1,                         //        y
@@ -221,7 +221,7 @@ public class SlopeVoxel extends BasicVoxel {
         // southeast
         vertices.addVertex8f(
                 wx + 1,                // x
-                y + getHeightInDirection(Direction.SOUTHEAST),                     // y
+                wy + getHeightInDirection(Direction.SOUTHEAST),                     // y
                 wz + 1,                // z
                 0,                         // normal x
                 1,                         //        y
@@ -232,7 +232,7 @@ public class SlopeVoxel extends BasicVoxel {
         // southwest
         vertices.addVertex8f(
                 wx,                    // x
-                y + getHeightInDirection(Direction.SOUTHWEST),                     // y
+                wy + getHeightInDirection(Direction.SOUTHWEST),                     // y
                 wz + 1,                // z
                 0,                         // normal x
                 1,                         //        y
@@ -246,7 +246,7 @@ public class SlopeVoxel extends BasicVoxel {
     public void createRightVertices(VertexArray vertices) {
         vertices.addVertex8f(
                 wx + 1,     // x
-                y,              // y
+                wy,              // y
                 wz,         // z
                 1,              // normal x
                 0,              //        y
@@ -255,7 +255,7 @@ public class SlopeVoxel extends BasicVoxel {
                 0);             // v
         vertices.addVertex8f(
                 wx + 1,     // x
-                y,              // y
+                wy,              // y
                 wz + 1,     // z
                 1,              // normal x
                 0,              //        y
@@ -264,7 +264,7 @@ public class SlopeVoxel extends BasicVoxel {
                 0);             // v
         vertices.addVertex8f(
                 wx + 1,     // x
-                y + getHeightInDirection(Direction.SOUTHEAST),          // y
+                wy + getHeightInDirection(Direction.SOUTHEAST),          // y
                 wz + 1,     // z
                 1,              // normal x
                 0,              //        y
@@ -273,7 +273,7 @@ public class SlopeVoxel extends BasicVoxel {
                 0);             // v
         vertices.addVertex8f(
                 wx + 1,     // x
-                y + getHeightInDirection(Direction.NORTHEAST),          // y
+                wy + getHeightInDirection(Direction.NORTHEAST),          // y
                 wz,         // z
                 1,              // normal x
                 0,              //        y
@@ -286,7 +286,7 @@ public class SlopeVoxel extends BasicVoxel {
     public void createFrontVertices(VertexArray vertices) {
         vertices.addVertex8f(
                 wx,         // x
-                y + getHeightInDirection(Direction.NORTHWEST),              // y
+                wy + getHeightInDirection(Direction.NORTHWEST),              // y
                 wz,         // z
                 0,              // normal x
                 0,              //        y
@@ -295,7 +295,7 @@ public class SlopeVoxel extends BasicVoxel {
                 0);             // v
         vertices.addVertex8f(
                 wx + 1,     // x
-                y + getHeightInDirection(Direction.NORTHEAST),              // y
+                wy + getHeightInDirection(Direction.NORTHEAST),              // y
                 wz,         // z
                 0,              // normal x
                 0,              //        y
@@ -304,7 +304,7 @@ public class SlopeVoxel extends BasicVoxel {
                 0);             // v
         vertices.addVertex8f(
                 wx + 1,     // x
-                y,          // y
+                wy,          // y
                 wz,         // z
                 0,              // normal x
                 0,              //        y
@@ -313,7 +313,7 @@ public class SlopeVoxel extends BasicVoxel {
                 0);             // v
         vertices.addVertex8f(
                 wx,         // x
-                y,          // y
+                wy,          // y
                 wz,         // z
                 0,              // normal x
                 0,              //        y
@@ -326,7 +326,7 @@ public class SlopeVoxel extends BasicVoxel {
     public void createBackVertices(VertexArray vertices) {
         vertices.addVertex8f(
                 wx,         // x
-                y + getHeightInDirection(Direction.SOUTHWEST),              // y
+                wy + getHeightInDirection(Direction.SOUTHWEST),              // y
                 wz + 1,     // z
                 0,              // normal x
                 0,              //        y
@@ -335,7 +335,7 @@ public class SlopeVoxel extends BasicVoxel {
                 0);             // v
         vertices.addVertex8f(
                 wx,         // x
-                y,          // y
+                wy,          // y
                 wz + 1,     // z
                 0,              // normal x
                 0,              //        y
@@ -344,7 +344,7 @@ public class SlopeVoxel extends BasicVoxel {
                 0);             // v
         vertices.addVertex8f(
                 wx + 1,     // x
-                y + getHeightInDirection(Direction.SOUTHEAST),          // y
+                wy + getHeightInDirection(Direction.SOUTHEAST),          // y
                 wz + 1,     // z
                 0,              // normal x
                 0,              //        y
@@ -353,7 +353,7 @@ public class SlopeVoxel extends BasicVoxel {
                 0);             // v
         vertices.addVertex8f(
                 wx + 1,     // x
-                y,              // y
+                wy,              // y
                 wz + 1,     // z
                 0,              // normal x
                 0,              //        y
@@ -366,7 +366,7 @@ public class SlopeVoxel extends BasicVoxel {
     public void createLeftVertices(VertexArray vertices) {
         vertices.addVertex8f(
                 wx,        // x
-                y + getHeightInDirection(Direction.NORTHWEST),             // y
+                wy + getHeightInDirection(Direction.NORTHWEST),             // y
                 wz,        // z
                 -1,            // normal x
                 0,             //        y
@@ -375,7 +375,7 @@ public class SlopeVoxel extends BasicVoxel {
                 0);            // v
         vertices.addVertex8f(
                 wx,        // x
-                y,         // y
+                wy,         // y
                 wz,        // z
                 -1,            // normal x
                 0,             //        y
@@ -384,7 +384,7 @@ public class SlopeVoxel extends BasicVoxel {
                 0);            // v
         vertices.addVertex8f(
                 wx,        // x
-                y + getHeightInDirection(Direction.SOUTHWEST),         // y
+                wy + getHeightInDirection(Direction.SOUTHWEST),         // y
                 wz + 1,    // z
                 -1,            // normal x
                 0,             //        y
@@ -393,7 +393,7 @@ public class SlopeVoxel extends BasicVoxel {
                 0);            // v
         vertices.addVertex8f(
                 wx,        // x
-                y,             // y
+                wy,             // y
                 wz + 1,    // z
                 -1,            // normal x
                 0,             //        y

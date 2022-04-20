@@ -83,7 +83,7 @@ public class WorldGenerator {
 
     public World createWorld() {
         log("Generating world...");
-        world = new World(params, this);
+        world = new World(this);
         for (int cx = 0; cx < 10; cx++) {
             for (int cz = 0; cz < 10; cz++) {
                 generateChunk(cx, cz);
