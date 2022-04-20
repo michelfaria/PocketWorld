@@ -1,4 +1,4 @@
-package vc.andro.poketest.tile;
+package vc.andro.poketest.voxel;
 
 public enum VoxelType {
     GRASS("tile/bwgrass", true),

@@ -1,4 +1,4 @@
-package vc.andro.poketest.tile;
+package vc.andro.poketest.voxel;
 
 import vc.andro.poketest.Direction;
 import vc.andro.poketest.world.VertexArray;
@@ -11,7 +11,7 @@ public class SlopeVoxel extends BasicVoxel {
         super(VoxelType.SLOPE);
         this.slopeType = slopeType;
         updateSlopeType(slopeType);
-        transparent = true;
+        setTransparent(true);
     }
 
     public void updateSlopeType(SlopeType newType) {
@@ -198,83 +198,83 @@ public class SlopeVoxel extends BasicVoxel {
     public void createTopVertices(VertexArray vertices) {
         // northwest
         vertices.addVertex8f(
-                wx,                    // x
-                wy + getHeightInDirection(Direction.NORTHWEST),                     // y
-                wz,                    // z
+                getWx(),                    // x
+                getWy() + getHeightInDirection(Direction.NORTHWEST),                     // y
+                getWz(),                    // z
                 0,                         // normal x
                 1,                         //        y
                 0,                         //        z
-                textureRegion.getU(),      // u
-                textureRegion.getV()      // v
+                getTextureRegion().getU(),      // u
+                getTextureRegion().getV()      // v
         );
         // northeast
         vertices.addVertex8f(
-                wx + 1,                // x
-                wy + getHeightInDirection(Direction.NORTHEAST),                     // y
-                wz,                    // z
+                getWx() + 1,                // x
+                getWy() + getHeightInDirection(Direction.NORTHEAST),                     // y
+                getWz(),                    // z
                 0,                         // normal x
                 1,                         //        y
                 0,                         //        z
-                textureRegion.getU2(),     // u
-                textureRegion.getV()      // v
+                getTextureRegion().getU2(),     // u
+                getTextureRegion().getV()      // v
         );
         // southeast
         vertices.addVertex8f(
-                wx + 1,                // x
-                wy + getHeightInDirection(Direction.SOUTHEAST),                     // y
-                wz + 1,                // z
+                getWx() + 1,                // x
+                getWy() + getHeightInDirection(Direction.SOUTHEAST),                     // y
+                getWz() + 1,                // z
                 0,                         // normal x
                 1,                         //        y
                 0,                         //        z
-                textureRegion.getU2(),     // u
-                textureRegion.getV2()       // v
+                getTextureRegion().getU2(),     // u
+                getTextureRegion().getV2()       // v
         );
         // southwest
         vertices.addVertex8f(
-                wx,                    // x
-                wy + getHeightInDirection(Direction.SOUTHWEST),                     // y
-                wz + 1,                // z
+                getWx(),                    // x
+                getWy() + getHeightInDirection(Direction.SOUTHWEST),                     // y
+                getWz() + 1,                // z
                 0,                         // normal x
                 1,                         //        y
                 0,                         //        z
-                textureRegion.getU(),      // u
-                textureRegion.getV2()       // v
+                getTextureRegion().getU(),      // u
+                getTextureRegion().getV2()       // v
         );
     }
 
     @Override
     public void createRightVertices(VertexArray vertices) {
         vertices.addVertex8f(
-                wx + 1,     // x
-                wy,              // y
-                wz,         // z
+                getWx() + 1,     // x
+                getWy(),              // y
+                getWz(),         // z
                 1,              // normal x
                 0,              //        y
                 0,              //        z
                 0,              // u
                 0);             // v
         vertices.addVertex8f(
-                wx + 1,     // x
-                wy,              // y
-                wz + 1,     // z
+                getWx() + 1,     // x
+                getWy(),              // y
+                getWz() + 1,     // z
                 1,              // normal x
                 0,              //        y
                 0,              //        z
                 0,              // u
                 0);             // v
         vertices.addVertex8f(
-                wx + 1,     // x
-                wy + getHeightInDirection(Direction.SOUTHEAST),          // y
-                wz + 1,     // z
+                getWx() + 1,     // x
+                getWy() + getHeightInDirection(Direction.SOUTHEAST),          // y
+                getWz() + 1,     // z
                 1,              // normal x
                 0,              //        y
                 0,              //        z
                 0,              // u
                 0);             // v
         vertices.addVertex8f(
-                wx + 1,     // x
-                wy + getHeightInDirection(Direction.NORTHEAST),          // y
-                wz,         // z
+                getWx() + 1,     // x
+                getWy() + getHeightInDirection(Direction.NORTHEAST),          // y
+                getWz(),         // z
                 1,              // normal x
                 0,              //        y
                 0,              //        z
@@ -285,36 +285,36 @@ public class SlopeVoxel extends BasicVoxel {
     @Override
     public void createFrontVertices(VertexArray vertices) {
         vertices.addVertex8f(
-                wx,         // x
-                wy + getHeightInDirection(Direction.NORTHWEST),              // y
-                wz,         // z
+                getWx(),         // x
+                getWy() + getHeightInDirection(Direction.NORTHWEST),              // y
+                getWz(),         // z
                 0,              // normal x
                 0,              //        y
                 1,              //        z
                 0,              // u
                 0);             // v
         vertices.addVertex8f(
-                wx + 1,     // x
-                wy + getHeightInDirection(Direction.NORTHEAST),              // y
-                wz,         // z
+                getWx() + 1,     // x
+                getWy() + getHeightInDirection(Direction.NORTHEAST),              // y
+                getWz(),         // z
                 0,              // normal x
                 0,              //        y
                 1,              //        z
                 0,              // u
                 0);             // v
         vertices.addVertex8f(
-                wx + 1,     // x
-                wy,          // y
-                wz,         // z
+                getWx() + 1,     // x
+                getWy(),          // y
+                getWz(),         // z
                 0,              // normal x
                 0,              //        y
                 1,              //        z
                 0,              // u
                 0);             // v
         vertices.addVertex8f(
-                wx,         // x
-                wy,          // y
-                wz,         // z
+                getWx(),         // x
+                getWy(),          // y
+                getWz(),         // z
                 0,              // normal x
                 0,              //        y
                 1,              //        z
@@ -325,36 +325,36 @@ public class SlopeVoxel extends BasicVoxel {
     @Override
     public void createBackVertices(VertexArray vertices) {
         vertices.addVertex8f(
-                wx,         // x
-                wy + getHeightInDirection(Direction.SOUTHWEST),              // y
-                wz + 1,     // z
+                getWx(),         // x
+                getWy() + getHeightInDirection(Direction.SOUTHWEST),              // y
+                getWz() + 1,     // z
                 0,              // normal x
                 0,              //        y
                 -1,             //        z
                 0,              // u
                 0);             // v
         vertices.addVertex8f(
-                wx,         // x
-                wy,          // y
-                wz + 1,     // z
+                getWx(),         // x
+                getWy(),          // y
+                getWz() + 1,     // z
                 0,              // normal x
                 0,              //        y
                 -1,             //        z
                 0,              // u
                 0);             // v
         vertices.addVertex8f(
-                wx + 1,     // x
-                wy + getHeightInDirection(Direction.SOUTHEAST),          // y
-                wz + 1,     // z
+                getWx() + 1,     // x
+                getWy() + getHeightInDirection(Direction.SOUTHEAST),          // y
+                getWz() + 1,     // z
                 0,              // normal x
                 0,              //        y
                 -1,             //        z
                 0,              // u
                 0);             // v
         vertices.addVertex8f(
-                wx + 1,     // x
-                wy,              // y
-                wz + 1,     // z
+                getWx() + 1,     // x
+                getWy(),              // y
+                getWz() + 1,     // z
                 0,              // normal x
                 0,              //        y
                 -1,             //        z
@@ -365,36 +365,36 @@ public class SlopeVoxel extends BasicVoxel {
     @Override
     public void createLeftVertices(VertexArray vertices) {
         vertices.addVertex8f(
-                wx,        // x
-                wy + getHeightInDirection(Direction.NORTHWEST),             // y
-                wz,        // z
+                getWx(),        // x
+                getWy() + getHeightInDirection(Direction.NORTHWEST),             // y
+                getWz(),        // z
                 -1,            // normal x
                 0,             //        y
                 0,             //        z
                 0,             // u
                 0);            // v
         vertices.addVertex8f(
-                wx,        // x
-                wy,         // y
-                wz,        // z
+                getWx(),        // x
+                getWy(),         // y
+                getWz(),        // z
                 -1,            // normal x
                 0,             //        y
                 0,             //        z
                 0,             // u
                 0);            // v
         vertices.addVertex8f(
-                wx,        // x
-                wy + getHeightInDirection(Direction.SOUTHWEST),         // y
-                wz + 1,    // z
+                getWx(),        // x
+                getWy() + getHeightInDirection(Direction.SOUTHWEST),         // y
+                getWz() + 1,    // z
                 -1,            // normal x
                 0,             //        y
                 0,             //        z
                 0,             // u
                 0);            // v
         vertices.addVertex8f(
-                wx,        // x
-                wy,             // y
-                wz + 1,    // z
+                getWx(),        // x
+                getWy(),             // y
+                getWz() + 1,    // z
                 -1,            // normal x
                 0,             //        y
                 0,             //        z

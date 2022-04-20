@@ -1,19 +1,11 @@
 package vc.andro.poketest.world;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g3d.Renderable;
-import com.badlogic.gdx.graphics.g3d.RenderableProvider;
-import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.Pool;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.entity.Entity;
-import vc.andro.poketest.tile.BasicVoxel;
+import vc.andro.poketest.voxel.BasicVoxel;
 import vc.andro.poketest.world.generation.WorldGenerator;
-
-import java.util.Iterator;
 
 import static vc.andro.poketest.world.Chunk.CHUNK_DEPTH;
 import static vc.andro.poketest.world.Chunk.CHUNK_SIZE;
@@ -70,9 +62,9 @@ public class World {
     };
 
     public void broadcastTileUpdateToAdjacentTiles(BasicVoxel updateOrigin) {
-        int ox = updateOrigin.wx;
-        int oy = updateOrigin.wy;
-        int oz = updateOrigin.wz;
+        int ox = updateOrigin.getWx();
+        int oy = updateOrigin.getWy();
+        int oz = updateOrigin.getWz();
         for (int i = 0; i < ADJACENT_POSITIONS.length; i += 3) {
             int dx = ADJACENT_POSITIONS[i];
             int dy = ADJACENT_POSITIONS[i + 1];

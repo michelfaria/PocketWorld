@@ -1,4 +1,4 @@
-package vc.andro.poketest.tile;
+package vc.andro.poketest.voxel;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import vc.andro.poketest.Assets;
@@ -9,29 +9,43 @@ import vc.andro.poketest.world.VertexArray;
 import vc.andro.poketest.world.World;
 
 import static vc.andro.poketest.PocketWorld.PPU;
+import static vc.andro.poketest.world.World.LxWx;
+import static vc.andro.poketest.world.World.LzWz;
 
 public class BasicVoxel {
 
-    public World world;
-    public Chunk chunk;
-    public Integer wx;
-    public Integer wy;
-    public Integer wz;
-    public Integer lx;
-    public Integer lz;
-    public boolean transparent;
-    public boolean bigTexture;
+    private World world;
+    private Chunk chunk;
+    private int wx;
+    private int wy;
+    private int wz;
+    private int lx;
+    private int lz;
+    private boolean transparent;
+    private UVCalculationStrategy uvCalculationStrategy;
 
     public VoxelType type;
-    public TextureRegion textureRegion;
+    private TextureRegion textureRegion;
 
     public BasicVoxel(VoxelType type) {
         this.type = type;
         setSprite(type.defaultSpriteId);
     }
 
+    public void storePosition(Chunk chunk, int lx, int wy, int lz) {
+        world = chunk.world;
+        this.chunk = chunk;
+        wx = LxWx(chunk.cx, lx);
+        this.wy = wy;
+        wz = LzWz(chunk.cz, lz);
+        this.lx = lx;
+        this.lz = lz;
+
+        uvCalculationStrategy.refresh();
+    }
+
     public void doTileUpdate() {
-        world.broadcastTileUpdateToAdjacentTiles(this);
+        getWorld().broadcastTileUpdateToAdjacentTiles(this);
     }
 
     public void receiveTileUpdate(BasicVoxel updateOrigin) {
@@ -47,141 +61,91 @@ public class BasicVoxel {
     public void setSprite(String spriteId) {
         textureRegion = AtlasUtil.findRegion(PocketWorld.assetManager.get(Assets.tileAtlas), spriteId);
         if (textureRegion.getRegionWidth() > PPU) {
-            bigTexture = true;
-        }
-    }
-
-    private float getTopU() {
-        if (bigTexture) {
-            int tilesW = (int) (textureRegion.getRegionWidth() / PPU);
-            int partX = Math.abs(wx) % tilesW;
-            float uDiff = textureRegion.getU2() - textureRegion.getU();
-            float uPerTile = uDiff / tilesW;
-            float u = textureRegion.getU() + uPerTile * partX;
-            return u;
-        } else {
-            return textureRegion.getU();
-        }
-    }
-
-    private float getTopU2() {
-        if (bigTexture) {
-            int tilesW = (int) (textureRegion.getRegionWidth() / PPU);
-            int partX = Math.abs(wx) % tilesW;
-            float uDiff = textureRegion.getU2() - textureRegion.getU();
-            float uPerTile = uDiff / tilesW;
-            float u2 = textureRegion.getU() + (uPerTile * partX) + uPerTile;
-            return u2;
-        } else {
-            return textureRegion.getU2();
-        }
-    }
-
-    private float getTopV() {
-        if (bigTexture) {
-            int tilesH = (int) (textureRegion.getRegionHeight() / PPU);
-            int partZ = Math.abs(wz) % tilesH;
-            float vDiff = textureRegion.getV2() - textureRegion.getV();
-            float vPerTile = vDiff / tilesH;
-            float v = textureRegion.getV() + vPerTile * partZ;
-            return v;
-        } else {
-            return textureRegion.getV();
-        }
-    }
-
-    private float getTopV2() {
-        if (bigTexture) {
-            int tilesH = (int) (textureRegion.getRegionHeight() / PPU);
-            int partZ = (Math.abs(wz) + 1) % tilesH;
-            float vDiff = textureRegion.getV2() - textureRegion.getV();
-            float vPerTile = vDiff / tilesH;
-            float v2 = textureRegion.getV() + (vPerTile * partZ) + vPerTile;
-            return v2;
-        } else {
-            return textureRegion.getV2();
+            uvCalculationStrategy = new BigTextureUVCalculationStrategy(this);
+        } else if (!(uvCalculationStrategy instanceof DefaultUVCalculationStrategy)) {
+            uvCalculationStrategy = new DefaultUVCalculationStrategy(this);
         }
     }
 
     public void createTopVertices(VertexArray vertices) {
         // northwest
         vertices.addVertex8f(
-                wx,                    // x
-                wy + 1,                     // y
-                wz,                    // z
+                getWx(),                    // x
+                getWy() + 1,                     // y
+                getWz(),                    // z
                 0,                         // normal x
                 1,                         //        y
                 0,                         //        z
-                getTopU(),      // u
-                getTopV()      // v
+                uvCalculationStrategy.getU(),      // u
+                uvCalculationStrategy.getV()      // v
         );
         // northeast
         vertices.addVertex8f(
-                wx + 1,                // x
-                wy + 1,                     // y
-                wz,                    // z
+                getWx() + 1,                // x
+                getWy() + 1,                     // y
+                getWz(),                    // z
                 0,                         // normal x
                 1,                         //        y
                 0,                         //        z
-                getTopU2(),     // u
-                getTopV()      // v
+                uvCalculationStrategy.getU2(),     // u
+                uvCalculationStrategy.getV()      // v
         );
         // southeast
         vertices.addVertex8f(
-                wx + 1,                // x
-                wy + 1,                     // y
-                wz + 1,                // z
+                getWx() + 1,                // x
+                getWy() + 1,                     // y
+                getWz() + 1,                // z
                 0,                         // normal x
                 1,                         //        y
                 0,                         //        z
-                getTopU2(),     // u
-                getTopV2()      // v
+                uvCalculationStrategy.getU2(),     // u
+                uvCalculationStrategy.getV2()      // v
         );
         // southwest
         vertices.addVertex8f(
-                wx,                    // x
-                wy + 1,                     // y
-                wz + 1,                // z
+                getWx(),                    // x
+                getWy() + 1,                     // y
+                getWz() + 1,                // z
                 0,                         // normal x
                 1,                         //        y
                 0,                         //        z
-                getTopU(),      // u
-                getTopV2()      // v
+                uvCalculationStrategy.getU(),      // u
+                uvCalculationStrategy.getV2()      // v
         );
     }
 
     public void createRightVertices(VertexArray vertices) {
         vertices.addVertex8f(
-                wx + 1,     // x
-                wy,              // y
-                wz,         // z
+                getWx() + 1,     // x
+                getWy(),              // y
+                getWz(),         // z
                 1,              // normal x
                 0,              //        y
                 0,              //        z
                 0,              // u
                 0);             // v
         vertices.addVertex8f(
-                wx + 1,     // x
-                wy,              // y
-                wz + 1,     // z
+                getWx() + 1,     // x
+                getWy(),              // y
+                getWz() + 1,     // z
                 1,              // normal x
                 0,              //        y
                 0,              //        z
                 0,              // u
                 0);             // v
         vertices.addVertex8f(
-                wx + 1,     // x
-                wy + 1,          // y
-                wz + 1,     // z
+                getWx() + 1,     // x
+                getWy() + 1,          // y
+                getWz() + 1,     // z
                 1,              // normal x
                 0,              //        y
                 0,              //        z
                 0,              // u
                 0);             // v
         vertices.addVertex8f(
-                wx + 1,     // x
-                wy + 1,          // y
-                wz,         // z
+                getWx() + 1,     // x
+                getWy() + 1,          // y
+                getWz(),         // z
                 1,              // normal x
                 0,              //        y
                 0,              //        z
@@ -191,36 +155,36 @@ public class BasicVoxel {
 
     public void createFrontVertices(VertexArray vertices) {
         vertices.addVertex8f(
-                wx,         // x
-                wy,              // y
-                wz,         // z
+                getWx(),         // x
+                getWy(),              // y
+                getWz(),         // z
                 0,              // normal x
                 0,              //        y
                 1,              //        z
                 0,              // u
                 0);             // v
         vertices.addVertex8f(
-                wx + 1,     // x
-                wy,              // y
-                wz,         // z
+                getWx() + 1,     // x
+                getWy(),              // y
+                getWz(),         // z
                 0,              // normal x
                 0,              //        y
                 1,              //        z
                 0,              // u
                 0);             // v
         vertices.addVertex8f(
-                wx + 1,     // x
-                wy + 1,          // y
-                wz,         // z
+                getWx() + 1,     // x
+                getWy() + 1,          // y
+                getWz(),         // z
                 0,              // normal x
                 0,              //        y
                 1,              //        z
                 0,              // u
                 0);             // v
         vertices.addVertex8f(
-                wx,         // x
-                wy + 1,          // y
-                wz,         // z
+                getWx(),         // x
+                getWy() + 1,          // y
+                getWz(),         // z
                 0,              // normal x
                 0,              //        y
                 1,              //        z
@@ -230,36 +194,36 @@ public class BasicVoxel {
 
     public void createBackVertices(VertexArray vertices) {
         vertices.addVertex8f(
-                wx,         // x
-                wy,              // y
-                wz + 1,     // z
+                getWx(),         // x
+                getWy(),              // y
+                getWz() + 1,     // z
                 0,              // normal x
                 0,              //        y
                 -1,             //        z
                 0,              // u
                 0);             // v
         vertices.addVertex8f(
-                wx,         // x
-                wy + 1,          // y
-                wz + 1,     // z
+                getWx(),         // x
+                getWy() + 1,          // y
+                getWz() + 1,     // z
                 0,              // normal x
                 0,              //        y
                 -1,             //        z
                 0,              // u
                 0);             // v
         vertices.addVertex8f(
-                wx + 1,     // x
-                wy + 1,          // y
-                wz + 1,     // z
+                getWx() + 1,     // x
+                getWy() + 1,          // y
+                getWz() + 1,     // z
                 0,              // normal x
                 0,              //        y
                 -1,             //        z
                 0,              // u
                 0);             // v
         vertices.addVertex8f(
-                wx + 1,     // x
-                wy,              // y
-                wz + 1,     // z
+                getWx() + 1,     // x
+                getWy(),              // y
+                getWz() + 1,     // z
                 0,              // normal x
                 0,              //        y
                 -1,             //        z
@@ -269,36 +233,36 @@ public class BasicVoxel {
 
     public void createBottomVertices(VertexArray vertices) {
         vertices.addVertex8f(
-                wx,         // x
-                wy,              // y
-                wz,         // z
+                getWx(),         // x
+                getWy(),              // y
+                getWz(),         // z
                 0,              // normal x
                 -1,             //        y
                 0,              //        z
                 0,              // u
                 0);             // v
         vertices.addVertex8f(
-                wx,         // x
-                wy,              // y
-                wz + 1,     // z
+                getWx(),         // x
+                getWy(),              // y
+                getWz() + 1,     // z
                 0,              // normal x
                 -1,             //        y
                 0,              //        z
                 0,              // u
                 0);             // v
         vertices.addVertex8f(
-                wx + 1,     // x
-                wy,              // y
-                wz + 1,     // z
+                getWx() + 1,     // x
+                getWy(),              // y
+                getWz() + 1,     // z
                 0,              // normal x
                 -1,             //        y
                 0,              //        z
                 0,              // u
                 0);             // v
         vertices.addVertex8f(
-                wx + 1,    // x
-                wy,             // y
-                wz,        // z
+                getWx() + 1,    // x
+                getWy(),             // y
+                getWz(),        // z
                 0,             // normal x
                 -1,            //        y
                 0,             //        z
@@ -308,40 +272,80 @@ public class BasicVoxel {
 
     public void createLeftVertices(VertexArray vertices) {
         vertices.addVertex8f(
-                wx,        // x
-                wy,             // y
-                wz,        // z
+                getWx(),        // x
+                getWy(),             // y
+                getWz(),        // z
                 -1,            // normal x
                 0,             //        y
                 0,             //        z
                 0,             // u
                 0);            // v
         vertices.addVertex8f(
-                wx,        // x
-                wy + 1,         // y
-                wz,        // z
+                getWx(),        // x
+                getWy() + 1,         // y
+                getWz(),        // z
                 -1,            // normal x
                 0,             //        y
                 0,             //        z
                 0,             // u
                 0);            // v
         vertices.addVertex8f(
-                wx,        // x
-                wy + 1,         // y
-                wz + 1,    // z
+                getWx(),        // x
+                getWy() + 1,         // y
+                getWz() + 1,    // z
                 -1,            // normal x
                 0,             //        y
                 0,             //        z
                 0,             // u
                 0);            // v
         vertices.addVertex8f(
-                wx,        // x
-                wy,             // y
-                wz + 1,    // z
+                getWx(),        // x
+                getWy(),             // y
+                getWz() + 1,    // z
                 -1,            // normal x
                 0,             //        y
                 0,             //        z
                 0,             // u
                 0);            // v
+    }
+
+    public TextureRegion getTextureRegion() {
+        return textureRegion;
+    }
+
+    public World getWorld() {
+        return world;
+    }
+
+    public Chunk getChunk() {
+        return chunk;
+    }
+
+    public int getWx() {
+        return wx;
+    }
+
+    public int getWy() {
+        return wy;
+    }
+
+    public int getWz() {
+        return wz;
+    }
+
+    public int getLx() {
+        return lx;
+    }
+
+    public int getLz() {
+        return lz;
+    }
+
+    public boolean isTransparent() {
+        return transparent;
+    }
+
+    protected void setTransparent(boolean newValue) {
+        transparent = newValue;
     }
 }

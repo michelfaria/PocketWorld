@@ -14,7 +14,7 @@ public class TallGrassEntity extends Entity {
     public TallGrassEntity() {
         super(new Vector2(1, 1));
 
-        int variation = MathUtils.random(0, 1);
+        int variation = 0;
 
         TextureAtlas atlas = PocketWorld.assetManager.get(Assets.entityAtlas);
         for (int i = 0; i <= 1; i++) {

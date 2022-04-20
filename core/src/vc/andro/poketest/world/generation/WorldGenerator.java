@@ -6,9 +6,9 @@ import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.entity.FlowerEntity;
 import vc.andro.poketest.entity.TallGrassEntity;
 import vc.andro.poketest.entity.TreeEntity;
-import vc.andro.poketest.tile.BasicVoxel;
-import vc.andro.poketest.tile.SlopeVoxel;
-import vc.andro.poketest.tile.VoxelType;
+import vc.andro.poketest.voxel.BasicVoxel;
+import vc.andro.poketest.voxel.SlopeVoxel;
+import vc.andro.poketest.voxel.VoxelType;
 import vc.andro.poketest.util.BlueNoise;
 import vc.andro.poketest.util.FastNoise;
 import vc.andro.poketest.world.Chunk;
@@ -23,7 +23,7 @@ import vc.andro.poketest.world.generation.map.VegetationMapGenerator;
 
 import java.util.Random;
 
-import static vc.andro.poketest.tile.SlopeType.*;
+import static vc.andro.poketest.voxel.SlopeType.*;
 import static vc.andro.poketest.world.Chunk.CHUNK_SIZE;
 import static vc.andro.poketest.world.World.LxWx;
 import static vc.andro.poketest.world.World.LzWz;

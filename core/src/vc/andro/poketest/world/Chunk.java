@@ -14,7 +14,7 @@ import com.badlogic.gdx.utils.Pool;
 import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.Assets;
 import vc.andro.poketest.PocketWorld;
-import vc.andro.poketest.tile.BasicVoxel;
+import vc.andro.poketest.voxel.BasicVoxel;
 
 import static vc.andro.poketest.world.VertexArray.VERTEX_SIZE;
 
@@ -73,34 +73,28 @@ public class Chunk implements RenderableProvider {
         return voxels[lx][y][lz];
     }
 
-    public void putTileAt(int chunkLocalX, int y, int chunkLocalZ, @Nullable BasicVoxel tile) {
-        BasicVoxel previousTile = getTileAt_LP(chunkLocalX, y, chunkLocalZ);
-        if (previousTile == null && tile != null) {
+    public void putTileAt(int lx, int wy, int lz, @Nullable BasicVoxel voxel) {
+        BasicVoxel prevVoxel = getTileAt_LP(lx, wy, lz);
+        if (prevVoxel == null && voxel != null) {
             voxelCount++;
-        } else if (previousTile != null && tile == null) {
+        } else if (prevVoxel != null && voxel == null) {
             voxelCount--;
         }
-        if (tile != null) {
-            tile.world = world;
-            tile.chunk = this;
-            tile.wx = cx * CHUNK_SIZE + chunkLocalX;
-            tile.wz = cz * CHUNK_SIZE + chunkLocalZ;
-            tile.wy = y;
-            tile.lx = chunkLocalX;
-            tile.lz = chunkLocalZ;
+        if (voxel != null) {
+            voxel.storePosition(this, lx, wy, lz);
         }
-        voxels[chunkLocalX][y][chunkLocalZ] = tile;
+        voxels[lx][wy][lz] = voxel;
     }
 
     public void updateTiles() {
-        for (int chunkLocalX = 0; chunkLocalX < CHUNK_SIZE; chunkLocalX++) {
-            for (int y = 0; y < CHUNK_DEPTH; y++) {
-                for (int chunkLocalZ = 0; chunkLocalZ < CHUNK_SIZE; chunkLocalZ++) {
-                    BasicVoxel tile = getTileAt_LP(chunkLocalX, y, chunkLocalZ);
-                    if (tile == null) {
+        for (int lx = 0; lx < CHUNK_SIZE; lx++) {
+            for (int wy = 0; wy < CHUNK_DEPTH; wy++) {
+                for (int lz = 0; lz < CHUNK_SIZE; lz++) {
+                    BasicVoxel v = getTileAt_LP(lx, wy, lz);
+                    if (v == null) {
                         continue;
                     }
-                    tile.doTileUpdate();
+                    v.doTileUpdate();
                 }
             }
         }
@@ -128,27 +122,27 @@ public class Chunk implements RenderableProvider {
                         if (voxel == null) {
                             continue;
                         }
-                        if (voxel.transparent || (y < CHUNK_DEPTH - 1 && (voxels[x][y + 1][z] == null || voxels[x][y + 1][z].transparent))) {
+                        if (voxel.isTransparent() || (y < CHUNK_DEPTH - 1 && (voxels[x][y + 1][z] == null || voxels[x][y + 1][z].isTransparent()))) {
                             voxel.createTopVertices(vertexArray8f);
                             indicesArray.addSquare();
                         }
-                        if (voxel.transparent || (y > 0 && (voxels[x][y - 1][z] == null || voxels[x][y - 1][z].transparent))) {
+                        if (voxel.isTransparent() || (y > 0 && (voxels[x][y - 1][z] == null || voxels[x][y - 1][z].isTransparent()))) {
                             voxel.createBottomVertices(vertexArray8f);
                             indicesArray.addSquare();
                         }
-                        if (voxel.transparent || (x > 0 && (voxels[x - 1][y][z] == null || voxels[x - 1][y][z].transparent))) {
+                        if (voxel.isTransparent() || (x > 0 && (voxels[x - 1][y][z] == null || voxels[x - 1][y][z].isTransparent()))) {
                             voxel.createLeftVertices(vertexArray8f);
                             indicesArray.addSquare();
                         }
-                        if (voxel.transparent || (x < CHUNK_SIZE - 1 && (voxels[x + 1][y][z] == null || voxels[x + 1][y][z].transparent))) {
+                        if (voxel.isTransparent() || (x < CHUNK_SIZE - 1 && (voxels[x + 1][y][z] == null || voxels[x + 1][y][z].isTransparent()))) {
                             voxel.createRightVertices(vertexArray8f);
                             indicesArray.addSquare();
                         }
-                        if (voxel.transparent || (z > 0 && (voxels[x][y][z - 1] == null || voxels[x][y][z - 1].transparent))) {
+                        if (voxel.isTransparent() || (z > 0 && (voxels[x][y][z - 1] == null || voxels[x][y][z - 1].isTransparent()))) {
                             voxel.createFrontVertices(vertexArray8f);
                             indicesArray.addSquare();
                         }
-                        if (voxel.transparent || (z < CHUNK_SIZE - 1 && (voxels[x][y][z + 1] == null || voxels[x][y][z + 1].transparent))) {
+                        if (voxel.isTransparent() || (z < CHUNK_SIZE - 1 && (voxels[x][y][z + 1] == null || voxels[x][y][z + 1].isTransparent()))) {
                             voxel.createBackVertices(vertexArray8f);
                             indicesArray.addSquare();
                         }

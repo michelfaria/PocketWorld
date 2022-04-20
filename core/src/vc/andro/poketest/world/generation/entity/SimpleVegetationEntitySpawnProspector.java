@@ -1,7 +1,7 @@
 package vc.andro.poketest.world.generation.entity;
 
-import vc.andro.poketest.tile.BasicVoxel;
-import vc.andro.poketest.tile.VoxelType;
+import vc.andro.poketest.voxel.BasicVoxel;
+import vc.andro.poketest.voxel.VoxelType;
 import vc.andro.poketest.world.Chunk;
 import vc.andro.poketest.world.generation.IntNoiseGenerator;
 
@@ -36,7 +36,7 @@ public class SimpleVegetationEntitySpawnProspector implements SpawnProspector<Pr
             return result;
         }
 
-        int y = surfaceTile.wy + 1;
+        int y = surfaceTile.getWy() + 1;
 
         if (y + 1 > CHUNK_DEPTH) {
             return result;

@@ -1,4 +1,4 @@
-package vc.andro.poketest.tile;
+package vc.andro.poketest.voxel;
 
 public enum SlopeType {
     NORTHWEST_CORNER("tile/wall-top-left-corner"),
