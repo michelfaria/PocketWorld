@@ -1,7 +1,7 @@
 package vc.andro.poketest.tile;
 
 public enum VoxelType {
-    GRASS("tile/grass", true),
+    GRASS("tile/bwgrass", true),
     SLOPE("tile/wall-bottom-edge", false),
     WATER("tile/water", false),
     SAND("tile/sand", true);

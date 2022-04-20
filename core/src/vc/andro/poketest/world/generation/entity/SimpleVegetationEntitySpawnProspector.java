@@ -5,6 +5,8 @@ import vc.andro.poketest.tile.VoxelType;
 import vc.andro.poketest.world.Chunk;
 import vc.andro.poketest.world.generation.IntNoiseGenerator;
 
+import static vc.andro.poketest.world.Chunk.CHUNK_DEPTH;
+
 public class SimpleVegetationEntitySpawnProspector implements SpawnProspector<ProspectorResult> {
 
     private final IntNoiseGenerator noiseGenerator;
@@ -35,6 +37,10 @@ public class SimpleVegetationEntitySpawnProspector implements SpawnProspector<Pr
         }
 
         int y = surfaceTile.wy + 1;
+
+        if (y + 1 > CHUNK_DEPTH) {
+            return result;
+        }
 
         for (int ix = 0; ix < entityCollisionWidth; ix++) {
             for (int iz = 0; iz < entityCollisionHeight; iz++) {

@@ -1,6 +1,5 @@
 package vc.andro.poketest.tile;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import vc.andro.poketest.Assets;
 import vc.andro.poketest.PocketWorld;
@@ -16,11 +15,12 @@ public class BasicVoxel {
     public World world;
     public Chunk chunk;
     public Integer wx;
-    public Integer wz;
-    public Integer cx;
     public Integer wy;
+    public Integer wz;
+    public Integer lx;
     public Integer lz;
     public boolean transparent;
+    public boolean bigTexture;
 
     public VoxelType type;
     public TextureRegion textureRegion;
@@ -28,14 +28,6 @@ public class BasicVoxel {
     public BasicVoxel(VoxelType type) {
         this.type = type;
         setSprite(type.defaultSpriteId);
-    }
-
-    public void draw(SpriteBatch spriteBatch) {
-        draw(spriteBatch, wx, wz);
-    }
-
-    protected void draw(SpriteBatch spriteBatch, int atX, int atZ) {
-        spriteBatch.draw(textureRegion, atX * PPU, atZ * PPU);
     }
 
     public void doTileUpdate() {
@@ -54,6 +46,61 @@ public class BasicVoxel {
 
     public void setSprite(String spriteId) {
         textureRegion = AtlasUtil.findRegion(PocketWorld.assetManager.get(Assets.tileAtlas), spriteId);
+        if (textureRegion.getRegionWidth() > PPU) {
+            bigTexture = true;
+        }
+    }
+
+    private float getTopU() {
+        if (bigTexture) {
+            int tilesW = (int) (textureRegion.getRegionWidth() / PPU);
+            int partX = Math.abs(wx) % tilesW;
+            float uDiff = textureRegion.getU2() - textureRegion.getU();
+            float uPerTile = uDiff / tilesW;
+            float u = textureRegion.getU() + uPerTile * partX;
+            return u;
+        } else {
+            return textureRegion.getU();
+        }
+    }
+
+    private float getTopU2() {
+        if (bigTexture) {
+            int tilesW = (int) (textureRegion.getRegionWidth() / PPU);
+            int partX = Math.abs(wx) % tilesW;
+            float uDiff = textureRegion.getU2() - textureRegion.getU();
+            float uPerTile = uDiff / tilesW;
+            float u2 = textureRegion.getU() + (uPerTile * partX) + uPerTile;
+            return u2;
+        } else {
+            return textureRegion.getU2();
+        }
+    }
+
+    private float getTopV() {
+        if (bigTexture) {
+            int tilesH = (int) (textureRegion.getRegionHeight() / PPU);
+            int partZ = Math.abs(wz) % tilesH;
+            float vDiff = textureRegion.getV2() - textureRegion.getV();
+            float vPerTile = vDiff / tilesH;
+            float v = textureRegion.getV() + vPerTile * partZ;
+            return v;
+        } else {
+            return textureRegion.getV();
+        }
+    }
+
+    private float getTopV2() {
+        if (bigTexture) {
+            int tilesH = (int) (textureRegion.getRegionHeight() / PPU);
+            int partZ = (Math.abs(wz) + 1) % tilesH;
+            float vDiff = textureRegion.getV2() - textureRegion.getV();
+            float vPerTile = vDiff / tilesH;
+            float v2 = textureRegion.getV() + (vPerTile * partZ) + vPerTile;
+            return v2;
+        } else {
+            return textureRegion.getV2();
+        }
     }
 
     public void createTopVertices(VertexArray vertices) {
@@ -65,8 +112,8 @@ public class BasicVoxel {
                 0,                         // normal x
                 1,                         //        y
                 0,                         //        z
-                textureRegion.getU(),      // u
-                textureRegion.getV()      // v
+                getTopU(),      // u
+                getTopV()      // v
         );
         // northeast
         vertices.addVertex8f(
@@ -76,8 +123,8 @@ public class BasicVoxel {
                 0,                         // normal x
                 1,                         //        y
                 0,                         //        z
-                textureRegion.getU2(),     // u
-                textureRegion.getV()      // v
+                getTopU2(),     // u
+                getTopV()      // v
         );
         // southeast
         vertices.addVertex8f(
@@ -87,8 +134,8 @@ public class BasicVoxel {
                 0,                         // normal x
                 1,                         //        y
                 0,                         //        z
-                textureRegion.getU2(),     // u
-                textureRegion.getV2()       // v
+                getTopU2(),     // u
+                getTopV2()      // v
         );
         // southwest
         vertices.addVertex8f(
@@ -98,8 +145,8 @@ public class BasicVoxel {
                 0,                         // normal x
                 1,                         //        y
                 0,                         //        z
-                textureRegion.getU(),      // u
-                textureRegion.getV2()       // v
+                getTopU(),      // u
+                getTopV2()      // v
         );
     }
 

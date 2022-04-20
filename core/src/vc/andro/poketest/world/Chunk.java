@@ -86,7 +86,7 @@ public class Chunk implements RenderableProvider {
             tile.wx = cx * CHUNK_SIZE + chunkLocalX;
             tile.wz = cz * CHUNK_SIZE + chunkLocalZ;
             tile.wy = y;
-            tile.cx = chunkLocalX;
+            tile.lx = chunkLocalX;
             tile.lz = chunkLocalZ;
         }
         voxels[chunkLocalX][y][chunkLocalZ] = tile;
@@ -135,12 +135,12 @@ public class Chunk implements RenderableProvider {
                         if (voxel.transparent || (y > 0 && (voxels[x][y - 1][z] == null || voxels[x][y - 1][z].transparent))) {
                             voxel.createBottomVertices(vertexArray8f);
                             indicesArray.addSquare();
-                                     }
+                        }
                         if (voxel.transparent || (x > 0 && (voxels[x - 1][y][z] == null || voxels[x - 1][y][z].transparent))) {
                             voxel.createLeftVertices(vertexArray8f);
                             indicesArray.addSquare();
-                       }
-                       if (voxel.transparent || (x < CHUNK_SIZE - 1 && (voxels[x + 1][y][z] == null || voxels[x + 1][y][z].transparent))) {
+                        }
+                        if (voxel.transparent || (x < CHUNK_SIZE - 1 && (voxels[x + 1][y][z] == null || voxels[x + 1][y][z].transparent))) {
                             voxel.createRightVertices(vertexArray8f);
                             indicesArray.addSquare();
                         }
@@ -151,7 +151,7 @@ public class Chunk implements RenderableProvider {
                         if (voxel.transparent || (z < CHUNK_SIZE - 1 && (voxels[x][y][z + 1] == null || voxels[x][y][z + 1].transparent))) {
                             voxel.createBackVertices(vertexArray8f);
                             indicesArray.addSquare();
-                       }
+                        }
                     }
                 }
             }

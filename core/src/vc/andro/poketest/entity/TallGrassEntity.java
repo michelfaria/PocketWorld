@@ -23,7 +23,7 @@ public class TallGrassEntity extends Entity {
                     true
             ));
             decal.pitch = 90.0f;
-            decal.offsetWy = i * 2.0f / PPU;
+            decal.offsetWy = i * 5.0f / PPU;
             addDecal(decal);
         }
     }

@@ -22,7 +22,7 @@ public class WorldRenderingStrategy implements RenderableProvider {
 
     private float viewpointWx;
     private float viewpointWz;
-    private int renderDistanceInChunks = 12;
+    private int renderDistanceInChunks = 32;
 
     public WorldRenderingStrategy(PocketCamera cam, World world) {
         this.cam = cam;
