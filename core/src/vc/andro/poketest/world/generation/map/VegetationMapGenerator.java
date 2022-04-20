@@ -15,7 +15,7 @@ public abstract class VegetationMapGenerator implements IntNoiseGenerator {
 
     @Override
     public int getAtPosition(int wx, int wz) {
-        var r = getRValue();
+        int r = getRValue();
         double max = 0;
         for (int ix = wx - r; ix <= wx + r; ix++) {
             for (int iz = wz - r; iz <= wz + r; iz++) {

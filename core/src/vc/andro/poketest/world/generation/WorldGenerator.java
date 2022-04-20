@@ -18,6 +18,7 @@ import vc.andro.poketest.world.generation.entity.SimpleEntitySpawner;
 import vc.andro.poketest.world.generation.entity.SimpleVegetationEntitySpawnProspector;
 import vc.andro.poketest.world.generation.entity.WorldGenEntitySpawner;
 import vc.andro.poketest.world.generation.map.AltitudeMapGenerator;
+import vc.andro.poketest.world.generation.map.GrassPatchMapGenerator;
 import vc.andro.poketest.world.generation.map.VegetationMapGenerator;
 
 import java.util.Random;
@@ -71,12 +72,10 @@ public class WorldGenerator {
         );
         tallGrassSpawner = new WorldGenEntitySpawner<>(
                 new SimpleVegetationEntitySpawnProspector(
-                        new VegetationMapGenerator(new BlueNoise(params.seed + 2)) {
-                            @Override
-                            public int getRValue() {
-                                return 2;
-                            }
-                        }
+                        new GrassPatchMapGenerator(
+                                new FastNoise(params.seed + 1, FastNoise.NoiseType.Perlin),
+                                params
+                        )
                 ),
                 new SimpleEntitySpawner<>(TallGrassEntity.class)
         );
@@ -125,7 +124,7 @@ public class WorldGenerator {
         assert world != null;
         int wx = LxWx(cx, lx);
         int wz = LzWz(cz, lz);
-        y = y < 0 ? altitudeMapGenerator.altitudeAtPos(wx, wz) : y;
+        y = y < 0 ? altitudeMapGenerator.getAtPosition(wx, wz) : y;
 
         if (y <= params.waterLevel) {
             // Is water tile
@@ -153,14 +152,14 @@ public class WorldGenerator {
     private boolean generateWalls(int wx, int y, int wz) {
         assert world != null;
 
-        float southwestY = altitudeMapGenerator.altitudeAtPos(wx - 1, wz + 1);
-        float southY = altitudeMapGenerator.altitudeAtPos(wx, wz + 1);
-        float southeastY = altitudeMapGenerator.altitudeAtPos(wx + 1, wz + 1);
-        float westY = altitudeMapGenerator.altitudeAtPos(wx - 1, wz);
-        float eastY = altitudeMapGenerator.altitudeAtPos(wx + 1, wz);
-        float northwestY = altitudeMapGenerator.altitudeAtPos(wx - 1, wz - 1);
-        float northY = altitudeMapGenerator.altitudeAtPos(wx, wz - 1);
-        float northeastY = altitudeMapGenerator.altitudeAtPos(wx + 1, wz - 1);
+        float southwestY = altitudeMapGenerator.getAtPosition(wx - 1, wz + 1);
+        float southY = altitudeMapGenerator.getAtPosition(wx, wz + 1);
+        float southeastY = altitudeMapGenerator.getAtPosition(wx + 1, wz + 1);
+        float westY = altitudeMapGenerator.getAtPosition(wx - 1, wz);
+        float eastY = altitudeMapGenerator.getAtPosition(wx + 1, wz);
+        float northwestY = altitudeMapGenerator.getAtPosition(wx - 1, wz - 1);
+        float northY = altitudeMapGenerator.getAtPosition(wx, wz - 1);
+        float northeastY = altitudeMapGenerator.getAtPosition(wx + 1, wz - 1);
 
         if (y > northwestY && y > westY && y > northY) {
             world.putTileAt_WP(wx, y, wz, new SlopeVoxel(NORTHWEST_CORNER));
