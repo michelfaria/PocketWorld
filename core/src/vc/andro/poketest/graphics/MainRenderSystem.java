@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Disposable;
 import vc.andro.poketest.PocketCamera;
 import vc.andro.poketest.tile.BasicVoxel;
 import vc.andro.poketest.world.World;
+import vc.andro.poketest.world.WorldRenderingStrategy;
 
 public class MainRenderSystem implements Disposable {
 
@@ -23,6 +24,8 @@ public class MainRenderSystem implements Disposable {
     private final MyCameraGroupStrategy cameraGroupStrategy;
     private final DecalBatch decalBatch;
 
+    private final WorldRenderingStrategy worldRenderingStrategy;
+
     public MainRenderSystem(World world, PocketCamera cam) {
         this.world = world;
         this.cam = cam;
@@ -33,6 +36,7 @@ public class MainRenderSystem implements Disposable {
         decalBatch = new DecalBatch(cameraGroupStrategy);
         modelBatch = new ModelBatch();
         DefaultShader.defaultCullFace = GL20.GL_FRONT;
+        worldRenderingStrategy = new WorldRenderingStrategy(cam, world);
 
         {
             BasicVoxel t00 = world.getSurfaceTile_WP(0, 0);
@@ -49,11 +53,11 @@ public class MainRenderSystem implements Disposable {
         Gdx.gl.glEnable(GL20.GL_CULL_FACE);
 
         modelBatch.begin(cam.getUnderlying());
-        modelBatch.render(world, env);
+        modelBatch.render(worldRenderingStrategy, env);
         modelBatch.end();
 
-        world.setCameraPosition_RP(cam.getPosition().x, cam.getPosition().z);
-        world.renderEntities(decalBatch);
+        worldRenderingStrategy.setCameraPosition_WP(cam.getPosition().x, cam.getPosition().z);
+        worldRenderingStrategy.renderEntities(decalBatch);
 
         decalBatch.flush();
 
