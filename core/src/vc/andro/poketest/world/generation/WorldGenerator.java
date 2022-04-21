@@ -160,13 +160,14 @@ public class WorldGenerator {
         assert world != null;
 
         // TODO: Remove this
-//        if (true) {
+        if (true) {
+            return false;
 //            Voxel v = VoxelPool.obtain();
 //            v.init(VoxelTypes.GRASS);
 //
 //            world.putTileAt_WP(wx, y, wz, v);
 //            return true;
-//        }
+        }
 
         float southwestY = altitudeMapGenerator.getAtPosition(wx - 1, wz + 1);
         float southY = altitudeMapGenerator.getAtPosition(wx, wz + 1);
