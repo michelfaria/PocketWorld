@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader;
 import com.badlogic.gdx.utils.Disposable;
 import vc.andro.poketest.PocketCamera;
-import vc.andro.poketest.voxel.Voxel;
 import vc.andro.poketest.world.World;
 import vc.andro.poketest.world.WorldRenderingStrategy;
 
@@ -39,9 +38,9 @@ public class MainRenderSystem implements Disposable {
         worldRenderingStrategy = new WorldRenderingStrategy(cam, world);
 
         {
-            Voxel t00 = world.getSurfaceVoxel_WP(0, 0);
-            if (t00 != null) {
-                cam.getPosition().set(0, t00.getWy() + 10, 0);
+            byte t00 = world.getSurfaceVoxel_WP(0, 0);
+            if (t00 != 0) {
+                cam.getPosition().set(0, world.getSurfaceVoxel_WP__SUPRETVAL__wy + 10, 0);
             }
         }
     }

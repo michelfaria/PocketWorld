@@ -17,22 +17,22 @@ public final class NullUVCalculationStrategy implements UVCalculationStrategy {
     }
 
     @Override
-    public float getU(Voxel voxel, CubicGroup.Face face) {
+    public float getU(CubicGroup.Face face, byte voxel, int wx, int wy, int wz) {
         return 0;
     }
 
     @Override
-    public float getV(Voxel voxel, CubicGroup.Face face) {
+    public float getV(CubicGroup.Face face, byte voxel, int wx, int wy, int wz) {
         return 0;
     }
 
     @Override
-    public float getU2(Voxel voxel, CubicGroup.Face face) {
+    public float getU2(CubicGroup.Face face, byte voxel, int wx, int wy, int wz) {
         return 0;
     }
 
     @Override
-    public float getV2(Voxel voxel, CubicGroup.Face face) {
+    public float getV2(CubicGroup.Face face, byte voxel, int wx, int wy, int wz) {
         return 0;
     }
 }

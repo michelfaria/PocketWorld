@@ -13,8 +13,10 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import vc.andro.poketest.Assets;
 import vc.andro.poketest.PocketWorld;
-import vc.andro.poketest.voxel.Voxel;
+import vc.andro.poketest.voxel.FaceGenerationStrategy;
+import vc.andro.poketest.voxel.VoxelTypes;
 
+import static vc.andro.poketest.voxel.VoxelTypes.VOXEL_TYPES;
 import static vc.andro.poketest.world.Chunk.CHUNK_DEPTH;
 import static vc.andro.poketest.world.Chunk.CHUNK_SIZE;
 import static vc.andro.poketest.world.VertexArray.VERTEX_SIZE;
@@ -65,46 +67,51 @@ public class ChunkRenderingStrategy implements RenderableProvider {
 
     private void updateVerticesIfDirty() {
         if (needsRenderingUpdate) {
-            Voxel[][][] voxels = chunk.voxels;
+            byte[][][] voxels = chunk.voxels;
             vertexArray8f.clear();
             indicesArray.clear();
             for (int wy = 0; wy < CHUNK_DEPTH; wy++) {
                 for (int lz = 0; lz < CHUNK_SIZE; lz++) {
                     for (int lx = 0; lx < CHUNK_SIZE; lx++) {
-                        Voxel voxel = voxels[lx][wy][lz];
-                        if (voxel == null) {
+                        byte voxel = voxels[lx][wy][lz];
+                        if (voxel == 0) {
                             continue;
                         }
+                        
+                        int wx = LxWx(chunk.cx, lx);
+                        int wz = LzWz(chunk.cz, lz);
 
-                        Voxel voxelAbove = wy < CHUNK_DEPTH - 1 ? voxels[lx][wy + 1][lz] : null;
-                        Voxel voxelUnder = wy > 0 ? voxels[lx][wy - 1][lz] : null;
-                        Voxel voxelEast = chunk.world.getVoxelAt_WP(LxWx(chunk.cx, lx) + 1, wy, LzWz(chunk.cz, lz));
-                        Voxel voxelWest = chunk.world.getVoxelAt_WP(LxWx(chunk.cx, lx) - 1, wy, LzWz(chunk.cz, lz));
-                        Voxel voxelNorth = chunk.world.getVoxelAt_WP(LxWx(chunk.cx, lx), wy, LzWz(chunk.cz, lz) - 1);
-                        Voxel voxelSouth = chunk.world.getVoxelAt_WP(LxWx(chunk.cx, lx), wy, LzWz(chunk.cz, lz) + 1);
+                        byte voxelAbove = wy < CHUNK_DEPTH - 1 ? voxels[lx][wy + 1][lz] : -1;
+                        byte voxelUnder = wy > 0 ? voxels[lx][wy - 1][lz] : -1;
+                        byte voxelEast = chunk.world.getVoxelAt_WP(LxWx(chunk.cx, lx) + 1, wy, LzWz(chunk.cz, lz));
+                        byte voxelWest = chunk.world.getVoxelAt_WP(LxWx(chunk.cx, lx) - 1, wy, LzWz(chunk.cz, lz));
+                        byte voxelNorth = chunk.world.getVoxelAt_WP(LxWx(chunk.cx, lx), wy, LzWz(chunk.cz, lz) - 1);
+                        byte voxelSouth = chunk.world.getVoxelAt_WP(LxWx(chunk.cx, lx), wy, LzWz(chunk.cz, lz) + 1);
 
-                        if (voxelAbove == null || voxelAbove.isTransparent()) {
-                            voxel.createTopVertices(vertexArray8f);
+                        FaceGenerationStrategy faceGenerationStrategy = VOXEL_TYPES[voxel].faceGenerationStrategy;
+
+                        if (voxelAbove <= 0 || VOXEL_TYPES[voxelAbove].transparent) {
+                            faceGenerationStrategy.createTopVertices(vertexArray8f, voxel, wx, wy, wz);
                             indicesArray.addSquare();
                         }
-                        if (voxelUnder == null || voxelUnder.isTransparent()) {
-                            voxel.createBottomVertices(vertexArray8f);
+                        if (voxelUnder <= 0 || VOXEL_TYPES[voxelUnder].transparent) {
+                            faceGenerationStrategy.createBottomVertices(vertexArray8f, voxel, wx, wy, wz);
                             indicesArray.addSquare();
                         }
-                        if (voxelWest == null || voxelWest.isTransparent()) {
-                            voxel.createWestVertices(vertexArray8f);
+                        if (voxelWest <= 0 || VOXEL_TYPES[voxelWest].transparent) {
+                            faceGenerationStrategy.createWestVertices(vertexArray8f, voxel, wx, wy, wz);
                             indicesArray.addSquare();
                         }
-                        if (voxelEast == null || voxelEast.isTransparent()) {
-                            voxel.createEastVertices(vertexArray8f);
+                        if (voxelEast <= 0 || VOXEL_TYPES[voxelEast].transparent) {
+                            faceGenerationStrategy.createEastVertices(vertexArray8f, voxel, wx, wy, wz);
                             indicesArray.addSquare();
                         }
-                        if (voxelNorth == null || voxelNorth.isTransparent()) {
-                            voxel.createNorthVertices(vertexArray8f);
+                        if (voxelNorth <= 0 || VOXEL_TYPES[voxelNorth].transparent) {
+                            faceGenerationStrategy.createNorthVertices(vertexArray8f, voxel, wx, wy, wz);
                             indicesArray.addSquare();
                         }
-                        if (voxelSouth == null || voxelSouth.isTransparent()) {
-                            voxel.createSouthVertices(vertexArray8f);
+                        if (voxelSouth <= 0 || VOXEL_TYPES[voxelSouth].transparent) {
+                            faceGenerationStrategy.createSouthVertices(vertexArray8f, voxel, wx, wy, wz);
                             indicesArray.addSquare();
                         }
                     }

@@ -6,6 +6,8 @@ import vc.andro.poketest.world.VertexArray;
 
 import java.util.Objects;
 
+import static vc.andro.poketest.voxel.VoxelTypes.VOXEL_TYPES;
+
 public class SlopeFaceGenerationStrategy implements FaceGenerationStrategy {
 
     private static SlopeFaceGenerationStrategy INSTANCE;
@@ -21,8 +23,8 @@ public class SlopeFaceGenerationStrategy implements FaceGenerationStrategy {
     }
 
     @SuppressWarnings("DuplicatedCode")
-    private float getHeightInDirection(Voxel v, Direction direction) {
-        SlopeType slopeType = Objects.requireNonNull(v.getType().slopeType, "Voxel isn't a slope");
+    private float getHeightInDirection(Direction direction, byte voxel) {
+        SlopeType slopeType = Objects.requireNonNull(VOXEL_TYPES[voxel].slopeType, "Voxel isn't a slope");
         switch (slopeType) {
             case NORTHWEST_CORNER -> {
                 switch (direction) {
@@ -197,86 +199,86 @@ public class SlopeFaceGenerationStrategy implements FaceGenerationStrategy {
     }
 
     @Override
-    public void createTopVertices(Voxel v, VertexArray vertices) {
+    public void createTopVertices(VertexArray vertices, byte voxel, int wx, int wy, int wz) {
 
         vertices.addVertex8f(
-                v.getWx(),
-                v.getWy() + getHeightInDirection(v, Direction.NORTHWEST),
-                v.getWz(),
+                wx,
+                wy + getHeightInDirection(Direction.NORTHWEST, voxel),
+                wz,
                 0,
                 1,
                 0,
-                v.getTextureRegion(CubicGroup.Face.TOP).getU(),
-                v.getTextureRegion(CubicGroup.Face.TOP).getV()
+                VOXEL_TYPES[voxel].textureRegions.getFace(CubicGroup.Face.TOP).getU(),
+                VOXEL_TYPES[voxel].textureRegions.getFace(CubicGroup.Face.TOP).getV()
         );
 
         vertices.addVertex8f(
-                v.getWx() + 1,
-                v.getWy() + getHeightInDirection(v, Direction.NORTHEAST),
-                v.getWz(),
+                wx + 1,
+                wy + getHeightInDirection(Direction.NORTHEAST, voxel),
+                wz,
                 0,
                 1,
                 0,
-                v.getTextureRegion(CubicGroup.Face.TOP).getU2(),
-                v.getTextureRegion(CubicGroup.Face.TOP).getV()
+                VOXEL_TYPES[voxel].textureRegions.getFace(CubicGroup.Face.TOP).getU2(),
+                VOXEL_TYPES[voxel].textureRegions.getFace(CubicGroup.Face.TOP).getV()
         );
 
         vertices.addVertex8f(
-                v.getWx() + 1,
-                v.getWy() + getHeightInDirection(v, Direction.SOUTHEAST),
-                v.getWz() + 1,
+                wx + 1,
+                wy + getHeightInDirection(Direction.SOUTHEAST, voxel),
+                wz + 1,
                 0,
                 1,
                 0,
-                v.getTextureRegion(CubicGroup.Face.TOP).getU2(),
-                v.getTextureRegion(CubicGroup.Face.TOP).getV2()
+                VOXEL_TYPES[voxel].textureRegions.getFace(CubicGroup.Face.TOP).getU2(),
+                VOXEL_TYPES[voxel].textureRegions.getFace(CubicGroup.Face.TOP).getV2()
         );
 
         vertices.addVertex8f(
-                v.getWx(),
-                v.getWy() + getHeightInDirection(v, Direction.SOUTHWEST),
-                v.getWz() + 1,
+                wx,
+                wy + getHeightInDirection(Direction.SOUTHWEST, voxel),
+                wz + 1,
                 0,
                 1,
                 0,
-                v.getTextureRegion(CubicGroup.Face.TOP).getU(),
-                v.getTextureRegion(CubicGroup.Face.TOP).getV2()
+                VOXEL_TYPES[voxel].textureRegions.getFace(CubicGroup.Face.TOP).getU(),
+                VOXEL_TYPES[voxel].textureRegions.getFace(CubicGroup.Face.TOP).getV2()
         );
     }
 
     @Override
-    public void createEastVertices(Voxel v, VertexArray vertices) {
+    public void createEastVertices(VertexArray vertices, byte voxel, int wx, int wy, int wz) {
         vertices.addVertex8f(
-                v.getWx() + 1,
-                v.getWy(),
-                v.getWz(),
+                wx + 1,
+                wy,
+                wz,
                 1,
                 0,
                 0,
                 0,
                 0);
         vertices.addVertex8f(
-                v.getWx() + 1,
-                v.getWy(),
-                v.getWz() + 1,
+                wx + 1,
+                wy,
+                wz + 1,
                 1,
                 0,
                 0,
                 0,
                 0);
         vertices.addVertex8f(
-                v.getWx() + 1,
-                v.getWy() + getHeightInDirection(v, Direction.SOUTHEAST),
-                v.getWz() + 1,
+                wx + 1,
+                wy + getHeightInDirection(Direction.SOUTHEAST, voxel),
+                wz + 1,
                 1,
                 0,
                 0,
                 0,
                 0);
         vertices.addVertex8f(
-                v.getWx() + 1,
-                v.getWy() + getHeightInDirection(v, Direction.NORTHEAST),
-                v.getWz(),
+                wx + 1,
+                wy + getHeightInDirection(Direction.NORTHEAST, voxel),
+                wz,
                 1,
                 0,
                 0,
@@ -285,38 +287,38 @@ public class SlopeFaceGenerationStrategy implements FaceGenerationStrategy {
     }
 
     @Override
-    public void createNorthVertices(Voxel v, VertexArray vertices) {
+    public void createNorthVertices(VertexArray vertices, byte voxel, int wx, int wy, int wz) {
         vertices.addVertex8f(
-                v.getWx(),
-                v.getWy() + getHeightInDirection(v, Direction.NORTHWEST),
-                v.getWz(),
+                wx,
+                wy + getHeightInDirection(Direction.NORTHWEST, voxel),
+                wz,
                 0,
                 0,
                 1,
                 0,
                 0);
         vertices.addVertex8f(
-                v.getWx() + 1,
-                v.getWy() + getHeightInDirection(v, Direction.NORTHEAST),
-                v.getWz(),
+                wx + 1,
+                wy + getHeightInDirection(Direction.NORTHEAST, voxel),
+                wz,
                 0,
                 0,
                 1,
                 0,
                 0);
         vertices.addVertex8f(
-                v.getWx() + 1,
-                v.getWy(),
-                v.getWz(),
+                wx + 1,
+                wy,
+                wz,
                 0,
                 0,
                 1,
                 0,
                 0);
         vertices.addVertex8f(
-                v.getWx(),
-                v.getWy(),
-                v.getWz(),
+                wx,
+                wy,
+                wz,
                 0,
                 0,
                 1,
@@ -325,38 +327,38 @@ public class SlopeFaceGenerationStrategy implements FaceGenerationStrategy {
     }
 
     @Override
-    public void createSouthVertices(Voxel v, VertexArray vertices) {
+    public void createSouthVertices(VertexArray vertices, byte voxel, int wx, int wy, int wz) {
         vertices.addVertex8f(
-                v.getWx(),
-                v.getWy() + getHeightInDirection(v, Direction.SOUTHWEST),
-                v.getWz() + 1,
+                wx,
+                wy + getHeightInDirection(Direction.SOUTHWEST, voxel),
+                wz + 1,
                 0,
                 0,
                 -1,
                 0,
                 0);
         vertices.addVertex8f(
-                v.getWx(),
-                v.getWy(),
-                v.getWz() + 1,
+                wx,
+                wy,
+                wz + 1,
                 0,
                 0,
                 -1,
                 0,
                 0);
         vertices.addVertex8f(
-                v.getWx() + 1,
-                v.getWy() + getHeightInDirection(v, Direction.SOUTHEAST),
-                v.getWz() + 1,
+                wx + 1,
+                wy + getHeightInDirection(Direction.SOUTHEAST, voxel),
+                wz + 1,
                 0,
                 0,
                 -1,
                 0,
                 0);
         vertices.addVertex8f(
-                v.getWx() + 1,
-                v.getWy(),
-                v.getWz() + 1,
+                wx + 1,
+                wy,
+                wz + 1,
                 0,
                 0,
                 -1,
@@ -365,38 +367,38 @@ public class SlopeFaceGenerationStrategy implements FaceGenerationStrategy {
     }
 
     @Override
-    public void createWestVertices(Voxel v, VertexArray vertices) {
+    public void createWestVertices(VertexArray vertices, byte voxel, int wx, int wy, int wz) {
         vertices.addVertex8f(
-                v.getWx(),
-                v.getWy() + getHeightInDirection(v, Direction.NORTHWEST),
-                v.getWz(),
+                wx,
+                wy + getHeightInDirection(Direction.NORTHWEST, voxel),
+                wz,
                 -1,
                 0,
                 0,
                 0,
                 0);
         vertices.addVertex8f(
-                v.getWx(),
-                v.getWy(),
-                v.getWz(),
+                wx,
+                wy,
+                wz,
                 -1,
                 0,
                 0,
                 0,
                 0);
         vertices.addVertex8f(
-                v.getWx(),
-                v.getWy() + getHeightInDirection(v, Direction.SOUTHWEST),
-                v.getWz() + 1,
+                wx,
+                wy + getHeightInDirection(Direction.SOUTHWEST, voxel),
+                wz + 1,
                 -1,
                 0,
                 0,
                 0,
                 0);
         vertices.addVertex8f(
-                v.getWx(),
-                v.getWy(),
-                v.getWz() + 1,
+                wx,
+                wy,
+                wz + 1,
                 -1,
                 0,
                 0,
@@ -405,6 +407,6 @@ public class SlopeFaceGenerationStrategy implements FaceGenerationStrategy {
     }
 
     @Override
-    public void createBottomVertices(Voxel v, VertexArray vertices) {
+    public void createBottomVertices(VertexArray vertices, byte voxel, int wx, int wy, int wz) {
     }
 }

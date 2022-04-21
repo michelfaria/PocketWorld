@@ -3,15 +3,15 @@ package vc.andro.poketest.voxel;
 import vc.andro.poketest.world.VertexArray;
 
 public interface FaceGenerationStrategy {
-    void createTopVertices(Voxel v, VertexArray vertices);
+    void createTopVertices(VertexArray vertices, byte voxel, int wx, int wy, int wz);
 
-    void createBottomVertices(Voxel v, VertexArray vertices);
+    void createBottomVertices(VertexArray vertices, byte voxel, int wx, int wy, int wz);
 
-    void createNorthVertices(Voxel v, VertexArray vertices);
+    void createNorthVertices(VertexArray vertices, byte voxel, int wx, int wy, int wz);
 
-    void createSouthVertices(Voxel v, VertexArray vertices);
+    void createSouthVertices(VertexArray vertices, byte voxel, int wx, int wy, int wz);
 
-    void createWestVertices(Voxel v, VertexArray vertices);
+    void createWestVertices(VertexArray vertices, byte voxel, int wx, int wy, int wz);
 
-    void createEastVertices(Voxel v, VertexArray vertices);
+    void createEastVertices(VertexArray vertices, byte voxel, int wx, int wy, int wz);
 }

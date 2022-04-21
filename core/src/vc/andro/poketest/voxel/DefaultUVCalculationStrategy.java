@@ -2,6 +2,8 @@ package vc.andro.poketest.voxel;
 
 import vc.andro.poketest.util.CubicGroup;
 
+import static vc.andro.poketest.voxel.VoxelTypes.VOXEL_TYPES;
+
 public class DefaultUVCalculationStrategy implements UVCalculationStrategy {
 
     private static DefaultUVCalculationStrategy INSTANCE;
@@ -14,22 +16,22 @@ public class DefaultUVCalculationStrategy implements UVCalculationStrategy {
     }
 
     @Override
-    public float getU(Voxel voxel, CubicGroup.Face face) {
-        return voxel.getTextureRegion(face).getU();
+    public float getU(CubicGroup.Face face, byte voxel, int wx, int wy, int wz) {
+        return VOXEL_TYPES[voxel].textureRegions.getFace(face).getU();
     }
 
     @Override
-    public float getV(Voxel voxel, CubicGroup.Face face) {
-        return voxel.getTextureRegion(face).getV();
+    public float getV(CubicGroup.Face face, byte voxel, int wx, int wy, int wz) {
+        return VOXEL_TYPES[voxel].textureRegions.getFace(face).getV();
     }
 
     @Override
-    public float getU2(Voxel voxel, CubicGroup.Face face) {
-        return voxel.getTextureRegion(face).getU2();
+    public float getU2(CubicGroup.Face face, byte voxel, int wx, int wy, int wz) {
+        return VOXEL_TYPES[voxel].textureRegions.getFace(face).getU2();
     }
 
     @Override
-    public float getV2(Voxel voxel, CubicGroup.Face face) {
-        return voxel.getTextureRegion(face).getV2();
+    public float getV2(CubicGroup.Face face, byte voxel, int wx, int wy, int wz) {
+        return VOXEL_TYPES[voxel].textureRegions.getFace(face).getV2();
     }
 }

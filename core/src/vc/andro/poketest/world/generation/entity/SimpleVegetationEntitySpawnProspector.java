@@ -1,7 +1,5 @@
 package vc.andro.poketest.world.generation.entity;
 
-import vc.andro.poketest.voxel.Voxel;
-import vc.andro.poketest.voxel.VoxelType;
 import vc.andro.poketest.voxel.VoxelTypes;
 import vc.andro.poketest.world.Chunk;
 import vc.andro.poketest.world.generation.IntNoiseGenerator;
@@ -32,12 +30,12 @@ public class SimpleVegetationEntitySpawnProspector implements SpawnProspector<Pr
         if (noiseGenerator.getAtPosition(wx, wz) == 0) {
             return result;
         }
-        Voxel surfaceTile = chunk.getSurfaceTile_LP(lx, lz);
-        if (surfaceTile == null) {
+        byte surfaceTile = chunk.getSurfaceVoxel_LP(lx, lz);
+        if (surfaceTile == 0) {
             return result;
         }
 
-        int y = surfaceTile.getWy() + 1;
+        int y = chunk.getSurfaceVoxel_LP__SUPRETVAL__wy + 1;
 
         if (y + 1 > CHUNK_DEPTH) {
             return result;
@@ -45,14 +43,14 @@ public class SimpleVegetationEntitySpawnProspector implements SpawnProspector<Pr
 
         for (int ix = 0; ix < entityCollisionWidth; ix++) {
             for (int iz = 0; iz < entityCollisionHeight; iz++) {
-                Voxel tile = chunk.world.getVoxelAt_WP(wx + ix, y, wz + iz);
-                if (tile != null) {
+                byte tile = chunk.world.getVoxelAt_WP(wx + ix, y, wz + iz);
+                if (tile != 0) {
                     return result;
                 }
 
-                Voxel ty1 = chunk.world.getVoxelAt_WP(wx + ix, y - 1, wz + iz);
+                byte ty1 = chunk.world.getVoxelAt_WP(wx + ix, y - 1, wz + iz);
 
-                if (ty1 == null || !ty1.getType().equals(VoxelTypes.GRASS)) {
+                if (ty1 == 0 || VoxelTypes.VOXEL_TYPES[ty1] != VoxelTypes.GRASS) {
                     return result;
                 }
             }

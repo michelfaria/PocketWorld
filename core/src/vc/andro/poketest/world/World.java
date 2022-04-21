@@ -2,13 +2,10 @@ package vc.andro.poketest.world;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.entity.Entity;
-import vc.andro.poketest.voxel.Voxel;
 import vc.andro.poketest.world.generation.WorldGenerator;
 
-import static vc.andro.poketest.world.Chunk.CHUNK_DEPTH;
 import static vc.andro.poketest.world.Chunk.CHUNK_SIZE;
 
 public class World {
@@ -52,35 +49,7 @@ public class World {
         chunk.updateVoxels();
     }
 
-    private static final int[] ADJACENT_POSITIONS = new int[]{
-            // x, y, z
-            -1, 0, 0,
-            0, -1, 0,
-            0, 0, -1,
-            1, 0, 0,
-            0, 1, 0,
-            0, 0, 1
-    };
-
-    public void broadcastTileUpdateToAdjacentTiles(Voxel updateOrigin) {
-        int ox = updateOrigin.getWx();
-        int oy = updateOrigin.getWy();
-        int oz = updateOrigin.getWz();
-        for (int i = 0; i < ADJACENT_POSITIONS.length; i += 3) {
-            int dx = ADJACENT_POSITIONS[i];
-            int dy = ADJACENT_POSITIONS[i + 1];
-            int dz = ADJACENT_POSITIONS[i + 2];
-            if (oy + dy >= CHUNK_DEPTH || oy - dy < 0) {
-                continue;
-            }
-            Voxel voxel = getVoxelAt_WP(ox + dx, oy + dy, oz + dz);
-            if (voxel != null) {
-                voxel.receiveTileUpdate(updateOrigin);
-            }
-        }
-    }
-
-    public void putTileAt_WP(int wx, int y, int wz, @NotNull Voxel voxel) {
+    public void putTileAt_WP(int wx, int y, int wz, byte voxel) {
         Chunk chunk = getChunkAt_G_WP(wx, wz);
         chunk.putVoxelAt(
                 WxLx(wx),
@@ -90,33 +59,19 @@ public class World {
         );
     }
 
-    @Nullable
-    public Voxel getVoxelAt_WP(int wx, int y, int wz) {
+    public byte getVoxelAt_WP(int wx, int y, int wz) {
         Chunk chunk = getChunkAt_CP(
                 WxCx(wx),
                 WzCz(wz)
         );
         if (chunk == null) {
-            return null;
+            return -1;
         }
-        return chunk.getTileAt_LP(
+        return chunk.getVoxelAt_LP(
                 WxLx(wx),
                 y,
                 WzLz(wz)
         );
-    }
-
-    public Voxel getTileAt_G_WP(int wx, int y, int wz) {
-        Chunk chunk = getChunkAt_G_WP(wx, wz);
-        Voxel voxel = chunk.getTileAt_LP(
-                WxLx(wx),
-                y,
-                WzLz(wz)
-        );
-        if (voxel == null) {
-            throw new IllegalStateException("No tile at position (%d, %d, %d)".formatted(wx, y, wz));
-        }
-        return voxel;
     }
 
     private Chunk getChunkAt_G_WP(int wx, int wz) {
@@ -156,25 +111,28 @@ public class World {
         return chunks.get(cx, cz);
     }
 
-    public @Nullable
-    Voxel getSurfaceVoxel_WP(int wx, int wz) {
+    public int getSurfaceVoxel_WP__SUPRETVAL__wy;
+
+    public byte getSurfaceVoxel_WP(int wx, int wz) {
         Chunk chunk = getChunkAt_CP(
                 WxCx(wx),
                 WzCz(wz)
         );
         if (chunk == null) {
-            return null;
+            getSurfaceVoxel_WP__SUPRETVAL__wy = -1;
+            return -1;
         }
-        return chunk.getSurfaceTile_LP(
+        byte voxel = chunk.getSurfaceVoxel_LP(
                 WxLx(wx),
                 WzLz(wz)
         );
+        getSurfaceVoxel_WP__SUPRETVAL__wy = chunk.getSurfaceVoxel_LP__SUPRETVAL__wy;
+        return voxel;
     }
 
-    public @Nullable
-    Voxel getSurfaceVoxel_G_WP(int wx, int wz) {
+    public byte getSurfaceVoxel_G_WP(int wx, int wz) {
         Chunk chunk = getChunkAt_G_WP(wx, wz);
-        return chunk.getSurfaceTile_LP(WxLx(wx), WzLz(wz));
+        return chunk.getSurfaceVoxel_LP(WxLx(wx), WzLz(wz));
     }
 
     public static int WxCx(float wx) {

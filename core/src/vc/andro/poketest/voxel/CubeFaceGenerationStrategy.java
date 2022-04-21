@@ -3,6 +3,8 @@ package vc.andro.poketest.voxel;
 import vc.andro.poketest.util.CubicGroup;
 import vc.andro.poketest.world.VertexArray;
 
+import static vc.andro.poketest.voxel.VoxelTypes.VOXEL_TYPES;
+
 public class CubeFaceGenerationStrategy implements FaceGenerationStrategy {
 
     private static CubeFaceGenerationStrategy INSTANCE;
@@ -18,250 +20,250 @@ public class CubeFaceGenerationStrategy implements FaceGenerationStrategy {
     }
 
     @Override
-    public void createTopVertices(Voxel v, VertexArray vertices) {
+    public void createTopVertices(VertexArray vertices, byte voxel, int wx, int wy, int wz) {
 
         vertices.addVertex8f(
-                v.getWx(),
-                v.getWy() + 1,
-                v.getWz(),
+                wx,
+                wy + 1,
+                wz,
                 0,
                 1,
                 0,
-                v.getUvCalculationStrategies().top.getU(v, CubicGroup.Face.TOP),
-                v.getUvCalculationStrategies().top.getV(v, CubicGroup.Face.TOP)
+                VOXEL_TYPES[voxel].uvCalculationStrategies.top.getU(CubicGroup.Face.TOP, voxel, wx, wy, wz),
+                VOXEL_TYPES[voxel].uvCalculationStrategies.top.getV(CubicGroup.Face.TOP, voxel, wx, wy, wz)
         );
 
         vertices.addVertex8f(
-                v.getWx() + 1,
-                v.getWy() + 1,
-                v.getWz(),
+                wx + 1,
+                wy + 1,
+                wz,
                 0,
                 1,
                 0,
-                v.getUvCalculationStrategies().top.getU2(v, CubicGroup.Face.TOP),
-                v.getUvCalculationStrategies().top.getV(v, CubicGroup.Face.TOP)
+                VOXEL_TYPES[voxel].uvCalculationStrategies.top.getU2(CubicGroup.Face.TOP, voxel, wx, wy, wz),
+                VOXEL_TYPES[voxel].uvCalculationStrategies.top.getV(CubicGroup.Face.TOP, voxel, wx, wy, wz)
         );
 
         vertices.addVertex8f(
-                v.getWx() + 1,
-                v.getWy() + 1,
-                v.getWz() + 1,
+                wx + 1,
+                wy + 1,
+                wz + 1,
                 0,
                 1,
                 0,
-                v.getUvCalculationStrategies().top.getU2(v, CubicGroup.Face.TOP),
-                v.getUvCalculationStrategies().top.getV2(v, CubicGroup.Face.TOP)
+                VOXEL_TYPES[voxel].uvCalculationStrategies.top.getU2(CubicGroup.Face.TOP, voxel, wx, wy, wz),
+                VOXEL_TYPES[voxel].uvCalculationStrategies.top.getV2(CubicGroup.Face.TOP, voxel, wx, wy, wz)
         );
 
         vertices.addVertex8f(
-                v.getWx(),
-                v.getWy() + 1,
-                v.getWz() + 1,
+                wx,
+                wy + 1,
+                wz + 1,
                 0,
                 1,
                 0,
-                v.getUvCalculationStrategies().top.getU(v, CubicGroup.Face.TOP),
-                v.getUvCalculationStrategies().top.getV2(v, CubicGroup.Face.TOP)
+                VOXEL_TYPES[voxel].uvCalculationStrategies.top.getU(CubicGroup.Face.TOP, voxel, wx, wy, wz),
+                VOXEL_TYPES[voxel].uvCalculationStrategies.top.getV2(CubicGroup.Face.TOP, voxel, wx, wy, wz)
         );
     }
 
     @Override
-    public void createEastVertices(Voxel v, VertexArray vertices) {
+    public void createEastVertices(VertexArray vertices, byte voxel, int wx, int wy, int wz) {
         vertices.addVertex8f(
-                v.getWx() + 1,
-                v.getWy(),
-                v.getWz(),
+                wx + 1,
+                wy,
+                wz,
                 1,
                 0,
                 0,
-                v.getUvCalculationStrategies().east.getU(v, CubicGroup.Face.EAST),
-                v.getUvCalculationStrategies().east.getV(v, CubicGroup.Face.EAST));
+                VOXEL_TYPES[voxel].uvCalculationStrategies.east.getU(CubicGroup.Face.EAST, voxel, wx, wy, wz),
+                VOXEL_TYPES[voxel].uvCalculationStrategies.east.getV(CubicGroup.Face.EAST, voxel, wx, wy, wz));
         vertices.addVertex8f(
-                v.getWx() + 1,
-                v.getWy(),
-                v.getWz() + 1,
+                wx + 1,
+                wy,
+                wz + 1,
                 1,
                 0,
                 0,
-                v.getUvCalculationStrategies().east.getU2(v, CubicGroup.Face.EAST),
-                v.getUvCalculationStrategies().east.getV(v, CubicGroup.Face.EAST));
+                VOXEL_TYPES[voxel].uvCalculationStrategies.east.getU2(CubicGroup.Face.EAST, voxel, wx, wy, wz),
+                VOXEL_TYPES[voxel].uvCalculationStrategies.east.getV(CubicGroup.Face.EAST, voxel, wx, wy, wz));
         vertices.addVertex8f(
-                v.getWx() + 1,
-                v.getWy() + 1,
-                v.getWz() + 1,
+                wx + 1,
+                wy + 1,
+                wz + 1,
                 1,
                 0,
                 0,
-                v.getUvCalculationStrategies().east.getU2(v, CubicGroup.Face.EAST),
-                v.getUvCalculationStrategies().east.getV2(v, CubicGroup.Face.EAST));
+                VOXEL_TYPES[voxel].uvCalculationStrategies.east.getU2(CubicGroup.Face.EAST, voxel, wx, wy, wz),
+                VOXEL_TYPES[voxel].uvCalculationStrategies.east.getV2(CubicGroup.Face.EAST, voxel, wx, wy, wz));
         vertices.addVertex8f(
-                v.getWx() + 1,
-                v.getWy() + 1,
-                v.getWz(),
+                wx + 1,
+                wy + 1,
+                wz,
                 1,
                 0,
                 0,
-                v.getUvCalculationStrategies().east.getU(v, CubicGroup.Face.EAST),
-                v.getUvCalculationStrategies().east.getV2(v, CubicGroup.Face.EAST));
+                VOXEL_TYPES[voxel].uvCalculationStrategies.east.getU(CubicGroup.Face.EAST, voxel, wx, wy, wz),
+                VOXEL_TYPES[voxel].uvCalculationStrategies.east.getV2(CubicGroup.Face.EAST, voxel, wx, wy, wz));
     }
 
     @Override
-    public void createNorthVertices(Voxel v, VertexArray vertices) {
+    public void createNorthVertices(VertexArray vertices, byte voxel, int wx, int wy, int wz) {
         vertices.addVertex8f(
-                v.getWx(),
-                v.getWy(),
-                v.getWz(),
+                wx,
+                wy,
+                wz,
                 0,
                 0,
                 1,
-                v.getUvCalculationStrategies().north.getU(v, CubicGroup.Face.NORTH),
-                v.getUvCalculationStrategies().north.getV(v, CubicGroup.Face.NORTH));
+                VOXEL_TYPES[voxel].uvCalculationStrategies.north.getU(CubicGroup.Face.NORTH, voxel, wx, wy, wz),
+                VOXEL_TYPES[voxel].uvCalculationStrategies.north.getV(CubicGroup.Face.NORTH, voxel, wx, wy, wz));
         vertices.addVertex8f(
-                v.getWx() + 1,
-                v.getWy(),
-                v.getWz(),
+                wx + 1,
+                wy,
+                wz,
                 0,
                 0,
                 1,
-                v.getUvCalculationStrategies().north.getU2(v, CubicGroup.Face.NORTH),
-                v.getUvCalculationStrategies().north.getV(v, CubicGroup.Face.NORTH));
+                VOXEL_TYPES[voxel].uvCalculationStrategies.north.getU2(CubicGroup.Face.NORTH, voxel, wx, wy, wz),
+                VOXEL_TYPES[voxel].uvCalculationStrategies.north.getV(CubicGroup.Face.NORTH, voxel, wx, wy, wz));
         vertices.addVertex8f(
-                v.getWx() + 1,
-                v.getWy() + 1,
-                v.getWz(),
+                wx + 1,
+                wy + 1,
+                wz,
                 0,
                 0,
                 1,
-                v.getUvCalculationStrategies().north.getU2(v, CubicGroup.Face.NORTH),
-                v.getUvCalculationStrategies().north.getV2(v, CubicGroup.Face.NORTH));
+                VOXEL_TYPES[voxel].uvCalculationStrategies.north.getU2(CubicGroup.Face.NORTH, voxel, wx, wy, wz),
+                VOXEL_TYPES[voxel].uvCalculationStrategies.north.getV2(CubicGroup.Face.NORTH, voxel, wx, wy, wz));
         vertices.addVertex8f(
-                v.getWx(),
-                v.getWy() + 1,
-                v.getWz(),
+                wx,
+                wy + 1,
+                wz,
                 0,
                 0,
                 1,
-                v.getUvCalculationStrategies().north.getU(v, CubicGroup.Face.NORTH),
-                v.getUvCalculationStrategies().north.getV2(v, CubicGroup.Face.NORTH));
+                VOXEL_TYPES[voxel].uvCalculationStrategies.north.getU(CubicGroup.Face.NORTH, voxel, wx, wy, wz),
+                VOXEL_TYPES[voxel].uvCalculationStrategies.north.getV2(CubicGroup.Face.NORTH, voxel, wx, wy, wz));
     }
 
     @Override
-    public void createSouthVertices(Voxel v, VertexArray vertices) {
+    public void createSouthVertices(VertexArray vertices, byte voxel, int wx, int wy, int wz) {
         vertices.addVertex8f(
-                v.getWx(),
-                v.getWy(),
-                v.getWz() + 1,
+                wx,
+                wy,
+                wz + 1,
                 0,
                 0,
                 -1,
-                v.getUvCalculationStrategies().south.getU(v, CubicGroup.Face.SOUTH),
-                v.getUvCalculationStrategies().south.getV(v, CubicGroup.Face.SOUTH));
+                VOXEL_TYPES[voxel].uvCalculationStrategies.south.getU(CubicGroup.Face.SOUTH, voxel, wx, wy, wz),
+                VOXEL_TYPES[voxel].uvCalculationStrategies.south.getV(CubicGroup.Face.SOUTH, voxel, wx, wy, wz));
         vertices.addVertex8f(
-                v.getWx(),
-                v.getWy() + 1,
-                v.getWz() + 1,
+                wx,
+                wy + 1,
+                wz + 1,
                 0,
                 0,
                 -1,
-                v.getUvCalculationStrategies().south.getU(v, CubicGroup.Face.SOUTH),
-                v.getUvCalculationStrategies().south.getV2(v, CubicGroup.Face.SOUTH));
+                VOXEL_TYPES[voxel].uvCalculationStrategies.south.getU(CubicGroup.Face.SOUTH, voxel, wx, wy, wz),
+                VOXEL_TYPES[voxel].uvCalculationStrategies.south.getV2(CubicGroup.Face.SOUTH, voxel, wx, wy, wz));
         vertices.addVertex8f(
-                v.getWx() + 1,
-                v.getWy() + 1,
-                v.getWz() + 1,
+                wx + 1,
+                wy + 1,
+                wz + 1,
                 0,
                 0,
                 -1,
-                v.getUvCalculationStrategies().south.getU2(v, CubicGroup.Face.SOUTH),
-                v.getUvCalculationStrategies().south.getV2(v, CubicGroup.Face.SOUTH));
+                VOXEL_TYPES[voxel].uvCalculationStrategies.south.getU2(CubicGroup.Face.SOUTH, voxel, wx, wy, wz),
+                VOXEL_TYPES[voxel].uvCalculationStrategies.south.getV2(CubicGroup.Face.SOUTH, voxel, wx, wy, wz));
         vertices.addVertex8f(
-                v.getWx() + 1,
-                v.getWy(),
-                v.getWz() + 1,
+                wx + 1,
+                wy,
+                wz + 1,
                 0,
                 0,
                 -1,
-                v.getUvCalculationStrategies().south.getU2(v, CubicGroup.Face.SOUTH),
-                v.getUvCalculationStrategies().south.getV(v, CubicGroup.Face.SOUTH));
+                VOXEL_TYPES[voxel].uvCalculationStrategies.south.getU2(CubicGroup.Face.SOUTH, voxel, wx, wy, wz),
+                VOXEL_TYPES[voxel].uvCalculationStrategies.south.getV(CubicGroup.Face.SOUTH, voxel, wx, wy, wz));
     }
 
     @Override
-    public void createBottomVertices(Voxel v, VertexArray vertices) {
+    public void createBottomVertices(VertexArray vertices, byte voxel, int wx, int wy, int wz) {
         vertices.addVertex8f(
-                v.getWx(),
-                v.getWy(),
-                v.getWz(),
+                wx,
+                wy,
+                wz,
                 0,
                 -1,
                 0,
-                v.getUvCalculationStrategies().bottom.getU(v, CubicGroup.Face.BOTTOM),
-                v.getUvCalculationStrategies().bottom.getV(v, CubicGroup.Face.BOTTOM));
+                VOXEL_TYPES[voxel].uvCalculationStrategies.bottom.getU(CubicGroup.Face.BOTTOM, voxel, wx, wy, wz),
+                VOXEL_TYPES[voxel].uvCalculationStrategies.bottom.getV(CubicGroup.Face.BOTTOM, voxel, wx, wy, wz));
         vertices.addVertex8f(
-                v.getWx(),
-                v.getWy(),
-                v.getWz() + 1,
+                wx,
+                wy,
+                wz + 1,
                 0,
                 -1,
                 0,
-                v.getUvCalculationStrategies().bottom.getU(v, CubicGroup.Face.BOTTOM),
-                v.getUvCalculationStrategies().bottom.getV2(v, CubicGroup.Face.BOTTOM));
+                VOXEL_TYPES[voxel].uvCalculationStrategies.bottom.getU(CubicGroup.Face.BOTTOM, voxel, wx, wy, wz),
+                VOXEL_TYPES[voxel].uvCalculationStrategies.bottom.getV2(CubicGroup.Face.BOTTOM, voxel, wx, wy, wz));
         vertices.addVertex8f(
-                v.getWx() + 1,
-                v.getWy(),
-                v.getWz() + 1,
+                wx + 1,
+                wy,
+                wz + 1,
                 0,
                 -1,
                 0,
-                v.getUvCalculationStrategies().bottom.getU2(v, CubicGroup.Face.BOTTOM),
-                v.getUvCalculationStrategies().bottom.getV2(v, CubicGroup.Face.BOTTOM));
+                VOXEL_TYPES[voxel].uvCalculationStrategies.bottom.getU2(CubicGroup.Face.BOTTOM, voxel, wx, wy, wz),
+                VOXEL_TYPES[voxel].uvCalculationStrategies.bottom.getV2(CubicGroup.Face.BOTTOM, voxel, wx, wy, wz));
         vertices.addVertex8f(
-                v.getWx() + 1,
-                v.getWy(),
-                v.getWz(),
+                wx + 1,
+                wy,
+                wz,
                 0,
                 -1,
                 0,
-                v.getUvCalculationStrategies().bottom.getU2(v, CubicGroup.Face.BOTTOM),
-                v.getUvCalculationStrategies().bottom.getV(v, CubicGroup.Face.BOTTOM));
+                VOXEL_TYPES[voxel].uvCalculationStrategies.bottom.getU2(CubicGroup.Face.BOTTOM, voxel, wx, wy, wz),
+                VOXEL_TYPES[voxel].uvCalculationStrategies.bottom.getV(CubicGroup.Face.BOTTOM, voxel, wx, wy, wz));
     }
 
     @Override
-    public void createWestVertices(Voxel v, VertexArray vertices) {
+    public void createWestVertices(VertexArray vertices, byte voxel, int wx, int wy, int wz) {
         vertices.addVertex8f(
-                v.getWx(),
-                v.getWy(),
-                v.getWz(),
+                wx,
+                wy,
+                wz,
                 -1,
                 0,
                 0,
-                v.getUvCalculationStrategies().west.getU(v, CubicGroup.Face.WEST),
-                v.getUvCalculationStrategies().west.getV(v, CubicGroup.Face.WEST));
+                VOXEL_TYPES[voxel].uvCalculationStrategies.west.getU(CubicGroup.Face.WEST, voxel, wx, wy, wz),
+                VOXEL_TYPES[voxel].uvCalculationStrategies.west.getV(CubicGroup.Face.WEST, voxel, wx, wy, wz));
         vertices.addVertex8f(
-                v.getWx(),
-                v.getWy() + 1,
-                v.getWz(),
+                wx,
+                wy + 1,
+                wz,
                 -1,
                 0,
                 0,
-                v.getUvCalculationStrategies().west.getU(v, CubicGroup.Face.WEST),
-                v.getUvCalculationStrategies().west.getV2(v, CubicGroup.Face.WEST));
+                VOXEL_TYPES[voxel].uvCalculationStrategies.west.getU(CubicGroup.Face.WEST, voxel, wx, wy, wz),
+                VOXEL_TYPES[voxel].uvCalculationStrategies.west.getV2(CubicGroup.Face.WEST, voxel, wx, wy, wz));
         vertices.addVertex8f(
-                v.getWx(),
-                v.getWy() + 1,
-                v.getWz() + 1,
+                wx,
+                wy + 1,
+                wz + 1,
                 -1,
                 0,
                 0,
-                v.getUvCalculationStrategies().west.getU2(v, CubicGroup.Face.WEST),
-                v.getUvCalculationStrategies().west.getV2(v, CubicGroup.Face.WEST));
+                VOXEL_TYPES[voxel].uvCalculationStrategies.west.getU2(CubicGroup.Face.WEST, voxel, wx, wy, wz),
+                VOXEL_TYPES[voxel].uvCalculationStrategies.west.getV2(CubicGroup.Face.WEST, voxel, wx, wy, wz));
         vertices.addVertex8f(
-                v.getWx(),
-                v.getWy(),
-                v.getWz() + 1,
+                wx,
+                wy,
+                wz + 1,
                 -1,
                 0,
                 0,
-                v.getUvCalculationStrategies().west.getU2(v, CubicGroup.Face.WEST),
-                v.getUvCalculationStrategies().west.getV(v, CubicGroup.Face.WEST));
+                VOXEL_TYPES[voxel].uvCalculationStrategies.west.getU2(CubicGroup.Face.WEST, voxel, wx, wy, wz),
+                VOXEL_TYPES[voxel].uvCalculationStrategies.west.getV(CubicGroup.Face.WEST, voxel, wx, wy, wz));
     }
 }

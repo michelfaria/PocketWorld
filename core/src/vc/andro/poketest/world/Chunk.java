@@ -2,9 +2,6 @@ package vc.andro.poketest.world;
 
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pools;
-import org.jetbrains.annotations.Nullable;
-import vc.andro.poketest.voxel.Voxel;
-import vc.andro.poketest.voxel.VoxelPool;
 
 public class Chunk implements Pool.Poolable {
 
@@ -16,7 +13,7 @@ public class Chunk implements Pool.Poolable {
     public int cx;
     public int cz;
 
-    protected Voxel[][][] voxels;
+    protected byte[][][] voxels;
     protected int voxelCount; // Amount of voxels that exist in this chunk
     protected ChunkRenderingStrategy chunkRenderingStrategy;
 
@@ -27,7 +24,7 @@ public class Chunk implements Pool.Poolable {
         this.world = world;
         this.cx = cx;
         this.cz = cz;
-        voxels = new Voxel[CHUNK_SIZE][CHUNK_DEPTH][CHUNK_SIZE];
+        voxels = new byte[CHUNK_SIZE][CHUNK_DEPTH][CHUNK_SIZE];
         chunkRenderingStrategy = new ChunkRenderingStrategy(this);
     }
 
@@ -41,26 +38,17 @@ public class Chunk implements Pool.Poolable {
         chunkRenderingStrategy = null;
     }
 
-    public @Nullable
-    Voxel getTileAt_LP(int lx, int y, int lz) {
+    public byte getVoxelAt_LP(int lx, int y, int lz) {
         return voxels[lx][y][lz];
     }
 
-    public void putVoxelAt(int lx, int wy, int lz, @Nullable Voxel voxel) {
-        Voxel prevVoxel = getTileAt_LP(lx, wy, lz);
-        if (prevVoxel == null && voxel != null) {
+    public void putVoxelAt(int lx, int wy, int lz, byte voxel) {
+        byte prevVoxel = getVoxelAt_LP(lx, wy, lz);
+        if (prevVoxel == 0 && voxel != 0) {
             voxelCount++;
-        } else if (prevVoxel != null && voxel == null) {
+        } else if (prevVoxel != 0 && voxel == 0) {
             voxelCount--;
         }
-        if (voxel != null) {
-            voxel.storePosition(this, lx, wy, lz);
-        }
-
-        if (prevVoxel != null) {
-            VoxelPool.free(prevVoxel);
-        }
-
         voxels[lx][wy][lz] = voxel;
     }
 
@@ -68,24 +56,28 @@ public class Chunk implements Pool.Poolable {
         for (int lx = 0; lx < CHUNK_SIZE; lx++) {
             for (int wy = 0; wy < CHUNK_DEPTH; wy++) {
                 for (int lz = 0; lz < CHUNK_SIZE; lz++) {
-                    Voxel v = getTileAt_LP(lx, wy, lz);
-                    if (v == null) {
+                    byte v = getVoxelAt_LP(lx, wy, lz);
+                    if (v == 0) {
                         continue;
                     }
-                    v.doTileUpdate();
+                    // FIXME
+                    // v.doTileUpdate();
                 }
             }
         }
     }
 
-    public @Nullable
-    Voxel getSurfaceTile_LP(int lx, int lz) {
+    public int getSurfaceVoxel_LP__SUPRETVAL__wy;
+
+    public byte getSurfaceVoxel_LP(int lx, int lz) {
         for (int wy = CHUNK_DEPTH - 1; wy >= 0; wy--) {
-            Voxel v = getTileAt_LP(lx, wy, lz);
-            if (v != null) {
+            byte v = getVoxelAt_LP(lx, wy, lz);
+            if (v != 0) {
+                getSurfaceVoxel_LP__SUPRETVAL__wy = wy;
                 return v;
             }
         }
-        return null;
+        getSurfaceVoxel_LP__SUPRETVAL__wy = -1;
+        return 0;
     }
 }

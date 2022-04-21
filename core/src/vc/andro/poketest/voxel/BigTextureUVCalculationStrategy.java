@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import vc.andro.poketest.util.CubicGroup;
 
 import static vc.andro.poketest.PocketWorld.PPU;
+import static vc.andro.poketest.voxel.VoxelTypes.VOXEL_TYPES;
 
 public class BigTextureUVCalculationStrategy implements UVCalculationStrategy {
 
@@ -24,20 +25,18 @@ public class BigTextureUVCalculationStrategy implements UVCalculationStrategy {
     private float v;
     private float v2;
 
-    public synchronized void calculateUVs(Voxel voxel, CubicGroup.Face face) {
-        TextureRegion txReg = voxel.getType().textureRegions.getFace(face);
+    public synchronized void calculateUVs(CubicGroup.Face face, byte voxel, int wx, int wy, int wz) {
+        TextureRegion txReg = VOXEL_TYPES[voxel].textureRegions.getFace(face);
         int regW = txReg.getRegionWidth();
         int regH = txReg.getRegionHeight();
         float regV = txReg.getV();
         float regV2 = txReg.getV2();
         float regU = txReg.getU();
         float regU2 = txReg.getU2();
-        int voxelWz = voxel.getWz();
-        int voxelWx = voxel.getWx();
         int tilesW = (int) (regW / PPU);
         int tilesH = (int) (regH / PPU);
-        int partX = Math.floorMod(voxelWx, tilesW);
-        int partZ = Math.floorMod(voxelWz, tilesH);
+        int partX = Math.floorMod(wx, tilesW);
+        int partZ = Math.floorMod(wz, tilesH);
         float uDiff = regU2 - regU;
         float vDiff = regV2 - regV;
         float uPerTile = uDiff / tilesW;
@@ -49,27 +48,28 @@ public class BigTextureUVCalculationStrategy implements UVCalculationStrategy {
         v2 = regV + (vPerTile * partZ) + vPerTile;
     }
 
+
     @Override
-    public synchronized float getU(Voxel voxel, CubicGroup.Face face) {
-        calculateUVs(voxel, face);
+    public float getU(CubicGroup.Face face, byte voxel, int wx, int wy, int wz) {
+        calculateUVs(face, voxel, wx, wy, wz);
         return u;
     }
 
     @Override
-    public synchronized float getV(Voxel voxel, CubicGroup.Face face) {
-        calculateUVs(voxel, face);
+    public float getV(CubicGroup.Face face, byte voxel, int wx, int wy, int wz) {
+        calculateUVs(face, voxel, wx, wy, wz);
         return v;
     }
 
     @Override
-    public synchronized float getU2(Voxel voxel, CubicGroup.Face face) {
-        calculateUVs(voxel, face);
+    public float getU2(CubicGroup.Face face, byte voxel, int wx, int wy, int wz) {
+        calculateUVs(face, voxel, wx, wy, wz);
         return u2;
     }
 
     @Override
-    public synchronized float getV2(Voxel voxel, CubicGroup.Face face) {
-        calculateUVs(voxel, face);
+    public float getV2(CubicGroup.Face face, byte voxel, int wx, int wy, int wz) {
+        calculateUVs(face, voxel, wx, wy, wz);
         return v2;
     }
 }
