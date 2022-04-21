@@ -28,6 +28,7 @@ public class Voxel implements Pool.Poolable {
     private boolean transparent;
     private CubicGroup<TextureRegion> textureRegions;
     private CubicGroup<UVCalculationStrategy> uvCalculationStrategies;
+    private FaceGenerationStrategy faceGenerationStrategy;
 
     Voxel() {
     }
@@ -35,6 +36,7 @@ public class Voxel implements Pool.Poolable {
     public void init(VoxelType type) {
         this.type = type;
         setTextures(type.textureRegionIds);
+        faceGenerationStrategy = CubeFaceGenerationStrategy.getInstance();
     }
 
     @Override
@@ -52,6 +54,7 @@ public class Voxel implements Pool.Poolable {
         textureRegions = null;
         CubicGroup.pool.free(uvCalculationStrategies);
         uvCalculationStrategies = null;
+        faceGenerationStrategy = null;
     }
 
     public void storePosition(Chunk chunk, int lx, int wy, int lz) {
@@ -100,245 +103,27 @@ public class Voxel implements Pool.Poolable {
     }
 
     public void createTopVertices(VertexArray vertices) {
-        // northwest
-        vertices.addVertex8f(
-                getWx(),                    // x
-                getWy() + 1,                     // y
-                getWz(),                    // z
-                0,                         // normal x
-                1,                         //        y
-                0,                         //        z
-                uvCalculationStrategies.top.getU(this, CubicGroup.Face.TOP),      // u
-                uvCalculationStrategies.top.getV(this, CubicGroup.Face.TOP)      // v
-        );
-        // northeast
-        vertices.addVertex8f(
-                getWx() + 1,                // x
-                getWy() + 1,                     // y
-                getWz(),                    // z
-                0,                         // normal x
-                1,                         //        y
-                0,                         //        z
-                uvCalculationStrategies.top.getU2(this, CubicGroup.Face.TOP),     // u
-                uvCalculationStrategies.top.getV(this, CubicGroup.Face.TOP)      // v
-        );
-        // southeast
-        vertices.addVertex8f(
-                getWx() + 1,                // x
-                getWy() + 1,                     // y
-                getWz() + 1,                // z
-                0,                         // normal x
-                1,                         //        y
-                0,                         //        z
-                uvCalculationStrategies.top.getU2(this, CubicGroup.Face.TOP),     // u
-                uvCalculationStrategies.top.getV2(this, CubicGroup.Face.TOP)      // v
-        );
-        // southwest
-        vertices.addVertex8f(
-                getWx(),                    // x
-                getWy() + 1,                     // y
-                getWz() + 1,                // z
-                0,                         // normal x
-                1,                         //        y
-                0,                         //        z
-                uvCalculationStrategies.top.getU(this, CubicGroup.Face.TOP),      // u
-                uvCalculationStrategies.top.getV2(this, CubicGroup.Face.TOP)      // v
-        );
-    }
-
-    public void createEastVertices(VertexArray vertices) {
-        vertices.addVertex8f(
-                getWx() + 1,     // x
-                getWy(),              // y
-                getWz(),         // z
-                1,              // normal x
-                0,              //        y
-                0,              //        z
-                uvCalculationStrategies.east.getU(this, CubicGroup.Face.EAST),              // u
-                uvCalculationStrategies.east.getV(this, CubicGroup.Face.EAST));             // v
-        vertices.addVertex8f(
-                getWx() + 1,     // x
-                getWy(),              // y
-                getWz() + 1,     // z
-                1,              // normal x
-                0,              //        y
-                0,              //        z
-                uvCalculationStrategies.east.getU2(this, CubicGroup.Face.EAST),              // u
-                uvCalculationStrategies.east.getV(this, CubicGroup.Face.EAST));             // v
-        vertices.addVertex8f(
-                getWx() + 1,     // x
-                getWy() + 1,          // y
-                getWz() + 1,     // z
-                1,              // normal x
-                0,              //        y
-                0,              //        z
-                uvCalculationStrategies.east.getU2(this, CubicGroup.Face.EAST),              // u
-                uvCalculationStrategies.east.getV2(this, CubicGroup.Face.EAST));             // v
-        vertices.addVertex8f(
-                getWx() + 1,     // x
-                getWy() + 1,          // y
-                getWz(),         // z
-                1,              // normal x
-                0,              //        y
-                0,              //        z
-                uvCalculationStrategies.east.getU(this, CubicGroup.Face.EAST),              // u
-                uvCalculationStrategies.east.getV2(this, CubicGroup.Face.EAST));             // v
-    }
-
-    public void createNorthVertices(VertexArray vertices) {
-        vertices.addVertex8f(
-                getWx(),         // x
-                getWy(),              // y
-                getWz(),         // z
-                0,              // normal x
-                0,              //        y
-                1,              //        z
-                uvCalculationStrategies.north.getU(this, CubicGroup.Face.NORTH),              // u
-                uvCalculationStrategies.north.getV(this, CubicGroup.Face.NORTH));             // v
-        vertices.addVertex8f(
-                getWx() + 1,     // x
-                getWy(),              // y
-                getWz(),         // z
-                0,              // normal x
-                0,              //        y
-                1,              //        z
-                uvCalculationStrategies.north.getU2(this, CubicGroup.Face.NORTH),              // u
-                uvCalculationStrategies.north.getV(this, CubicGroup.Face.NORTH));             // v
-        vertices.addVertex8f(
-                getWx() + 1,     // x
-                getWy() + 1,          // y
-                getWz(),         // z
-                0,              // normal x
-                0,              //        y
-                1,              //        z
-                uvCalculationStrategies.north.getU2(this, CubicGroup.Face.NORTH),              // u
-                uvCalculationStrategies.north.getV2(this, CubicGroup.Face.NORTH));             // v
-        vertices.addVertex8f(
-                getWx(),         // x
-                getWy() + 1,          // y
-                getWz(),         // z
-                0,              // normal x
-                0,              //        y
-                1,              //        z
-                uvCalculationStrategies.north.getU(this, CubicGroup.Face.NORTH),              // u
-                uvCalculationStrategies.north.getV2(this, CubicGroup.Face.NORTH));             // v
-    }
-
-    public void createSouthVertices(VertexArray vertices) {
-        vertices.addVertex8f(
-                getWx(),         // x
-                getWy(),              // y
-                getWz() + 1,     // z
-                0,              // normal x
-                0,              //        y
-                -1,             //        z
-                uvCalculationStrategies.south.getU(this, CubicGroup.Face.SOUTH),              // u
-                uvCalculationStrategies.south.getV(this, CubicGroup.Face.SOUTH));             // v
-        vertices.addVertex8f(
-                getWx(),         // x
-                getWy() + 1,          // y
-                getWz() + 1,     // z
-                0,              // normal x
-                0,              //        y
-                -1,             //        z
-                uvCalculationStrategies.south.getU(this, CubicGroup.Face.SOUTH),              // u
-                uvCalculationStrategies.south.getV2(this, CubicGroup.Face.SOUTH));             // v
-        vertices.addVertex8f(
-                getWx() + 1,     // x
-                getWy() + 1,          // y
-                getWz() + 1,     // z
-                0,              // normal x
-                0,              //        y
-                -1,             //        z
-                uvCalculationStrategies.south.getU2(this, CubicGroup.Face.SOUTH),              // u
-                uvCalculationStrategies.south.getV2(this, CubicGroup.Face.SOUTH));             // v
-        vertices.addVertex8f(
-                getWx() + 1,     // x
-                getWy(),              // y
-                getWz() + 1,     // z
-                0,              // normal x
-                0,              //        y
-                -1,             //        z
-                uvCalculationStrategies.south.getU2(this, CubicGroup.Face.SOUTH),              // u
-                uvCalculationStrategies.south.getV(this, CubicGroup.Face.SOUTH));             // v
+        faceGenerationStrategy.createTopVertices(this, vertices);
     }
 
     public void createBottomVertices(VertexArray vertices) {
-        vertices.addVertex8f(
-                getWx(),         // x
-                getWy(),              // y
-                getWz(),         // z
-                0,              // normal x
-                -1,             //        y
-                0,              //        z
-                uvCalculationStrategies.bottom.getU(this, CubicGroup.Face.BOTTOM),              // u
-                uvCalculationStrategies.bottom.getV(this, CubicGroup.Face.BOTTOM));             // v
-        vertices.addVertex8f(
-                getWx(),         // x
-                getWy(),              // y
-                getWz() + 1,     // z
-                0,              // normal x
-                -1,             //        y
-                0,              //        z
-                uvCalculationStrategies.bottom.getU(this, CubicGroup.Face.BOTTOM),              // u
-                uvCalculationStrategies.bottom.getV2(this, CubicGroup.Face.BOTTOM));             // v
-        vertices.addVertex8f(
-                getWx() + 1,     // x
-                getWy(),              // y
-                getWz() + 1,     // z
-                0,              // normal x
-                -1,             //        y
-                0,              //        z
-                uvCalculationStrategies.bottom.getU2(this, CubicGroup.Face.BOTTOM),             // u
-                uvCalculationStrategies.bottom.getV2(this, CubicGroup.Face.BOTTOM));             // v
-        vertices.addVertex8f(
-                getWx() + 1,    // x
-                getWy(),             // y
-                getWz(),        // z
-                0,             // normal x
-                -1,            //        y
-                0,             //        z
-                uvCalculationStrategies.bottom.getU2(this, CubicGroup.Face.BOTTOM),             // u
-                uvCalculationStrategies.bottom.getV(this, CubicGroup.Face.BOTTOM));            // v
+        faceGenerationStrategy.createBottomVertices(this, vertices);
+    }
+
+    public void createNorthVertices(VertexArray vertices) {
+        faceGenerationStrategy.createNorthVertices(this, vertices);
+    }
+
+    public void createSouthVertices(VertexArray vertices) {
+        faceGenerationStrategy.createSouthVertices(this, vertices);
     }
 
     public void createWestVertices(VertexArray vertices) {
-        vertices.addVertex8f(
-                getWx(),        // x
-                getWy(),             // y
-                getWz(),        // z
-                -1,            // normal x
-                0,             //        y
-                0,             //        z
-                uvCalculationStrategies.west.getU(this, CubicGroup.Face.WEST),             // u
-                uvCalculationStrategies.west.getV(this, CubicGroup.Face.WEST));            // v
-        vertices.addVertex8f(
-                getWx(),        // x
-                getWy() + 1,         // y
-                getWz(),        // z
-                -1,            // normal x
-                0,             //        y
-                0,             //        z
-                uvCalculationStrategies.west.getU(this, CubicGroup.Face.WEST),             // u
-                uvCalculationStrategies.west.getV2(this, CubicGroup.Face.WEST));            // v
-        vertices.addVertex8f(
-                getWx(),        // x
-                getWy() + 1,         // y
-                getWz() + 1,    // z
-                -1,            // normal x
-                0,             //        y
-                0,             //        z
-                uvCalculationStrategies.west.getU2(this, CubicGroup.Face.WEST),             // u
-                uvCalculationStrategies.west.getV2(this, CubicGroup.Face.WEST));            // v
-        vertices.addVertex8f(
-                getWx(),        // x
-                getWy(),             // y
-                getWz() + 1,    // z
-                -1,            // normal x
-                0,             //        y
-                0,             //        z
-                uvCalculationStrategies.west.getU2(this, CubicGroup.Face.WEST),             // u
-                uvCalculationStrategies.west.getV(this, CubicGroup.Face.WEST));            // v
+        faceGenerationStrategy.createWestVertices(this, vertices);
+    }
+
+    public void createEastVertices(VertexArray vertices) {
+        faceGenerationStrategy.createEastVertices(this, vertices);
     }
 
     public World getWorld() {
@@ -383,5 +168,9 @@ public class Voxel implements Pool.Poolable {
 
     public VoxelType getType() {
         return type;
+    }
+
+    public CubicGroup<UVCalculationStrategy> getUvCalculationStrategies() {
+        return uvCalculationStrategies;
     }
 }
