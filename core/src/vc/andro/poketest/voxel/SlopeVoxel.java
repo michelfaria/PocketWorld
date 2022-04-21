@@ -1,6 +1,7 @@
 package vc.andro.poketest.voxel;
 
 import vc.andro.poketest.Direction;
+import vc.andro.poketest.util.CubicGroup;
 import vc.andro.poketest.world.VertexArray;
 
 public class SlopeVoxel extends BasicVoxel {
@@ -16,7 +17,7 @@ public class SlopeVoxel extends BasicVoxel {
 
     public void updateSlopeType(SlopeType newType) {
         slopeType = newType;
-        setSprite(newType.spriteId);
+        setTextures(newType.spriteIds);
     }
 
     @SuppressWarnings("DuplicatedCode")
@@ -204,8 +205,8 @@ public class SlopeVoxel extends BasicVoxel {
                 0,                         // normal x
                 1,                         //        y
                 0,                         //        z
-                getTextureRegion().getU(),      // u
-                getTextureRegion().getV()      // v
+                getTextureRegion(CubicGroup.Face.TOP).getU(),      // u
+                getTextureRegion(CubicGroup.Face.TOP).getV()      // v
         );
         // northeast
         vertices.addVertex8f(
@@ -215,8 +216,8 @@ public class SlopeVoxel extends BasicVoxel {
                 0,                         // normal x
                 1,                         //        y
                 0,                         //        z
-                getTextureRegion().getU2(),     // u
-                getTextureRegion().getV()      // v
+                getTextureRegion(CubicGroup.Face.TOP).getU2(),     // u
+                getTextureRegion(CubicGroup.Face.TOP).getV()      // v
         );
         // southeast
         vertices.addVertex8f(
@@ -226,8 +227,8 @@ public class SlopeVoxel extends BasicVoxel {
                 0,                         // normal x
                 1,                         //        y
                 0,                         //        z
-                getTextureRegion().getU2(),     // u
-                getTextureRegion().getV2()       // v
+                getTextureRegion(CubicGroup.Face.TOP).getU2(),     // u
+                getTextureRegion(CubicGroup.Face.TOP).getV2()       // v
         );
         // southwest
         vertices.addVertex8f(
@@ -237,8 +238,8 @@ public class SlopeVoxel extends BasicVoxel {
                 0,                         // normal x
                 1,                         //        y
                 0,                         //        z
-                getTextureRegion().getU(),      // u
-                getTextureRegion().getV2()       // v
+                getTextureRegion(CubicGroup.Face.TOP).getU(),      // u
+                getTextureRegion(CubicGroup.Face.TOP).getV2()       // v
         );
     }
 

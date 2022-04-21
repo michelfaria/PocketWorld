@@ -1,5 +1,7 @@
 package vc.andro.poketest.voxel;
 
+import vc.andro.poketest.util.CubicGroup;
+
 public enum SlopeType {
     NORTHWEST_CORNER("tile/wall-top-left-corner"),
     NORTH_EDGE("tile/wall-top-edge"),
@@ -14,10 +16,10 @@ public enum SlopeType {
     SOUTHWEST_INNER_CORNER("tile/wall-bottom-left-inner-corner"),
     SOUTHEAST_INNER_CORNER("tile/wall-bottom-right-inner-corner");
 
-    public final String spriteId;
+    public final CubicGroup<String> spriteIds;
 
-    SlopeType(String spriteId) {
-        this.spriteId = spriteId;
+    SlopeType(String topFaceSpriteId) {
+        spriteIds = new CubicGroup<>(topFaceSpriteId, null, null, null, null, null);
     }
 
 }

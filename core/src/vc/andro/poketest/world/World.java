@@ -192,15 +192,11 @@ public class World {
     }
 
     public static int WxLx(int wx) {
-        return wx >= 0
-                ? wx % CHUNK_SIZE
-                : (CHUNK_SIZE + (wx % CHUNK_SIZE)) % CHUNK_SIZE;
+        return Math.floorMod(wx, CHUNK_SIZE);
     }
 
     public static int WzLz(int wz) {
-        return wz >= 0
-                ? wz % CHUNK_SIZE
-                : (CHUNK_SIZE + (wz % CHUNK_SIZE)) % CHUNK_SIZE;
+        return Math.floorMod(wz, CHUNK_SIZE);
     }
 
     public static int LxWx(int cx, int lx) {

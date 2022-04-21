@@ -1,26 +1,29 @@
 package vc.andro.poketest.voxel;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import vc.andro.poketest.util.CubicGroup;
 
 import static vc.andro.poketest.PocketWorld.PPU;
 
 public class BigTextureUVCalculationStrategy implements UVCalculationStrategy {
 
     private final BasicVoxel voxel;
+    private final CubicGroup.Face whichFace;
 
     private float u;
     private float u2;
     private float v;
     private float v2;
 
-    public BigTextureUVCalculationStrategy(BasicVoxel voxel) {
+    public BigTextureUVCalculationStrategy(BasicVoxel voxel, CubicGroup.Face whichFace) {
         this.voxel = voxel;
+        this.whichFace = whichFace;
         refresh();
     }
 
     @Override
     public void refresh() {
-        TextureRegion txReg = voxel.getTextureRegion();
+        TextureRegion txReg = voxel.getTextureRegion(whichFace);
         int regW = txReg.getRegionWidth();
         int regH = txReg.getRegionHeight();
         float regV = txReg.getV();
@@ -42,7 +45,6 @@ public class BigTextureUVCalculationStrategy implements UVCalculationStrategy {
         u2 = regU + (uPerTile * partX) + uPerTile;
         v = regV + vPerTile * partZ;
         v2 = regV + (vPerTile * partZ) + vPerTile;
-
     }
 
     @Override
