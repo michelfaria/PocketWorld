@@ -11,8 +11,6 @@ import vc.andro.poketest.PocketCamera;
 import vc.andro.poketest.Registry;
 import vc.andro.poketest.entity.Entity;
 
-import java.util.Iterator;
-
 import static vc.andro.poketest.world.World.WxCx;
 import static vc.andro.poketest.world.World.WzCz;
 
@@ -74,17 +72,18 @@ public class WorldRenderingStrategy implements RenderableProvider {
         return Math.abs(WxCx(viewpointWx) - cx) > renderDistanceInChunks || Math.abs(WzCz(viewpointWz) - cz) > renderDistanceInChunks;
     }
 
+    private final Array<Chunk> chunksToUnload = new Array<>(Chunk.class);
+
     private void unloadChunksOutsideOfRenderDistance() {
-        for (IntMap<Chunk> yMap : world.getChunks().map.values()) {
-            Iterator<Chunk> iterChunk = yMap.values().iterator();
-            while (iterChunk.hasNext()) {
-                Chunk chunk = iterChunk.next();
+        chunksToUnload.clear();
+        for (IntMap<Chunk> xs : world.getChunks().map.values()) {
+            for (Chunk chunk : xs.values()) {
                 if (isChunkOutsideOfRenderDistance(chunk)) {
-                    iterChunk.remove();
-                    Gdx.app.log("World", "DELETED chunk at (" + chunk.cx + "," + chunk.cz + ")");
+                    chunksToUnload.add(chunk);
                 }
             }
         }
+        world.unloadChunks(chunksToUnload);
     }
 
     private void deleteEntitiesOutsideOfRenderDistance() {

@@ -7,7 +7,7 @@ import static vc.andro.poketest.PocketWorld.PPU;
 
 public class BigTextureUVCalculationStrategy implements UVCalculationStrategy {
 
-    private final BasicVoxel voxel;
+    private final Voxel voxel;
     private final CubicGroup.Face whichFace;
 
     private float u;
@@ -15,7 +15,7 @@ public class BigTextureUVCalculationStrategy implements UVCalculationStrategy {
     private float v;
     private float v2;
 
-    public BigTextureUVCalculationStrategy(BasicVoxel voxel, CubicGroup.Face whichFace) {
+    public BigTextureUVCalculationStrategy(Voxel voxel, CubicGroup.Face whichFace) {
         this.voxel = voxel;
         this.whichFace = whichFace;
         refresh();
@@ -48,22 +48,22 @@ public class BigTextureUVCalculationStrategy implements UVCalculationStrategy {
     }
 
     @Override
-    public float getU() {
+    public float getU(Voxel voxel, CubicGroup.Face face) {
         return u;
     }
 
     @Override
-    public float getV() {
+    public float getV(Voxel voxel, CubicGroup.Face face) {
         return v;
     }
 
     @Override
-    public float getU2() {
+    public float getU2(Voxel voxel, CubicGroup.Face face) {
         return u2;
     }
 
     @Override
-    public float getV2() {
+    public float getV2(Voxel voxel, CubicGroup.Face face) {
         return v2;
     }
 }

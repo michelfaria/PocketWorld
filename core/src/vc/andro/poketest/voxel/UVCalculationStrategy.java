@@ -1,5 +1,7 @@
 package vc.andro.poketest.voxel;
 
+import vc.andro.poketest.util.CubicGroup;
+
 public interface UVCalculationStrategy {
 
     /**
@@ -8,11 +10,11 @@ public interface UVCalculationStrategy {
     default void refresh() {
     }
 
-    float getU();
+    float getU(Voxel voxel, CubicGroup.Face face);
 
-    float getV();
+    float getV(Voxel voxel, CubicGroup.Face face);
 
-    float getU2();
+    float getU2(Voxel voxel, CubicGroup.Face face);
 
-    float getV2();
+    float getV2(Voxel voxel, CubicGroup.Face face);
 }

@@ -46,4 +46,21 @@ public class CoordMat<T> {
                 .map(IntMap::values)
                 .flatMap(it -> StreamSupport.stream(Spliterators.spliteratorUnknownSize(it, Spliterator.ORDERED), false));
     }
+
+    public @Nullable
+    T remove(int x, int y) {
+        IntMap<T> ym = map.get(x);
+        if (ym == null) {
+            return null;
+        }
+        T t = ym.get(y);
+        if (t == null) {
+            return null;
+        }
+        ym.remove(y);
+        if (ym.isEmpty()) {
+            map.remove(x);
+        }
+        return t;
+    }
 }

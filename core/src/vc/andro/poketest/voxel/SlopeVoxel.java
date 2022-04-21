@@ -4,15 +4,24 @@ import vc.andro.poketest.Direction;
 import vc.andro.poketest.util.CubicGroup;
 import vc.andro.poketest.world.VertexArray;
 
-public class SlopeVoxel extends BasicVoxel {
+public class SlopeVoxel extends Voxel {
 
     private SlopeType slopeType;
 
-    public SlopeVoxel(SlopeType slopeType) {
-        super(VoxelType.SLOPE);
+    SlopeVoxel() {
+    }
+
+    public void setup(SlopeType slopeType) {
+        super.setup(VoxelType.SLOPE);
         this.slopeType = slopeType;
         updateSlopeType(slopeType);
         setTransparent(true);
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        slopeType = null;
     }
 
     public void updateSlopeType(SlopeType newType) {

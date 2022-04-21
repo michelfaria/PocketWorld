@@ -1,5 +1,7 @@
 package vc.andro.poketest.voxel;
 
+import vc.andro.poketest.util.CubicGroup;
+
 public final class NullUVCalculationStrategy implements UVCalculationStrategy {
 
     private static NullUVCalculationStrategy INSTANCE;
@@ -15,22 +17,22 @@ public final class NullUVCalculationStrategy implements UVCalculationStrategy {
     }
 
     @Override
-    public float getU() {
+    public float getU(Voxel voxel, CubicGroup.Face face) {
         return 0;
     }
 
     @Override
-    public float getV() {
+    public float getV(Voxel voxel, CubicGroup.Face face) {
         return 0;
     }
 
     @Override
-    public float getU2() {
+    public float getU2(Voxel voxel, CubicGroup.Face face) {
         return 0;
     }
 
     @Override
-    public float getV2() {
+    public float getV2(Voxel voxel, CubicGroup.Face face) {
         return 0;
     }
 }

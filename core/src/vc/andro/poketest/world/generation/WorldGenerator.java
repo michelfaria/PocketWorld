@@ -6,11 +6,12 @@ import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.entity.FlowerEntity;
 import vc.andro.poketest.entity.TallGrassEntity;
 import vc.andro.poketest.entity.TreeEntity;
-import vc.andro.poketest.voxel.BasicVoxel;
-import vc.andro.poketest.voxel.SlopeVoxel;
-import vc.andro.poketest.voxel.VoxelType;
 import vc.andro.poketest.util.BlueNoise;
 import vc.andro.poketest.util.FastNoise;
+import vc.andro.poketest.voxel.SlopeVoxel;
+import vc.andro.poketest.voxel.Voxel;
+import vc.andro.poketest.voxel.VoxelPools;
+import vc.andro.poketest.voxel.VoxelType;
 import vc.andro.poketest.world.Chunk;
 import vc.andro.poketest.world.World;
 import vc.andro.poketest.world.WorldCreationParams;
@@ -125,7 +126,10 @@ public class WorldGenerator {
 
         if (y <= params.waterLevel) {
             // Is water tile
-            world.putTileAt_WP(wx, params.waterLevel, wz, new BasicVoxel(VoxelType.WATER));
+            Voxel v = VoxelPools.obtain(Voxel.class);
+            v.setup(VoxelType.WATER);
+
+            world.putTileAt_WP(wx, params.waterLevel, wz, v);
             return;
         }
 
@@ -137,12 +141,18 @@ public class WorldGenerator {
 
         if (y <= params.beachAltitude) {
             // Is sand tile
-            world.putTileAt_WP(wx, y, wz, new BasicVoxel(VoxelType.SAND));
+            Voxel v = VoxelPools.obtain(Voxel.class);
+            v.setup(VoxelType.SAND);
+
+            world.putTileAt_WP(wx, y, wz, v);
             return;
         }
 
         // Spawn grass
-        world.putTileAt_WP(wx, y, wz, new BasicVoxel(VoxelType.GRASS));
+        Voxel v = VoxelPools.obtain(Voxel.class);
+        v.setup(VoxelType.GRASS);
+
+        world.putTileAt_WP(wx, y, wz, v);
     }
 
     @SuppressWarnings("DuplicatedCode")
@@ -159,62 +169,86 @@ public class WorldGenerator {
         float northeastY = altitudeMapGenerator.getAtPosition(wx + 1, wz - 1);
 
         if (y > northwestY && y > westY && y > northY) {
-            world.putTileAt_WP(wx, y, wz, new SlopeVoxel(NORTHWEST_CORNER));
+            SlopeVoxel v = VoxelPools.obtain(SlopeVoxel.class);
+            v.setup(NORTHWEST_CORNER);
+            world.putTileAt_WP(wx, y, wz, v);
             return true;
         }
 
         if (y > northeastY && y > northY && y > eastY) {
-            world.putTileAt_WP(wx, y, wz, new SlopeVoxel(NORTHEAST_CORNER));
+            SlopeVoxel v = VoxelPools.obtain(SlopeVoxel.class);
+            v.setup(NORTHEAST_CORNER);
+            world.putTileAt_WP(wx, y, wz, v);
             return true;
         }
 
         if (y > southwestY && y > westY && y > southY) {
-            world.putTileAt_WP(wx, y, wz, new SlopeVoxel(SOUTHWEST_CORNER));
+            SlopeVoxel v = VoxelPools.obtain(SlopeVoxel.class);
+            v.setup(SOUTHWEST_CORNER);
+            world.putTileAt_WP(wx, y, wz, v);
             return true;
         }
 
         if (y > southeastY && y > eastY && y > southY) {
-            world.putTileAt_WP(wx, y, wz, new SlopeVoxel(SOUTHEAST_CORNER));
+            SlopeVoxel v = VoxelPools.obtain(SlopeVoxel.class);
+            v.setup(SOUTHEAST_CORNER);
+            world.putTileAt_WP(wx, y, wz, v);
             return true;
         }
 
         if (y > southwestY && MathUtils.isEqual(y, westY) && MathUtils.isEqual(y, southY)) {
-            world.putTileAt_WP(wx, y, wz, new SlopeVoxel(SOUTHWEST_INNER_CORNER));
+            SlopeVoxel v = VoxelPools.obtain(SlopeVoxel.class);
+            v.setup(SOUTHWEST_INNER_CORNER);
+            world.putTileAt_WP(wx, y, wz, v);
             return true;
         }
 
         if (y > southeastY && MathUtils.isEqual(y, eastY) && MathUtils.isEqual(y, southY)) {
-            world.putTileAt_WP(wx, y, wz, new SlopeVoxel(SOUTHEAST_INNER_CORNER));
+            SlopeVoxel v = VoxelPools.obtain(SlopeVoxel.class);
+            v.setup(SOUTHEAST_INNER_CORNER);
+            world.putTileAt_WP(wx, y, wz, v);
             return true;
         }
 
         if (y > northwestY && MathUtils.isEqual(y, westY) && MathUtils.isEqual(y, northY)) {
-            world.putTileAt_WP(wx, y, wz, new SlopeVoxel(NORTHWEST_INNER_CORNER));
+            SlopeVoxel v = VoxelPools.obtain(SlopeVoxel.class);
+            v.setup(NORTHWEST_INNER_CORNER);
+            world.putTileAt_WP(wx, y, wz, v);
             return true;
         }
 
         if (y > northeastY && MathUtils.isEqual(y, eastY) && MathUtils.isEqual(y, northY)) {
-            world.putTileAt_WP(wx, y, wz, new SlopeVoxel(NORTHEAST_INNER_CORNER));
+            SlopeVoxel v = VoxelPools.obtain(SlopeVoxel.class);
+            v.setup(NORTHWEST_CORNER);
+            world.putTileAt_WP(wx, y, wz, v);
             return true;
         }
 
         if (westY < y) {
-            world.putTileAt_WP(wx, y, wz, new SlopeVoxel(WEST_EDGE));
+            SlopeVoxel v = VoxelPools.obtain(SlopeVoxel.class);
+            v.setup(WEST_EDGE);
+            world.putTileAt_WP(wx, y, wz, v);
             return true;
         }
 
         if (eastY < y) {
-            world.putTileAt_WP(wx, y, wz, new SlopeVoxel(EAST_EDGE));
+            SlopeVoxel v = VoxelPools.obtain(SlopeVoxel.class);
+            v.setup(EAST_EDGE);
+            world.putTileAt_WP(wx, y, wz, v);
             return true;
         }
 
         if (southY < y) {
-            world.putTileAt_WP(wx, y, wz, new SlopeVoxel(SOUTH_EDGE));
+            SlopeVoxel v = VoxelPools.obtain(SlopeVoxel.class);
+            v.setup(SOUTH_EDGE);
+            world.putTileAt_WP(wx, y, wz, v);
             return true;
         }
 
         if (northY < y) {
-            world.putTileAt_WP(wx, y, wz, new SlopeVoxel(NORTH_EDGE));
+            SlopeVoxel v = VoxelPools.obtain(SlopeVoxel.class);
+            v.setup(NORTH_EDGE);
+            world.putTileAt_WP(wx, y, wz, v);
             return true;
         }
 
