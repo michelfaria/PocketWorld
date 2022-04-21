@@ -41,11 +41,11 @@ public class CubicGroup<T> implements Pool.Poolable {
         this.south = south;
     }
 
-    public void setup(T all) {
-        setup(all, all, all, all, all, all);
+    public void init(T all) {
+        init(all, all, all, all, all, all);
     }
 
-    public void setup(T top, T bottom, T west, T east, T north, T south) {
+    public void init(T top, T bottom, T west, T east, T north, T south) {
         this.top = top;
         this.bottom = bottom;
         this.west = west;
@@ -67,7 +67,7 @@ public class CubicGroup<T> implements Pool.Poolable {
     public <R> CubicGroup<R> mapPooled(BiFunction<T, Face, R> mapper) {
         //noinspection unchecked
         CubicGroup<R> g = (CubicGroup<R>) pool.obtain();
-        g.setup(
+        g.init(
                 mapper.apply(top, Face.TOP),
                 mapper.apply(bottom, Face.BOTTOM),
                 mapper.apply(west, Face.WEST),

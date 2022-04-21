@@ -128,7 +128,7 @@ public class World {
             throw new IllegalArgumentException("chunk already exists at %d,%d".formatted(cx, cz));
         }
         Chunk emptyChunk = Chunk.POOL.obtain();
-        emptyChunk.setup(this, cx, cz);
+        emptyChunk.init(this, cx, cz);
         chunks.set(cx, cz, emptyChunk);
     }
 

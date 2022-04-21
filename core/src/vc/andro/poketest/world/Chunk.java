@@ -23,7 +23,7 @@ public class Chunk implements Pool.Poolable {
     private Chunk() {
     }
 
-    public void setup(World world, int cx, int cz) {
+    public void init(World world, int cx, int cz) {
         this.world = world;
         this.cx = cx;
         this.cz = cz;

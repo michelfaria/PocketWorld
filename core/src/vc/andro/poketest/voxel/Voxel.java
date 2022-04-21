@@ -33,7 +33,7 @@ public class Voxel implements Pool.Poolable {
     Voxel() {
     }
 
-    public void setup(VoxelType type) {
+    public void init(VoxelType type) {
         this.type = type;
         setTextures(type.textureRegionIds);
     }

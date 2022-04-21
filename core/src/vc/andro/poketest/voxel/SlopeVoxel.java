@@ -11,8 +11,8 @@ public class SlopeVoxel extends Voxel {
     SlopeVoxel() {
     }
 
-    public void setup(SlopeType slopeType) {
-        super.setup(VoxelType.SLOPE);
+    public void init(SlopeType slopeType) {
+        super.init(VoxelType.SLOPE);
         this.slopeType = slopeType;
         updateSlopeType(slopeType);
         setTransparent(true);
