@@ -26,6 +26,10 @@ public class IndexArray {
         j += 4;
     }
 
+    public void skip(int n) {
+        j += n;
+    }
+
     public short[] getItems() {
         return indices.items;
     }

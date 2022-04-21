@@ -22,7 +22,7 @@ public class WorldRenderingStrategy implements RenderableProvider {
 
     private float viewpointWx;
     private float viewpointWz;
-    private int renderDistanceInChunks = 32;
+    private int renderDistanceInChunks = 10;
 
     public WorldRenderingStrategy(PocketCamera cam, World world) {
         this.cam = cam;
@@ -40,7 +40,7 @@ public class WorldRenderingStrategy implements RenderableProvider {
                     continue;
                 }
                 Chunk chunk = world.getChunkAt_G_CP(ix, iz);
-                chunk.getRenderables(renderables, pool);
+                chunk.chunkRenderingStrategy.getRenderables(renderables, pool);
                 chunksRendered++;
             }
         }
