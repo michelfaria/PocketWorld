@@ -51,7 +51,7 @@ public class World {
 
     public void putTileAt_WP(int wx, int y, int wz, byte voxel) {
         Chunk chunk = getChunkAt_G_WP(wx, wz);
-        chunk.putVoxelAt(
+        chunk.putVoxelAt_LP(
                 WxLx(wx),
                 y,
                 WzLz(wz),

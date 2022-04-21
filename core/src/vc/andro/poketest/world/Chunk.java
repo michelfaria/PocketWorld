@@ -3,6 +3,8 @@ package vc.andro.poketest.world;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pools;
 
+import java.util.Arrays;
+
 public class Chunk implements Pool.Poolable {
 
     public static final Pool<Chunk> POOL = Pools.get(Chunk.class);
@@ -13,12 +15,12 @@ public class Chunk implements Pool.Poolable {
     public int cx;
     public int cz;
 
-    protected byte[][][] voxels;
+    private final byte[] voxels;
     protected int voxelCount; // Amount of voxels that exist in this chunk
     protected ChunkRenderingStrategy chunkRenderingStrategy;
 
     private Chunk() {
-        voxels = new byte[CHUNK_SIZE][CHUNK_DEPTH][CHUNK_SIZE];
+        voxels = new byte[CHUNK_SIZE * CHUNK_DEPTH * CHUNK_SIZE];
     }
 
     public void init(World world, int cx, int cz) {
@@ -34,29 +36,26 @@ public class Chunk implements Pool.Poolable {
         cx = 0;
         cz = 0;
         voxelCount = 0;
+        Arrays.fill(voxels, (byte) 0);
         chunkRenderingStrategy = null;
-
-        for (int lx = 0; lx < CHUNK_SIZE; lx++) {
-            for (int y = 0; y < CHUNK_DEPTH; y++) {
-                for (int lz = 0; lz < CHUNK_SIZE; lz++) {
-                    voxels[lx][y][lz] = 0;
-                }
-            }
-        }
     }
 
-    public byte getVoxelAt_LP(int lx, int y, int lz) {
-        return voxels[lx][y][lz];
+    public byte getVoxelAt_LP(int lx, int ly, int lz) {
+        return voxels[calcVoxelArrayPosition_LP(lx, ly, lz)];
     }
 
-    public void putVoxelAt(int lx, int wy, int lz, byte voxel) {
-        byte prevVoxel = getVoxelAt_LP(lx, wy, lz);
+    private int calcVoxelArrayPosition_LP(int lx, int ly, int lz) {
+        return lx + CHUNK_SIZE * (ly + CHUNK_DEPTH * lz);
+    }
+
+    public void putVoxelAt_LP(int lx, int ly, int lz, byte voxel) {
+        byte prevVoxel = getVoxelAt_LP(lx, ly, lz);
         if (prevVoxel == 0 && voxel != 0) {
             voxelCount++;
         } else if (prevVoxel != 0 && voxel == 0) {
             voxelCount--;
         }
-        voxels[lx][wy][lz] = voxel;
+        voxels[calcVoxelArrayPosition_LP(lx, ly, lz)] = voxel;
     }
 
     public void updateVoxels() {
