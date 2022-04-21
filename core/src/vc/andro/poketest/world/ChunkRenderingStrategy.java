@@ -42,7 +42,6 @@ public class ChunkRenderingStrategy implements RenderableProvider {
 
     public ChunkRenderingStrategy(Chunk chunk) {
         this.chunk = chunk;
-
         vertexArray8f = new VertexArray();
         indicesArray = new IndexArray();
         mesh = new Mesh(

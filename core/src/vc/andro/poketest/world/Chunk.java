@@ -18,13 +18,13 @@ public class Chunk implements Pool.Poolable {
     protected ChunkRenderingStrategy chunkRenderingStrategy;
 
     private Chunk() {
+        voxels = new byte[CHUNK_SIZE][CHUNK_DEPTH][CHUNK_SIZE];
     }
 
     public void init(World world, int cx, int cz) {
         this.world = world;
         this.cx = cx;
         this.cz = cz;
-        voxels = new byte[CHUNK_SIZE][CHUNK_DEPTH][CHUNK_SIZE];
         chunkRenderingStrategy = new ChunkRenderingStrategy(this);
     }
 
@@ -33,9 +33,16 @@ public class Chunk implements Pool.Poolable {
         world = null;
         cx = 0;
         cz = 0;
-        voxels = null;
         voxelCount = 0;
         chunkRenderingStrategy = null;
+
+        for (int lx = 0; lx < CHUNK_SIZE; lx++) {
+            for (int y = 0; y < CHUNK_DEPTH; y++) {
+                for (int lz = 0; lz < CHUNK_SIZE; lz++) {
+                    voxels[lx][y][lz] = 0;
+                }
+            }
+        }
     }
 
     public byte getVoxelAt_LP(int lx, int y, int lz) {
@@ -69,7 +76,7 @@ public class Chunk implements Pool.Poolable {
 
     public int getSurfaceVoxel_LP__SUPRETVAL__wy;
 
-    public byte getSurfaceVoxel_LP(int lx, int lz) {
+    public synchronized byte getSurfaceVoxel_LP(int lx, int lz) {
         for (int wy = CHUNK_DEPTH - 1; wy >= 0; wy--) {
             byte v = getVoxelAt_LP(lx, wy, lz);
             if (v != 0) {
