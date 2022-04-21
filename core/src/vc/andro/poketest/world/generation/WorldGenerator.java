@@ -10,7 +10,6 @@ import vc.andro.poketest.util.BlueNoise;
 import vc.andro.poketest.util.FastNoise;
 import vc.andro.poketest.voxel.Voxel;
 import vc.andro.poketest.voxel.VoxelPool;
-import vc.andro.poketest.voxel.VoxelType;
 import vc.andro.poketest.voxel.VoxelTypes;
 import vc.andro.poketest.world.Chunk;
 import vc.andro.poketest.world.World;
@@ -24,7 +23,6 @@ import vc.andro.poketest.world.generation.map.VegetationMapGenerator;
 
 import java.util.Random;
 
-import static vc.andro.poketest.voxel.SlopeType.*;
 import static vc.andro.poketest.world.Chunk.CHUNK_SIZE;
 import static vc.andro.poketest.world.World.LxWx;
 import static vc.andro.poketest.world.World.LzWz;
@@ -72,9 +70,7 @@ public class WorldGenerator {
         );
         tallGrassSpawner = new WorldGenEntitySpawner<>(
                 new SimpleVegetationEntitySpawnProspector(
-                        new GrassPatchMapGenerator(
-                                new FastNoise(params.seed + 1, FastNoise.NoiseType.Perlin),
-                                params)),
+                        new GrassPatchMapGenerator(new FastNoise(params.seed + 1, FastNoise.NoiseType.Perlin))),
                 new SimpleEntitySpawner<>(TallGrassEntity.class)
         );
     }

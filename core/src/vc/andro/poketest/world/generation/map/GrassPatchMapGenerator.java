@@ -7,11 +7,9 @@ import vc.andro.poketest.world.generation.IntNoiseGenerator;
 public class GrassPatchMapGenerator implements IntNoiseGenerator {
 
     private final FloatNoiseGenerator noiseGenerator;
-    private final WorldCreationParams creationParams;
 
-    public GrassPatchMapGenerator(FloatNoiseGenerator noiseGenerator, WorldCreationParams creationParams) {
+    public GrassPatchMapGenerator(FloatNoiseGenerator noiseGenerator) {
         this.noiseGenerator = noiseGenerator;
-        this.creationParams = creationParams;
     }
 
     @Override

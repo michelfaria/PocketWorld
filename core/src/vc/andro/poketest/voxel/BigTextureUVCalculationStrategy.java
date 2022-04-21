@@ -24,7 +24,7 @@ public class BigTextureUVCalculationStrategy implements UVCalculationStrategy {
     private float v;
     private float v2;
 
-    public synchronized void refresh(Voxel voxel, CubicGroup.Face face) {
+    public synchronized void calculateUVs(Voxel voxel, CubicGroup.Face face) {
         TextureRegion txReg = voxel.getType().textureRegions.getFace(face);
         int regW = txReg.getRegionWidth();
         int regH = txReg.getRegionHeight();
@@ -51,25 +51,25 @@ public class BigTextureUVCalculationStrategy implements UVCalculationStrategy {
 
     @Override
     public synchronized float getU(Voxel voxel, CubicGroup.Face face) {
-        refresh(voxel, face);
+        calculateUVs(voxel, face);
         return u;
     }
 
     @Override
     public synchronized float getV(Voxel voxel, CubicGroup.Face face) {
-        refresh(voxel, face);
+        calculateUVs(voxel, face);
         return v;
     }
 
     @Override
     public synchronized float getU2(Voxel voxel, CubicGroup.Face face) {
-        refresh(voxel, face);
+        calculateUVs(voxel, face);
         return u2;
     }
 
     @Override
     public synchronized float getV2(Voxel voxel, CubicGroup.Face face) {
-        refresh(voxel, face);
+        calculateUVs(voxel, face);
         return v2;
     }
 }
