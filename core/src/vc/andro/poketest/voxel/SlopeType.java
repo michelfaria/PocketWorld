@@ -21,5 +21,4 @@ public enum SlopeType {
     SlopeType(String topFaceSpriteId) {
         spriteIds = new CubicGroup<>(topFaceSpriteId, null, null, null, null, null);
     }
-
 }

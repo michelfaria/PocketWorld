@@ -244,7 +244,7 @@ public class SlopeVoxel extends BasicVoxel {
     }
 
     @Override
-    public void createRightVertices(VertexArray vertices) {
+    public void createEastVertices(VertexArray vertices) {
         vertices.addVertex8f(
                 getWx() + 1,     // x
                 getWy(),              // y
@@ -284,7 +284,7 @@ public class SlopeVoxel extends BasicVoxel {
     }
 
     @Override
-    public void createFrontVertices(VertexArray vertices) {
+    public void createNorthVertices(VertexArray vertices) {
         vertices.addVertex8f(
                 getWx(),         // x
                 getWy() + getHeightInDirection(Direction.NORTHWEST),              // y
@@ -324,7 +324,7 @@ public class SlopeVoxel extends BasicVoxel {
     }
 
     @Override
-    public void createBackVertices(VertexArray vertices) {
+    public void createSouthVertices(VertexArray vertices) {
         vertices.addVertex8f(
                 getWx(),         // x
                 getWy() + getHeightInDirection(Direction.SOUTHWEST),              // y
@@ -364,7 +364,7 @@ public class SlopeVoxel extends BasicVoxel {
     }
 
     @Override
-    public void createLeftVertices(VertexArray vertices) {
+    public void createWestVertices(VertexArray vertices) {
         vertices.addVertex8f(
                 getWx(),        // x
                 getWy() + getHeightInDirection(Direction.NORTHWEST),             // y

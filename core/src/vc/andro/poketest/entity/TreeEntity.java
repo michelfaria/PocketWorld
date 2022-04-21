@@ -3,6 +3,7 @@ package vc.andro.poketest.entity;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import vc.andro.poketest.Assets;
 import vc.andro.poketest.PocketWorld;
 import vc.andro.poketest.util.AtlasUtil;
@@ -12,7 +13,7 @@ import static vc.andro.poketest.PocketWorld.PPU;
 public class TreeEntity extends Entity {
 
     public TreeEntity() {
-        super(new Vector2(2f, 2f));
+        super(new Vector3(2.0f, 4.0f, 2.0f));
         TextureAtlas atlas = PocketWorld.assetManager.get(Assets.entityAtlas);
         {
             var mainDecal = new EntityDecal(Decal.newDecal(

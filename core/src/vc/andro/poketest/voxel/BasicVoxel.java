@@ -43,9 +43,7 @@ public class BasicVoxel {
         this.lz = lz;
 
         uvCalculationStrategies.forEach((strategy, $) -> {
-            if (strategy != null) {
-                strategy.refresh();
-            }
+            strategy.refresh();
         });
     }
 
@@ -69,7 +67,7 @@ public class BasicVoxel {
         });
         uvCalculationStrategies = textureRegions.map((region, face) -> {
             if (region == null) {
-                return null;
+                return NullUVCalculationStrategy.getInstance();
             }
             if (region.getRegionWidth() > PPU || region.getRegionHeight() > PPU) {
                 return new BigTextureUVCalculationStrategy(this, face);
@@ -125,7 +123,7 @@ public class BasicVoxel {
         );
     }
 
-    public void createRightVertices(VertexArray vertices) {
+    public void createEastVertices(VertexArray vertices) {
         vertices.addVertex8f(
                 getWx() + 1,     // x
                 getWy(),              // y
@@ -133,8 +131,8 @@ public class BasicVoxel {
                 1,              // normal x
                 0,              //        y
                 0,              //        z
-                0,              // u
-                0);             // v
+                uvCalculationStrategies.east.getU(),              // u
+                uvCalculationStrategies.east.getV());             // v
         vertices.addVertex8f(
                 getWx() + 1,     // x
                 getWy(),              // y
@@ -142,8 +140,8 @@ public class BasicVoxel {
                 1,              // normal x
                 0,              //        y
                 0,              //        z
-                0,              // u
-                0);             // v
+                uvCalculationStrategies.east.getU2(),              // u
+                uvCalculationStrategies.east.getV());             // v
         vertices.addVertex8f(
                 getWx() + 1,     // x
                 getWy() + 1,          // y
@@ -151,8 +149,8 @@ public class BasicVoxel {
                 1,              // normal x
                 0,              //        y
                 0,              //        z
-                0,              // u
-                0);             // v
+                uvCalculationStrategies.east.getU2(),              // u
+                uvCalculationStrategies.east.getV2());             // v
         vertices.addVertex8f(
                 getWx() + 1,     // x
                 getWy() + 1,          // y
@@ -160,11 +158,11 @@ public class BasicVoxel {
                 1,              // normal x
                 0,              //        y
                 0,              //        z
-                0,              // u
-                0);             // v
+                uvCalculationStrategies.east.getU(),              // u
+                uvCalculationStrategies.east.getV2());             // v
     }
 
-    public void createFrontVertices(VertexArray vertices) {
+    public void createNorthVertices(VertexArray vertices) {
         vertices.addVertex8f(
                 getWx(),         // x
                 getWy(),              // y
@@ -172,8 +170,8 @@ public class BasicVoxel {
                 0,              // normal x
                 0,              //        y
                 1,              //        z
-                0,              // u
-                0);             // v
+                uvCalculationStrategies.north.getU(),              // u
+                uvCalculationStrategies.north.getV());             // v
         vertices.addVertex8f(
                 getWx() + 1,     // x
                 getWy(),              // y
@@ -181,8 +179,8 @@ public class BasicVoxel {
                 0,              // normal x
                 0,              //        y
                 1,              //        z
-                0,              // u
-                0);             // v
+                uvCalculationStrategies.north.getU2(),              // u
+                uvCalculationStrategies.north.getV());             // v
         vertices.addVertex8f(
                 getWx() + 1,     // x
                 getWy() + 1,          // y
@@ -190,8 +188,8 @@ public class BasicVoxel {
                 0,              // normal x
                 0,              //        y
                 1,              //        z
-                0,              // u
-                0);             // v
+                uvCalculationStrategies.north.getU2(),              // u
+                uvCalculationStrategies.north.getV2());             // v
         vertices.addVertex8f(
                 getWx(),         // x
                 getWy() + 1,          // y
@@ -199,11 +197,11 @@ public class BasicVoxel {
                 0,              // normal x
                 0,              //        y
                 1,              //        z
-                0,              // u
-                0);             // v
+                uvCalculationStrategies.north.getU(),              // u
+                uvCalculationStrategies.north.getV2());             // v
     }
 
-    public void createBackVertices(VertexArray vertices) {
+    public void createSouthVertices(VertexArray vertices) {
         vertices.addVertex8f(
                 getWx(),         // x
                 getWy(),              // y
@@ -211,8 +209,8 @@ public class BasicVoxel {
                 0,              // normal x
                 0,              //        y
                 -1,             //        z
-                0,              // u
-                0);             // v
+                uvCalculationStrategies.south.getU(),              // u
+                uvCalculationStrategies.south.getV());             // v
         vertices.addVertex8f(
                 getWx(),         // x
                 getWy() + 1,          // y
@@ -220,8 +218,8 @@ public class BasicVoxel {
                 0,              // normal x
                 0,              //        y
                 -1,             //        z
-                0,              // u
-                0);             // v
+                uvCalculationStrategies.south.getU(),              // u
+                uvCalculationStrategies.south.getV2());             // v
         vertices.addVertex8f(
                 getWx() + 1,     // x
                 getWy() + 1,          // y
@@ -229,8 +227,8 @@ public class BasicVoxel {
                 0,              // normal x
                 0,              //        y
                 -1,             //        z
-                0,              // u
-                0);             // v
+                uvCalculationStrategies.south.getU2(),              // u
+                uvCalculationStrategies.south.getV2());             // v
         vertices.addVertex8f(
                 getWx() + 1,     // x
                 getWy(),              // y
@@ -238,8 +236,8 @@ public class BasicVoxel {
                 0,              // normal x
                 0,              //        y
                 -1,             //        z
-                0,              // u
-                0);             // v
+                uvCalculationStrategies.south.getU2(),              // u
+                uvCalculationStrategies.south.getV());             // v
     }
 
     public void createBottomVertices(VertexArray vertices) {
@@ -250,8 +248,8 @@ public class BasicVoxel {
                 0,              // normal x
                 -1,             //        y
                 0,              //        z
-                0,              // u
-                0);             // v
+                uvCalculationStrategies.bottom.getU(),              // u
+                uvCalculationStrategies.bottom.getV());             // v
         vertices.addVertex8f(
                 getWx(),         // x
                 getWy(),              // y
@@ -259,8 +257,8 @@ public class BasicVoxel {
                 0,              // normal x
                 -1,             //        y
                 0,              //        z
-                0,              // u
-                0);             // v
+                uvCalculationStrategies.bottom.getU(),              // u
+                uvCalculationStrategies.bottom.getV2());             // v
         vertices.addVertex8f(
                 getWx() + 1,     // x
                 getWy(),              // y
@@ -268,8 +266,8 @@ public class BasicVoxel {
                 0,              // normal x
                 -1,             //        y
                 0,              //        z
-                0,              // u
-                0);             // v
+                uvCalculationStrategies.bottom.getU2(),             // u
+                uvCalculationStrategies.bottom.getV2());             // v
         vertices.addVertex8f(
                 getWx() + 1,    // x
                 getWy(),             // y
@@ -277,11 +275,11 @@ public class BasicVoxel {
                 0,             // normal x
                 -1,            //        y
                 0,             //        z
-                0,             // u
-                0);            // v
+                uvCalculationStrategies.bottom.getU2(),             // u
+                uvCalculationStrategies.bottom.getV());            // v
     }
 
-    public void createLeftVertices(VertexArray vertices) {
+    public void createWestVertices(VertexArray vertices) {
         vertices.addVertex8f(
                 getWx(),        // x
                 getWy(),             // y
@@ -289,8 +287,8 @@ public class BasicVoxel {
                 -1,            // normal x
                 0,             //        y
                 0,             //        z
-                0,             // u
-                0);            // v
+                uvCalculationStrategies.west.getU(),             // u
+                uvCalculationStrategies.west.getV());            // v
         vertices.addVertex8f(
                 getWx(),        // x
                 getWy() + 1,         // y
@@ -298,8 +296,8 @@ public class BasicVoxel {
                 -1,            // normal x
                 0,             //        y
                 0,             //        z
-                0,             // u
-                0);            // v
+                uvCalculationStrategies.west.getU(),             // u
+                uvCalculationStrategies.west.getV2());            // v
         vertices.addVertex8f(
                 getWx(),        // x
                 getWy() + 1,         // y
@@ -307,8 +305,8 @@ public class BasicVoxel {
                 -1,            // normal x
                 0,             //        y
                 0,             //        z
-                0,             // u
-                0);            // v
+                uvCalculationStrategies.west.getU2(),             // u
+                uvCalculationStrategies.west.getV2());            // v
         vertices.addVertex8f(
                 getWx(),        // x
                 getWy(),             // y
@@ -316,8 +314,8 @@ public class BasicVoxel {
                 -1,            // normal x
                 0,             //        y
                 0,             //        z
-                0,             // u
-                0);            // v
+                uvCalculationStrategies.west.getU2(),             // u
+                uvCalculationStrategies.west.getV());            // v
     }
 
     public World getWorld() {

@@ -113,16 +113,25 @@ public class PocketCamera {
     }
 
     public boolean isChunkVisible(int cx, int cz) {
-        return camera.frustum.boundsInFrustum(CxWx(cx), 0, CzWz(cz),
-                CHUNK_SIZE / 2.0f, CHUNK_DEPTH / 2.0f, CHUNK_SIZE / 2.0f);
+        return camera.frustum.boundsInFrustum(
+                CxWx(cx) + CHUNK_SIZE / 2.0f,
+                CHUNK_DEPTH / 2.0f,
+                CzWz(cz) + CHUNK_SIZE / 2.0f,
+                CHUNK_SIZE / 2.0f,
+                CHUNK_DEPTH / 2.0f,
+                CHUNK_SIZE / 2.0f
+        );
     }
 
     public boolean isVisible(Entity entity) {
-        return isVisible(entity.getWx(), entity.getWy(), entity.getWz());
-    }
-
-    public boolean isVisible(float wx, float wy, float wz) {
-        return camera.frustum.pointInFrustum(wx, wy, wz);
+        return camera.frustum.boundsInFrustum(
+                entity.getWx() + entity.dimensions.x / 2.0f,
+                entity.getWy() + entity.dimensions.y / 2.0f,
+                entity.getWz() + entity.dimensions.z / 2.0f,
+                entity.dimensions.x / 2.0f,
+                entity.dimensions.y / 2.0f,
+                entity.dimensions.z / 2.0f
+        );
     }
 
 }

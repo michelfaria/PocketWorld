@@ -3,7 +3,7 @@ package vc.andro.poketest.voxel;
 import vc.andro.poketest.util.CubicGroup;
 
 public enum VoxelType {
-    GRASS("tile/bwgrass"),
+    GRASS("tile/bwgrass", "tile/bwwall","tile/bwwall","tile/bwwall","tile/bwwall","tile/bwwall"),
     SLOPE("tile/wall-bottom-edge"),
     WATER("tile/water"),
     SAND("tile/sand");

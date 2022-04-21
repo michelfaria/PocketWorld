@@ -2,7 +2,7 @@ package vc.andro.poketest.entity;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 
 import static vc.andro.poketest.PocketWorld.PPU;
@@ -12,14 +12,14 @@ public class Entity {
     private float wy;
     private float wz;
 
-    protected Vector2 dimensions;
+    public final Vector3 dimensions;
     protected Array<EntityDecal> decals;
 
     public Entity() {
-        this(new Vector2(1, 1));
+        this(new Vector3(1.0f, 1.0f, 1.0f));
     }
 
-    public Entity(Vector2 dimensions) {
+    public Entity(Vector3 dimensions) {
         this.dimensions = dimensions;
         decals = new Array<>(EntityDecal.class);
     }

@@ -18,6 +18,8 @@ import vc.andro.poketest.voxel.BasicVoxel;
 import static vc.andro.poketest.world.Chunk.CHUNK_DEPTH;
 import static vc.andro.poketest.world.Chunk.CHUNK_SIZE;
 import static vc.andro.poketest.world.VertexArray.VERTEX_SIZE;
+import static vc.andro.poketest.world.World.LxWx;
+import static vc.andro.poketest.world.World.LzWz;
 
 public class ChunkRenderingStrategy implements RenderableProvider {
 
@@ -66,35 +68,43 @@ public class ChunkRenderingStrategy implements RenderableProvider {
             BasicVoxel[][][] voxels = chunk.voxels;
             vertexArray8f.clear();
             indicesArray.clear();
-            for (int y = 0; y < CHUNK_DEPTH; y++) {
-                for (int z = 0; z < CHUNK_SIZE; z++) {
-                    for (int x = 0; x < CHUNK_SIZE; x++) {
-                        BasicVoxel voxel = voxels[x][y][z];
+            for (int wy = 0; wy < CHUNK_DEPTH; wy++) {
+                for (int lz = 0; lz < CHUNK_SIZE; lz++) {
+                    for (int lx = 0; lx < CHUNK_SIZE; lx++) {
+                        BasicVoxel voxel = voxels[lx][wy][lz];
                         if (voxel == null) {
                             continue;
                         }
-                        if (voxel.isTransparent() || (y < CHUNK_DEPTH - 1 && (voxels[x][y + 1][z] == null || voxels[x][y + 1][z].isTransparent()))) {
+
+                        BasicVoxel voxelAbove = wy < CHUNK_DEPTH - 1 ? voxels[lx][wy + 1][lz] : null;
+                        BasicVoxel voxelUnder = wy > 0 ? voxels[lx][wy - 1][lz] : null;
+                        BasicVoxel voxelEast = chunk.world.getTileAt_WP(LxWx(chunk.cx, lx) + 1, wy, LzWz(chunk.cz, lz));
+                        BasicVoxel voxelWest = chunk.world.getTileAt_WP(LxWx(chunk.cx, lx) - 1, wy, LzWz(chunk.cz, lz));
+                        BasicVoxel voxelNorth = chunk.world.getTileAt_WP(LxWx(chunk.cx, lx), wy, LzWz(chunk.cz, lz) - 1);
+                        BasicVoxel voxelSouth = chunk.world.getTileAt_WP(LxWx(chunk.cx, lx), wy, LzWz(chunk.cz, lz) + 1);
+
+                        if (voxelAbove == null || voxelAbove.isTransparent()) {
                             voxel.createTopVertices(vertexArray8f);
                             indicesArray.addSquare();
                         }
-                        if (voxel.isTransparent() || (y > 0 && (voxels[x][y - 1][z] == null || voxels[x][y - 1][z].isTransparent()))) {
+                        if (voxelUnder == null || voxelUnder.isTransparent()) {
                             voxel.createBottomVertices(vertexArray8f);
                             indicesArray.addSquare();
                         }
-                        if (voxel.isTransparent() || (x > 0 && (voxels[x - 1][y][z] == null || voxels[x - 1][y][z].isTransparent()))) {
-                            voxel.createLeftVertices(vertexArray8f);
+                        if (voxelWest == null || voxelWest.isTransparent()) {
+                            voxel.createWestVertices(vertexArray8f);
                             indicesArray.addSquare();
                         }
-                        if (voxel.isTransparent() || (x < CHUNK_SIZE - 1 && (voxels[x + 1][y][z] == null || voxels[x + 1][y][z].isTransparent()))) {
-                            voxel.createRightVertices(vertexArray8f);
+                        if (voxelEast == null || voxelEast.isTransparent()) {
+                            voxel.createEastVertices(vertexArray8f);
                             indicesArray.addSquare();
                         }
-                        if (voxel.isTransparent() || (z > 0 && (voxels[x][y][z - 1] == null || voxels[x][y][z - 1].isTransparent()))) {
-                            voxel.createFrontVertices(vertexArray8f);
+                        if (voxelNorth == null || voxelNorth.isTransparent()) {
+                            voxel.createNorthVertices(vertexArray8f);
                             indicesArray.addSquare();
                         }
-                        if (voxel.isTransparent() || (z < CHUNK_SIZE - 1 && (voxels[x][y][z + 1] == null || voxels[x][y][z + 1].isTransparent()))) {
-                            voxel.createBackVertices(vertexArray8f);
+                        if (voxelSouth == null || voxelSouth.isTransparent()) {
+                            voxel.createSouthVertices(vertexArray8f);
                             indicesArray.addSquare();
                         }
                     }
