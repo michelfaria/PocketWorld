@@ -78,10 +78,10 @@ public class ChunkRenderingStrategy implements RenderableProvider {
 
                         Voxel voxelAbove = wy < CHUNK_DEPTH - 1 ? voxels[lx][wy + 1][lz] : null;
                         Voxel voxelUnder = wy > 0 ? voxels[lx][wy - 1][lz] : null;
-                        Voxel voxelEast = chunk.world.getTileAt_WP(LxWx(chunk.cx, lx) + 1, wy, LzWz(chunk.cz, lz));
-                        Voxel voxelWest = chunk.world.getTileAt_WP(LxWx(chunk.cx, lx) - 1, wy, LzWz(chunk.cz, lz));
-                        Voxel voxelNorth = chunk.world.getTileAt_WP(LxWx(chunk.cx, lx), wy, LzWz(chunk.cz, lz) - 1);
-                        Voxel voxelSouth = chunk.world.getTileAt_WP(LxWx(chunk.cx, lx), wy, LzWz(chunk.cz, lz) + 1);
+                        Voxel voxelEast = chunk.world.getVoxelAt_WP(LxWx(chunk.cx, lx) + 1, wy, LzWz(chunk.cz, lz));
+                        Voxel voxelWest = chunk.world.getVoxelAt_WP(LxWx(chunk.cx, lx) - 1, wy, LzWz(chunk.cz, lz));
+                        Voxel voxelNorth = chunk.world.getVoxelAt_WP(LxWx(chunk.cx, lx), wy, LzWz(chunk.cz, lz) - 1);
+                        Voxel voxelSouth = chunk.world.getVoxelAt_WP(LxWx(chunk.cx, lx), wy, LzWz(chunk.cz, lz) + 1);
 
                         if (voxelAbove == null || voxelAbove.isTransparent()) {
                             voxel.createTopVertices(vertexArray8f);

@@ -3,7 +3,6 @@ package vc.andro.poketest.voxel;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Pool;
-import com.badlogic.gdx.utils.Pools;
 import vc.andro.poketest.Assets;
 import vc.andro.poketest.PocketWorld;
 import vc.andro.poketest.util.AtlasUtil;
@@ -98,11 +97,6 @@ public class Voxel implements Pool.Poolable {
             }
             return DefaultUVCalculationStrategy.getInstance();
         });
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
     }
 
     public void createTopVertices(VertexArray vertices) {

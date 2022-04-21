@@ -159,6 +159,15 @@ public class WorldGenerator {
     private boolean generateWalls(int wx, int y, int wz) {
         assert world != null;
 
+        // TODO: Remove this
+        if (true) {
+            Voxel v = VoxelPools.obtain(Voxel.class);
+            v.init(VoxelType.GRASS);
+
+            world.putTileAt_WP(wx, y, wz, v);
+            return true;
+        }
+
         float southwestY = altitudeMapGenerator.getAtPosition(wx - 1, wz + 1);
         float southY = altitudeMapGenerator.getAtPosition(wx, wz + 1);
         float southeastY = altitudeMapGenerator.getAtPosition(wx + 1, wz + 1);

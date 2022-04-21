@@ -37,8 +37,8 @@ public class WorldRenderingStrategy implements RenderableProvider {
                 if (!cam.isChunkVisible(ix, iz)) {
                     continue;
                 }
-                Chunk chunk = world.getChunkAt_G_CP(ix, iz);
-                chunk.chunkRenderingStrategy.getRenderables(renderables, pool);
+                Chunk chunkº = world.getChunkAt_G_CP(ix, iz);
+                chunkº.chunkRenderingStrategy.getRenderables(renderables, pool);
                 chunksRendered++;
             }
         }
@@ -77,9 +77,9 @@ public class WorldRenderingStrategy implements RenderableProvider {
     private void unloadChunksOutsideOfRenderDistance() {
         chunksToUnload.clear();
         for (IntMap<Chunk> xs : world.getChunks().map.values()) {
-            for (Chunk chunk : xs.values()) {
-                if (isChunkOutsideOfRenderDistance(chunk)) {
-                    chunksToUnload.add(chunk);
+            for (Chunk chunkº : xs.values()) {
+                if (isChunkOutsideOfRenderDistance(chunkº)) {
+                    chunksToUnload.add(chunkº);
                 }
             }
         }

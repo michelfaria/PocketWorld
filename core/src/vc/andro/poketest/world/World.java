@@ -49,7 +49,7 @@ public class World {
         if (chunk == null) {
             throw new NullPointerException("no such chunk (" + cx + ", " + cz + ")");
         }
-        chunk.updateTiles();
+        chunk.updateVoxels();
     }
 
     private static final int[] ADJACENT_POSITIONS = new int[]{
@@ -73,25 +73,25 @@ public class World {
             if (oy + dy >= CHUNK_DEPTH || oy - dy < 0) {
                 continue;
             }
-            Voxel tile = getTileAt_WP(ox + dx, oy + dy, oz + dz);
-            if (tile != null) {
-                tile.receiveTileUpdate(updateOrigin);
+            Voxel voxel = getVoxelAt_WP(ox + dx, oy + dy, oz + dz);
+            if (voxel != null) {
+                voxel.receiveTileUpdate(updateOrigin);
             }
         }
     }
 
-    public void putTileAt_WP(int wx, int y, int wz, @NotNull Voxel tile) {
+    public void putTileAt_WP(int wx, int y, int wz, @NotNull Voxel voxel) {
         Chunk chunk = getChunkAt_G_WP(wx, wz);
-        chunk.putTileAt(
+        chunk.putVoxelAt(
                 WxLx(wx),
                 y,
                 WzLz(wz),
-                tile
+                voxel
         );
     }
 
     @Nullable
-    public Voxel getTileAt_WP(int wx, int y, int wz) {
+    public Voxel getVoxelAt_WP(int wx, int y, int wz) {
         Chunk chunk = getChunkAt_CP(
                 WxCx(wx),
                 WzCz(wz)
@@ -108,15 +108,15 @@ public class World {
 
     public Voxel getTileAt_G_WP(int wx, int y, int wz) {
         Chunk chunk = getChunkAt_G_WP(wx, wz);
-        Voxel tile = chunk.getTileAt_LP(
+        Voxel voxel = chunk.getTileAt_LP(
                 WxLx(wx),
                 y,
                 WzLz(wz)
         );
-        if (tile == null) {
+        if (voxel == null) {
             throw new IllegalStateException("No tile at position (%d, %d, %d)".formatted(wx, y, wz));
         }
-        return tile;
+        return voxel;
     }
 
     private Chunk getChunkAt_G_WP(int wx, int wz) {
@@ -157,7 +157,7 @@ public class World {
     }
 
     public @Nullable
-    Voxel getSurfaceTile_WP(int wx, int wz) {
+    Voxel getSurfaceVoxel_WP(int wx, int wz) {
         Chunk chunk = getChunkAt_CP(
                 WxCx(wx),
                 WzCz(wz)
@@ -172,7 +172,7 @@ public class World {
     }
 
     public @Nullable
-    Voxel getSurfaceTile_G_WP(int wx, int wz) {
+    Voxel getSurfaceVoxel_G_WP(int wx, int wz) {
         Chunk chunk = getChunkAt_G_WP(wx, wz);
         return chunk.getSurfaceTile_LP(WxLx(wx), WzLz(wz));
     }
@@ -219,8 +219,9 @@ public class World {
 
     public void unloadChunks(Array<Chunk> chunksToUnload) {
         for (Chunk chunk : chunksToUnload) {
-            Chunk removed = chunks.remove(chunk.cx, chunk.cz);
-            assert removed != null : "failed to remove chunk from chunk map";
+            if (chunks.remove(chunk.cx, chunk.cz) == null) {
+                throw new IllegalStateException("failed to remove chunk from chunk map");
+            }
             Chunk.POOL.free(chunk);
             Gdx.app.log("World", "UNLOADED chunk at (" + chunk.cx + "," + chunk.cz + ")");
         }

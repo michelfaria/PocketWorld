@@ -46,7 +46,7 @@ public class Chunk implements Pool.Poolable {
         return voxels[lx][y][lz];
     }
 
-    public void putTileAt(int lx, int wy, int lz, @Nullable Voxel voxel) {
+    public void putVoxelAt(int lx, int wy, int lz, @Nullable Voxel voxel) {
         Voxel prevVoxel = getTileAt_LP(lx, wy, lz);
         if (prevVoxel == null && voxel != null) {
             voxelCount++;
@@ -64,7 +64,7 @@ public class Chunk implements Pool.Poolable {
         voxels[lx][wy][lz] = voxel;
     }
 
-    public void updateTiles() {
+    public void updateVoxels() {
         for (int lx = 0; lx < CHUNK_SIZE; lx++) {
             for (int wy = 0; wy < CHUNK_DEPTH; wy++) {
                 for (int lz = 0; lz < CHUNK_SIZE; lz++) {
@@ -80,10 +80,10 @@ public class Chunk implements Pool.Poolable {
 
     public @Nullable
     Voxel getSurfaceTile_LP(int lx, int lz) {
-        for (int y = CHUNK_DEPTH - 1; y >= 0; y--) {
-            Voxel tile = getTileAt_LP(lx, y, lz);
-            if (tile != null) {
-                return tile;
+        for (int wy = CHUNK_DEPTH - 1; wy >= 0; wy--) {
+            Voxel v = getTileAt_LP(lx, wy, lz);
+            if (v != null) {
+                return v;
             }
         }
         return null;

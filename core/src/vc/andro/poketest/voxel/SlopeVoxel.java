@@ -4,6 +4,7 @@ import vc.andro.poketest.Direction;
 import vc.andro.poketest.util.CubicGroup;
 import vc.andro.poketest.world.VertexArray;
 
+@Deprecated
 public class SlopeVoxel extends Voxel {
 
     private SlopeType slopeType;

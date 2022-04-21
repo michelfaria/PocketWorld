@@ -44,12 +44,12 @@ public class SimpleVegetationEntitySpawnProspector implements SpawnProspector<Pr
 
         for (int ix = 0; ix < entityCollisionWidth; ix++) {
             for (int iz = 0; iz < entityCollisionHeight; iz++) {
-                Voxel tile = chunk.world.getTileAt_WP(wx + ix, y, wz + iz);
+                Voxel tile = chunk.world.getVoxelAt_WP(wx + ix, y, wz + iz);
                 if (tile != null) {
                     return result;
                 }
 
-                Voxel ty1 = chunk.world.getTileAt_WP(wx + ix, y - 1, wz + iz);
+                Voxel ty1 = chunk.world.getVoxelAt_WP(wx + ix, y - 1, wz + iz);
 
                 if (ty1 == null || !ty1.getType().equals(VoxelType.GRASS)) {
                     return result;
