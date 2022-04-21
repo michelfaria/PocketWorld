@@ -1,46 +1,31 @@
 package vc.andro.poketest.voxel;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Pool;
-import com.badlogic.gdx.utils.Pools;
 import vc.andro.poketest.util.CubicGroup;
 
 import static vc.andro.poketest.PocketWorld.PPU;
 
-public class BigTextureUVCalculationStrategy implements UVCalculationStrategy, Pool.Poolable {
+public class BigTextureUVCalculationStrategy implements UVCalculationStrategy {
 
-    public static final Pool<BigTextureUVCalculationStrategy> POOL = Pools.get(BigTextureUVCalculationStrategy.class);
+    private static BigTextureUVCalculationStrategy INSTANCE;
 
-    private Voxel voxel;
-    private CubicGroup.Face whichFace;
+    public static BigTextureUVCalculationStrategy getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new BigTextureUVCalculationStrategy();
+        }
+        return INSTANCE;
+    }
+
+    private BigTextureUVCalculationStrategy() {
+    }
 
     private float u;
     private float u2;
     private float v;
     private float v2;
 
-    public BigTextureUVCalculationStrategy() {
-    }
-
-    public void init(Voxel voxel, CubicGroup.Face whichFace) {
-        this.voxel = voxel;
-        this.whichFace = whichFace;
-        refresh();
-    }
-
-    @Override
-    public void reset() {
-        voxel = null;
-        whichFace = null;
-        u = 0;
-        v = 0;
-        u2 = 0;
-        v2 = 0;
-    }
-
-    @Override
-    public void refresh() {
-        TextureRegion txReg = voxel.getTextureRegion(whichFace);
+    public synchronized void refresh(Voxel voxel, CubicGroup.Face face) {
+        TextureRegion txReg = voxel.getType().textureRegions.getFace(face);
         int regW = txReg.getRegionWidth();
         int regH = txReg.getRegionHeight();
         float regV = txReg.getV();
@@ -65,22 +50,26 @@ public class BigTextureUVCalculationStrategy implements UVCalculationStrategy, P
     }
 
     @Override
-    public float getU(Voxel voxel, CubicGroup.Face face) {
+    public synchronized float getU(Voxel voxel, CubicGroup.Face face) {
+        refresh(voxel, face);
         return u;
     }
 
     @Override
-    public float getV(Voxel voxel, CubicGroup.Face face) {
+    public synchronized float getV(Voxel voxel, CubicGroup.Face face) {
+        refresh(voxel, face);
         return v;
     }
 
     @Override
-    public float getU2(Voxel voxel, CubicGroup.Face face) {
+    public synchronized float getU2(Voxel voxel, CubicGroup.Face face) {
+        refresh(voxel, face);
         return u2;
     }
 
     @Override
-    public float getV2(Voxel voxel, CubicGroup.Face face) {
+    public synchronized float getV2(Voxel voxel, CubicGroup.Face face) {
+        refresh(voxel, face);
         return v2;
     }
 }

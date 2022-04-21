@@ -1,17 +1,12 @@
 package vc.andro.poketest.voxel;
 
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Pool;
-import vc.andro.poketest.Assets;
-import vc.andro.poketest.PocketWorld;
-import vc.andro.poketest.util.AtlasUtil;
 import vc.andro.poketest.util.CubicGroup;
 import vc.andro.poketest.world.Chunk;
 import vc.andro.poketest.world.VertexArray;
 import vc.andro.poketest.world.World;
 
-import static vc.andro.poketest.PocketWorld.PPU;
 import static vc.andro.poketest.world.World.LxWx;
 import static vc.andro.poketest.world.World.LzWz;
 
@@ -25,18 +20,12 @@ public class Voxel implements Pool.Poolable {
     private int lx;
     private int lz;
     private VoxelType type;
-    private boolean transparent;
-    private CubicGroup<TextureRegion> textureRegions;
-    private CubicGroup<UVCalculationStrategy> uvCalculationStrategies;
-    private FaceGenerationStrategy faceGenerationStrategy;
 
     Voxel() {
     }
 
     public void init(VoxelType type) {
         this.type = type;
-        setTextures(type.textureRegionIds);
-        faceGenerationStrategy = CubeFaceGenerationStrategy.getInstance();
     }
 
     @Override
@@ -49,21 +38,6 @@ public class Voxel implements Pool.Poolable {
         lx = 0;
         lz = 0;
         type = null;
-        transparent = false;
-        {
-            CubicGroup.pool.free(textureRegions);
-            textureRegions = null;
-        }
-        {
-            uvCalculationStrategies.forEach((strat, face) -> {
-                if (strat instanceof BigTextureUVCalculationStrategy s) {
-                    BigTextureUVCalculationStrategy.POOL.free(s);
-                }
-            });
-            CubicGroup.pool.free(uvCalculationStrategies);
-            uvCalculationStrategies = null;
-        }
-        faceGenerationStrategy = null;
     }
 
     public void storePosition(Chunk chunk, int lx, int wy, int lz) {
@@ -74,10 +48,6 @@ public class Voxel implements Pool.Poolable {
         wz = LzWz(chunk.cz, lz);
         this.lx = lx;
         this.lz = lz;
-
-        uvCalculationStrategies.forEach((strategy, $) -> {
-            strategy.refresh();
-        });
     }
 
     public void doTileUpdate() {
@@ -90,51 +60,29 @@ public class Voxel implements Pool.Poolable {
     public void tick() {
     }
 
-    public void setTextures(CubicGroup<String> textureRegionIds) {
-        TextureAtlas atlas = PocketWorld.assetManager.get(Assets.tileAtlas);
-
-        textureRegions = textureRegionIds.mapPooled((id, $) -> {
-            if (id != null) {
-                return AtlasUtil.findRegion(atlas, id);
-            }
-            return null;
-        });
-
-        uvCalculationStrategies = textureRegions.mapPooled((region, face) -> {
-            if (region == null) {
-                return NullUVCalculationStrategy.getInstance();
-            }
-            if (region.getRegionWidth() > PPU || region.getRegionHeight() > PPU) {
-                BigTextureUVCalculationStrategy strat = BigTextureUVCalculationStrategy.POOL.obtain();
-                strat.init(this, face);
-                return strat;
-            }
-            return DefaultUVCalculationStrategy.getInstance();
-        });
-    }
 
     public void createTopVertices(VertexArray vertices) {
-        faceGenerationStrategy.createTopVertices(this, vertices);
+        type.faceGenerationStrategy.createTopVertices(this, vertices);
     }
 
     public void createBottomVertices(VertexArray vertices) {
-        faceGenerationStrategy.createBottomVertices(this, vertices);
+        type.faceGenerationStrategy.createBottomVertices(this, vertices);
     }
 
     public void createNorthVertices(VertexArray vertices) {
-        faceGenerationStrategy.createNorthVertices(this, vertices);
+        type.faceGenerationStrategy.createNorthVertices(this, vertices);
     }
 
     public void createSouthVertices(VertexArray vertices) {
-        faceGenerationStrategy.createSouthVertices(this, vertices);
+        type.faceGenerationStrategy.createSouthVertices(this, vertices);
     }
 
     public void createWestVertices(VertexArray vertices) {
-        faceGenerationStrategy.createWestVertices(this, vertices);
+        type.faceGenerationStrategy.createWestVertices(this, vertices);
     }
 
     public void createEastVertices(VertexArray vertices) {
-        faceGenerationStrategy.createEastVertices(this, vertices);
+        type.faceGenerationStrategy.createEastVertices(this, vertices);
     }
 
     public World getWorld() {
@@ -158,7 +106,7 @@ public class Voxel implements Pool.Poolable {
     }
 
     public TextureRegion getTextureRegion(CubicGroup.Face whichFace) {
-        return textureRegions.getFace(whichFace);
+        return getType().textureRegions.getFace(whichFace);
     }
 
     public int getLx() {
@@ -170,11 +118,7 @@ public class Voxel implements Pool.Poolable {
     }
 
     public boolean isTransparent() {
-        return transparent;
-    }
-
-    protected void setTransparent(boolean newValue) {
-        transparent = newValue;
+        return type.transparent;
     }
 
     public VoxelType getType() {
@@ -182,6 +126,6 @@ public class Voxel implements Pool.Poolable {
     }
 
     public CubicGroup<UVCalculationStrategy> getUvCalculationStrategies() {
-        return uvCalculationStrategies;
+        return getType().uvCalculationStrategies;
     }
 }

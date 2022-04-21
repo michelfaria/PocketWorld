@@ -4,7 +4,7 @@ import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pools;
 import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.voxel.Voxel;
-import vc.andro.poketest.voxel.VoxelPools;
+import vc.andro.poketest.voxel.VoxelPool;
 
 public class Chunk implements Pool.Poolable {
 
@@ -58,7 +58,7 @@ public class Chunk implements Pool.Poolable {
         }
 
         if (prevVoxel != null) {
-            VoxelPools.free(prevVoxel);
+            VoxelPool.free(prevVoxel);
         }
 
         voxels[lx][wy][lz] = voxel;

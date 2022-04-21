@@ -2,6 +2,7 @@ package vc.andro.poketest.voxel;
 
 import vc.andro.poketest.util.CubicGroup;
 
+@Deprecated
 public enum SlopeType {
     NORTHWEST_CORNER("tile/wall-top-left-corner"),
     NORTH_EDGE("tile/wall-top-edge"),
