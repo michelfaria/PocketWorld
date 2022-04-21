@@ -1,24 +1,41 @@
 package vc.andro.poketest.voxel;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Pool;
+import com.badlogic.gdx.utils.Pools;
 import vc.andro.poketest.util.CubicGroup;
 
 import static vc.andro.poketest.PocketWorld.PPU;
 
-public class BigTextureUVCalculationStrategy implements UVCalculationStrategy {
+public class BigTextureUVCalculationStrategy implements UVCalculationStrategy, Pool.Poolable {
 
-    private final Voxel voxel;
-    private final CubicGroup.Face whichFace;
+    public static final Pool<BigTextureUVCalculationStrategy> POOL = Pools.get(BigTextureUVCalculationStrategy.class);
+
+    private Voxel voxel;
+    private CubicGroup.Face whichFace;
 
     private float u;
     private float u2;
     private float v;
     private float v2;
 
-    public BigTextureUVCalculationStrategy(Voxel voxel, CubicGroup.Face whichFace) {
+    public BigTextureUVCalculationStrategy() {
+    }
+
+    public void init(Voxel voxel, CubicGroup.Face whichFace) {
         this.voxel = voxel;
         this.whichFace = whichFace;
         refresh();
+    }
+
+    @Override
+    public void reset() {
+        voxel = null;
+        whichFace = null;
+        u = 0;
+        v = 0;
+        u2 = 0;
+        v2 = 0;
     }
 
     @Override

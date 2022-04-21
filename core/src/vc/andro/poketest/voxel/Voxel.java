@@ -50,10 +50,19 @@ public class Voxel implements Pool.Poolable {
         lz = 0;
         type = null;
         transparent = false;
-        CubicGroup.pool.free(textureRegions);
-        textureRegions = null;
-        CubicGroup.pool.free(uvCalculationStrategies);
-        uvCalculationStrategies = null;
+        {
+            CubicGroup.pool.free(textureRegions);
+            textureRegions = null;
+        }
+        {
+            uvCalculationStrategies.forEach((strat, face) -> {
+                if (strat instanceof BigTextureUVCalculationStrategy s) {
+                    BigTextureUVCalculationStrategy.POOL.free(s);
+                }
+            });
+            CubicGroup.pool.free(uvCalculationStrategies);
+            uvCalculationStrategies = null;
+        }
         faceGenerationStrategy = null;
     }
 
@@ -96,7 +105,9 @@ public class Voxel implements Pool.Poolable {
                 return NullUVCalculationStrategy.getInstance();
             }
             if (region.getRegionWidth() > PPU || region.getRegionHeight() > PPU) {
-                return new BigTextureUVCalculationStrategy(this, face);
+                BigTextureUVCalculationStrategy strat = BigTextureUVCalculationStrategy.POOL.obtain();
+                strat.init(this, face);
+                return strat;
             }
             return DefaultUVCalculationStrategy.getInstance();
         });
