@@ -1,6 +1,5 @@
 package vc.andro.poketest.world.generation.map;
 
-import vc.andro.poketest.world.WorldCreationParams;
 import vc.andro.poketest.world.generation.FloatNoiseGenerator;
 import vc.andro.poketest.world.generation.IntNoiseGenerator;
 

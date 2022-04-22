@@ -1,6 +1,5 @@
 package vc.andro.poketest.world;
 
-import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.ShortArray;
 
 public class IndexArray {
@@ -24,6 +23,15 @@ public class IndexArray {
                 j
         );
         j += 4;
+    }
+
+    public void addTriangle() {
+        indices.add(
+                j,
+                (short)(j + 1),
+                (short)(j + 2)
+        );
+        j += 3;
     }
 
     public void skip(int n) {

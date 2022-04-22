@@ -4,7 +4,7 @@ public class WorldCreationParams {
 
     private static final int DEFAULT_WORLD_SEED = 0;
     private static final int DEFAULT_WORLD_WATER_LEVEL = 64;
-    private static final int DEFAULT_WORLD_TERRACES = 0;
+    private static final int DEFAULT_WORLD_TERRACES = 48;
     private static final int DEFAULT_WORLD_BEACH_ALTITUDE = 68;
     private static final int DEFAULT_TREE_MAP_R_VALUE = 2;
     private static final boolean DEFAULT_ISLAND_MODE = false;

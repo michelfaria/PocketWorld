@@ -37,8 +37,8 @@ public class WorldRenderingStrategy implements RenderableProvider {
                 if (!cam.isChunkVisible(ix, iz)) {
                     continue;
                 }
-                Chunk chunkº = world.getChunkAt_G_CP(ix, iz);
-                chunkº.chunkRenderingStrategy.getRenderables(renderables, pool);
+                Chunk chunk = world.getChunkAt_G_CP(ix, iz);
+                chunk.chunkRenderingStrategy.getRenderables(renderables, pool);
                 chunksRendered++;
             }
         }

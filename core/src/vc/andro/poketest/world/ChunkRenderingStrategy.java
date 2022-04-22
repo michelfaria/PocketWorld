@@ -13,10 +13,10 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import vc.andro.poketest.Assets;
 import vc.andro.poketest.PocketWorld;
-import vc.andro.poketest.util.ArrayUtil;
 import vc.andro.poketest.voxel.FaceGenerationStrategy;
+import vc.andro.poketest.voxel.VoxelAttributes;
 
-import static vc.andro.poketest.voxel.VoxelTypes.VOXEL_TYPES;
+import static vc.andro.poketest.voxel.VoxelSpecs.VOXEL_TYPES;
 import static vc.andro.poketest.world.Chunk.CHUNK_DEPTH;
 import static vc.andro.poketest.world.Chunk.CHUNK_SIZE;
 import static vc.andro.poketest.world.VertexArray.VERTEX_SIZE;
@@ -77,8 +77,12 @@ public class ChunkRenderingStrategy implements RenderableProvider {
                             continue;
                         }
 
-                        int wx = LxWx(chunk.cx, lx);
-                        int wz = LzWz(chunk.cz, lz);
+                        VoxelAttributes voxelAttributes = chunk.getVoxelAttrsAt_LP(lx, ly, lz);
+
+                        // int wx = LxWx(chunk.cx, lx); // TODO : UNCOMMENT THIS
+                        // int wz = LzWz(chunk.cz, lz); // TODO : UNCOMMENT THIS
+                        int wx = LxWx(chunk.cx, lx) + (chunk.cx * 2); // TODO: REMOVE THIS. This spaces the chunks 1 tile apart
+                        int wz = LzWz(chunk.cz, lz) + (chunk.cz * 2); // TODO: REMOVE THIS. This spaces the chunks 1 tile apart
 
                         byte voxelAbove = ly < CHUNK_DEPTH - 1 ? chunk.getVoxelAt_LP(lx, ly + 1, lz) : -1;
                         byte voxelUnder = ly > 0 ? chunk.getVoxelAt_LP(lx, ly - 1, lz) : -1;
@@ -87,31 +91,25 @@ public class ChunkRenderingStrategy implements RenderableProvider {
                         byte voxelNorth = chunk.world.getVoxelAt_WP(LxWx(chunk.cx, lx), ly, LzWz(chunk.cz, lz) - 1);
                         byte voxelSouth = chunk.world.getVoxelAt_WP(LxWx(chunk.cx, lx), ly, LzWz(chunk.cz, lz) + 1);
 
-                        FaceGenerationStrategy faceGenerationStrategy = VOXEL_TYPES[voxel].faceGenerationStrategy;
+                        FaceGenerationStrategy faceGenStrat = VOXEL_TYPES[voxel].faceGenerationStrategy;
 
                         if (voxelAbove <= 0 || VOXEL_TYPES[voxelAbove].transparent) {
-                            faceGenerationStrategy.createTopVertices(vertexArray8f, voxel, wx, ly, wz);
-                            indicesArray.addSquare();
+                            faceGenStrat.createTopVertices(vertexArray8f, indicesArray, voxel, voxelAttributes, wx, ly, wz);
                         }
                         if (voxelUnder <= 0 || VOXEL_TYPES[voxelUnder].transparent) {
-                            faceGenerationStrategy.createBottomVertices(vertexArray8f, voxel, wx, ly, wz);
-                            indicesArray.addSquare();
+                            faceGenStrat.createBottomVertices(vertexArray8f, indicesArray, voxel, voxelAttributes, wx, ly, wz);
                         }
                         if (voxelWest <= 0 || VOXEL_TYPES[voxelWest].transparent) {
-                            faceGenerationStrategy.createWestVertices(vertexArray8f, voxel, wx, ly, wz);
-                            indicesArray.addSquare();
+                            faceGenStrat.createWestVertices(vertexArray8f, indicesArray, voxel, voxelAttributes, wx, ly, wz);
                         }
                         if (voxelEast <= 0 || VOXEL_TYPES[voxelEast].transparent) {
-                            faceGenerationStrategy.createEastVertices(vertexArray8f, voxel, wx, ly, wz);
-                            indicesArray.addSquare();
+                            faceGenStrat.createEastVertices(vertexArray8f, indicesArray, voxel, voxelAttributes, wx, ly, wz);
                         }
                         if (voxelNorth <= 0 || VOXEL_TYPES[voxelNorth].transparent) {
-                            faceGenerationStrategy.createNorthVertices(vertexArray8f, voxel, wx, ly, wz);
-                            indicesArray.addSquare();
+                            faceGenStrat.createNorthVertices(vertexArray8f, indicesArray, voxel, voxelAttributes, wx, ly, wz);
                         }
                         if (voxelSouth <= 0 || VOXEL_TYPES[voxelSouth].transparent) {
-                            faceGenerationStrategy.createSouthVertices(vertexArray8f, voxel, wx, ly, wz);
-                            indicesArray.addSquare();
+                            faceGenStrat.createSouthVertices(vertexArray8f, indicesArray, voxel, voxelAttributes, wx, ly, wz);
                         }
                     }
                 }

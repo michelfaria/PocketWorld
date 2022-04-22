@@ -19,13 +19,6 @@ public class CubicGroup<T> {
     public T north;
     public T south;
 
-    private CubicGroup() {
-    }
-
-    public CubicGroup(T all) {
-        this(all, all, all, all, all, all);
-    }
-
     public CubicGroup(T top, T bottom, T west, T east, T north, T south) {
         this.top = top;
         this.bottom = bottom;
@@ -35,17 +28,8 @@ public class CubicGroup<T> {
         this.south = south;
     }
 
-    public void init(T all) {
-        init(all, all, all, all, all, all);
-    }
-
-    public void init(T top, T bottom, T west, T east, T north, T south) {
-        this.top = top;
-        this.bottom = bottom;
-        this.west = west;
-        this.east = east;
-        this.north = north;
-        this.south = south;
+    public static <T> CubicGroup<T> newAllSameFaces(T t) {
+        return new CubicGroup<>(t, t, t, t, t, t);
     }
 
     @CheckReturnValue

@@ -1,6 +1,6 @@
 package vc.andro.poketest.world.generation.entity;
 
-import vc.andro.poketest.voxel.VoxelTypes;
+import vc.andro.poketest.voxel.VoxelSpecs;
 import vc.andro.poketest.world.Chunk;
 import vc.andro.poketest.world.generation.IntNoiseGenerator;
 
@@ -50,7 +50,7 @@ public class SimpleVegetationEntitySpawnProspector implements SpawnProspector<Pr
 
                 byte ty1 = chunk.world.getVoxelAt_WP(wx + ix, y - 1, wz + iz);
 
-                if (ty1 == 0 || VoxelTypes.VOXEL_TYPES[ty1] != VoxelTypes.GRASS) {
+                if (ty1 == 0 || VoxelSpecs.VOXEL_TYPES[ty1] != VoxelSpecs.GRASS) {
                     return result;
                 }
             }

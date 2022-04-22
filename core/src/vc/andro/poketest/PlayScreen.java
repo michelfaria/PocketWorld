@@ -18,7 +18,7 @@ public class PlayScreen implements Screen {
 
     public PlayScreen(WorldCreationParams worldCreationParams) {
         cam = new PocketCamera();
-        world = new WorldGenerator(worldCreationParams).createWorld();
+        world = new WorldGenerator(worldCreationParams).createNewWorld();
         mainRenderSystem = new MainRenderSystem(world, cam);
         debugRenderSystem = new DebugRenderSystem(world, cam);
     }

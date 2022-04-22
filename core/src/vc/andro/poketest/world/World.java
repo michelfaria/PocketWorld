@@ -44,61 +44,48 @@ public class World {
     public void updateChunk(int cx, int cz) {
         Chunk chunk = getChunkAt_CP(cx, cz);
         if (chunk == null) {
-            throw new NullPointerException("no such chunk (" + cx + ", " + cz + ")");
+            throw new NullPointerException("No chunk at (%d, %d)".formatted(cx, cz));
         }
         chunk.updateVoxels();
     }
 
-    public void putTileAt_WP(int wx, int y, int wz, byte voxel) {
+    public void putVoxelAt_G_WP(int wx, int y, int wz, byte voxel) {
         Chunk chunk = getChunkAt_G_WP(wx, wz);
-        chunk.putVoxelAt_LP(
-                WxLx(wx),
-                y,
-                WzLz(wz),
-                voxel
-        );
+        chunk.putVoxelAt_LP(WxLx(wx), y, WzLz(wz), voxel);
     }
 
     public byte getVoxelAt_WP(int wx, int y, int wz) {
-        Chunk chunk = getChunkAt_CP(
-                WxCx(wx),
-                WzCz(wz)
-        );
+        Chunk chunk = getChunkAt_CP(WxCx(wx), WzCz(wz));
         if (chunk == null) {
             return -1;
         }
-        return chunk.getVoxelAt_LP(
-                WxLx(wx),
-                y,
-                WzLz(wz)
-        );
+        return chunk.getVoxelAt_LP(WxLx(wx), y, WzLz(wz));
     }
 
     private Chunk getChunkAt_G_WP(int wx, int wz) {
         return getChunkAt_G_CP(WxCx(wx), WzCz(wz));
     }
 
-    private void createBlankChunkAt_CP(int cx, int cz) {
+    public Chunk createBlankChunkAt_CP(int cx, int cz) {
         if (getChunkAt_CP(cx, cz) != null) {
-            throw new IllegalArgumentException("chunk already exists at %d,%d".formatted(cx, cz));
+            throw new IllegalArgumentException("A chunk already exists at %d,%d".formatted(cx, cz));
         }
-        Chunk emptyChunk = Chunk.POOL.obtain();
-        emptyChunk.init(this, cx, cz);
-        chunks.set(cx, cz, emptyChunk);
+        Chunk blankChunk = Chunk.POOL.obtain();
+        blankChunk.init(this, cx, cz);
+        chunks.set(cx, cz, blankChunk);
+        return blankChunk;
     }
 
     public @Nullable
     Chunk getChunkAt_WP(int wx, int wz) {
         return getChunkAt_CP(
                 WxCx(wx),
-                WzLz(wz)
-        );
+                WzLz(wz));
     }
 
     public Chunk getChunkAt_G_CP(int cx, int cz) {
         Chunk chunk = getChunkAt_CP(cx, cz);
         if (chunk == null) {
-            createBlankChunkAt_CP(cx, cz);
             worldGenerator.generateChunk(cx, cz);
             chunk = getChunkAt_CP(cx, cz);
             assert chunk != null : "chunk should have generated";
@@ -114,15 +101,13 @@ public class World {
     public int getSurfaceVoxelWy_WP(int wx, int wz) {
         Chunk chunk = getChunkAt_CP(
                 WxCx(wx),
-                WzCz(wz)
-        );
+                WzCz(wz));
         if (chunk == null) {
             return -1;
         }
         return chunk.getSurfaceVoxelWy_LP(
                 WxLx(wx),
-                WzLz(wz)
-        );
+                WzLz(wz));
     }
 
     public int getSurfaceVoxelWy_G_WP(int wx, int wz) {

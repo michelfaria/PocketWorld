@@ -1,10 +1,13 @@
 package vc.andro.poketest.voxel;
 
+import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.util.CubicGroup;
+import vc.andro.poketest.world.IndexArray;
 import vc.andro.poketest.world.VertexArray;
 
-import static vc.andro.poketest.voxel.VoxelTypes.VOXEL_TYPES;
+import static vc.andro.poketest.voxel.VoxelSpecs.VOXEL_TYPES;
 
+@Deprecated
 public class CubeFaceGenerationStrategy implements FaceGenerationStrategy {
 
     private static CubeFaceGenerationStrategy INSTANCE;
@@ -20,8 +23,8 @@ public class CubeFaceGenerationStrategy implements FaceGenerationStrategy {
     }
 
     @Override
-    public void createTopVertices(VertexArray vertices, byte voxel, int wx, int wy, int wz) {
-
+    public void createTopVertices(VertexArray vertices, IndexArray indices, byte voxel,
+                                  @Nullable VoxelAttributes attributes, int wx, int wy, int wz) {
         vertices.addVertex8f(
                 wx,
                 wy + 1,
@@ -65,10 +68,12 @@ public class CubeFaceGenerationStrategy implements FaceGenerationStrategy {
                 VOXEL_TYPES[voxel].uvCalculationStrategies.top.getU(CubicGroup.Face.TOP, voxel, wx, wy, wz),
                 VOXEL_TYPES[voxel].uvCalculationStrategies.top.getV2(CubicGroup.Face.TOP, voxel, wx, wy, wz)
         );
+
+        indices.addSquare();
     }
 
     @Override
-    public void createEastVertices(VertexArray vertices, byte voxel, int wx, int wy, int wz) {
+    public void createEastVertices(VertexArray vertices, IndexArray indices, byte voxel,  @Nullable VoxelAttributes attributes, int wx, int wy, int wz) {
         vertices.addVertex8f(
                 wx + 1,
                 wy,
@@ -105,19 +110,12 @@ public class CubeFaceGenerationStrategy implements FaceGenerationStrategy {
                 0,
                 VOXEL_TYPES[voxel].uvCalculationStrategies.east.getU(CubicGroup.Face.EAST, voxel, wx, wy, wz),
                 VOXEL_TYPES[voxel].uvCalculationStrategies.east.getV2(CubicGroup.Face.EAST, voxel, wx, wy, wz));
+
+        indices.addSquare();
     }
 
     @Override
-    public void createNorthVertices(VertexArray vertices, byte voxel, int wx, int wy, int wz) {
-        vertices.addVertex8f(
-                wx,
-                wy,
-                wz,
-                0,
-                0,
-                1,
-                VOXEL_TYPES[voxel].uvCalculationStrategies.north.getU(CubicGroup.Face.NORTH, voxel, wx, wy, wz),
-                VOXEL_TYPES[voxel].uvCalculationStrategies.north.getV(CubicGroup.Face.NORTH, voxel, wx, wy, wz));
+    public void createNorthVertices(VertexArray vertices,  IndexArray indices, byte voxel,  @Nullable VoxelAttributes attributes, int wx, int wy, int wz) {
         vertices.addVertex8f(
                 wx + 1,
                 wy,
@@ -126,6 +124,15 @@ public class CubeFaceGenerationStrategy implements FaceGenerationStrategy {
                 0,
                 1,
                 VOXEL_TYPES[voxel].uvCalculationStrategies.north.getU2(CubicGroup.Face.NORTH, voxel, wx, wy, wz),
+                VOXEL_TYPES[voxel].uvCalculationStrategies.north.getV(CubicGroup.Face.NORTH, voxel, wx, wy, wz));
+        vertices.addVertex8f(
+                wx,
+                wy,
+                wz,
+                0,
+                0,
+                1,
+                VOXEL_TYPES[voxel].uvCalculationStrategies.north.getU(CubicGroup.Face.NORTH, voxel, wx, wy, wz),
                 VOXEL_TYPES[voxel].uvCalculationStrategies.north.getV(CubicGroup.Face.NORTH, voxel, wx, wy, wz));
         vertices.addVertex8f(
                 wx + 1,
@@ -145,10 +152,12 @@ public class CubeFaceGenerationStrategy implements FaceGenerationStrategy {
                 1,
                 VOXEL_TYPES[voxel].uvCalculationStrategies.north.getU(CubicGroup.Face.NORTH, voxel, wx, wy, wz),
                 VOXEL_TYPES[voxel].uvCalculationStrategies.north.getV2(CubicGroup.Face.NORTH, voxel, wx, wy, wz));
+
+        indices.addSquare();
     }
 
     @Override
-    public void createSouthVertices(VertexArray vertices, byte voxel, int wx, int wy, int wz) {
+    public void createSouthVertices(VertexArray vertices,  IndexArray indices, byte voxel,  @Nullable VoxelAttributes attributes, int wx, int wy, int wz) {
         vertices.addVertex8f(
                 wx,
                 wy,
@@ -185,10 +194,12 @@ public class CubeFaceGenerationStrategy implements FaceGenerationStrategy {
                 -1,
                 VOXEL_TYPES[voxel].uvCalculationStrategies.south.getU2(CubicGroup.Face.SOUTH, voxel, wx, wy, wz),
                 VOXEL_TYPES[voxel].uvCalculationStrategies.south.getV(CubicGroup.Face.SOUTH, voxel, wx, wy, wz));
+
+        indices.addSquare();
     }
 
     @Override
-    public void createBottomVertices(VertexArray vertices, byte voxel, int wx, int wy, int wz) {
+    public void createBottomVertices(VertexArray vertices,  IndexArray indices, byte voxel,  @Nullable VoxelAttributes attributes, int wx, int wy, int wz) {
         vertices.addVertex8f(
                 wx,
                 wy,
@@ -225,10 +236,12 @@ public class CubeFaceGenerationStrategy implements FaceGenerationStrategy {
                 0,
                 VOXEL_TYPES[voxel].uvCalculationStrategies.bottom.getU2(CubicGroup.Face.BOTTOM, voxel, wx, wy, wz),
                 VOXEL_TYPES[voxel].uvCalculationStrategies.bottom.getV(CubicGroup.Face.BOTTOM, voxel, wx, wy, wz));
+
+        indices.addSquare();
     }
 
     @Override
-    public void createWestVertices(VertexArray vertices, byte voxel, int wx, int wy, int wz) {
+    public void createWestVertices(VertexArray vertices,  IndexArray indices, byte voxel,  @Nullable VoxelAttributes attributes, int wx, int wy, int wz) {
         vertices.addVertex8f(
                 wx,
                 wy,
@@ -265,5 +278,7 @@ public class CubeFaceGenerationStrategy implements FaceGenerationStrategy {
                 0,
                 VOXEL_TYPES[voxel].uvCalculationStrategies.west.getU2(CubicGroup.Face.WEST, voxel, wx, wy, wz),
                 VOXEL_TYPES[voxel].uvCalculationStrategies.west.getV(CubicGroup.Face.WEST, voxel, wx, wy, wz));
+
+        indices.addSquare();
     }
 }

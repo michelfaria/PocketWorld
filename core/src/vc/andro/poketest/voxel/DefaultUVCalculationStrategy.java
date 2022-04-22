@@ -2,7 +2,7 @@ package vc.andro.poketest.voxel;
 
 import vc.andro.poketest.util.CubicGroup;
 
-import static vc.andro.poketest.voxel.VoxelTypes.VOXEL_TYPES;
+import static vc.andro.poketest.voxel.VoxelSpecs.VOXEL_TYPES;
 
 public class DefaultUVCalculationStrategy implements UVCalculationStrategy {
 

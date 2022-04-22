@@ -1,14 +1,16 @@
 package vc.andro.poketest.world.generation;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.MathUtils;
 import org.jetbrains.annotations.Nullable;
+import vc.andro.poketest.Direction;
 import vc.andro.poketest.entity.FlowerEntity;
 import vc.andro.poketest.entity.TallGrassEntity;
 import vc.andro.poketest.entity.TreeEntity;
 import vc.andro.poketest.util.BlueNoise;
 import vc.andro.poketest.util.FastNoise;
-import vc.andro.poketest.voxel.VoxelTypes;
+import vc.andro.poketest.voxel.VoxelAttributes;
+import vc.andro.poketest.voxel.VoxelSpec;
+import vc.andro.poketest.voxel.VoxelSpecs;
 import vc.andro.poketest.world.Chunk;
 import vc.andro.poketest.world.World;
 import vc.andro.poketest.world.WorldCreationParams;
@@ -21,22 +23,18 @@ import vc.andro.poketest.world.generation.map.VegetationMapGenerator;
 
 import java.util.Random;
 
-import static vc.andro.poketest.voxel.VoxelTypes.*;
+import static vc.andro.poketest.world.Chunk.CHUNK_DEPTH;
 import static vc.andro.poketest.world.Chunk.CHUNK_SIZE;
-import static vc.andro.poketest.world.World.LxWx;
-import static vc.andro.poketest.world.World.LzWz;
+import static vc.andro.poketest.world.World.*;
 
 public class WorldGenerator {
-    public final WorldCreationParams params;
-    public final Random random;
-    public final AltitudeMapGenerator altitudeMapGenerator;
-
-    public final WorldGenEntitySpawner<?> treeSpawner;
-    public final WorldGenEntitySpawner<?> flowerSpawner;
-    public final WorldGenEntitySpawner<?> tallGrassSpawner;
-
-    private @Nullable
-    World world = null;
+    private final WorldCreationParams params;
+    private final Random random;
+    private final AltitudeMapGenerator altitudeMapGenerator;
+    private final WorldGenEntitySpawner<?> treeSpawner;
+    private final WorldGenEntitySpawner<?> flowerSpawner;
+    private final WorldGenEntitySpawner<?> tallGrassSpawner;
+    private @Nullable World world = null;
 
     public WorldGenerator(WorldCreationParams params) {
         this.params = params;
@@ -74,7 +72,7 @@ public class WorldGenerator {
         );
     }
 
-    public World createWorld() {
+    public World createNewWorld() {
         log("Generating world...");
         world = new World(this);
         for (int cx = 0; cx < 10; cx++) {
@@ -91,129 +89,209 @@ public class WorldGenerator {
     }
 
     public void generateChunk(int cx, int cz) {
+        assert world != null : "Missing world";
         log("Generating chunk: " + cx + ", " + cz);
-        assert world != null;
-        for (int chunkLocalX = 0; chunkLocalX < CHUNK_SIZE; chunkLocalX++) {
-            for (int chunkLocalZ = 0; chunkLocalZ < CHUNK_SIZE; chunkLocalZ++) {
-                generateTileAtPosition(cx, cz, chunkLocalX, chunkLocalZ);
+        Chunk chunk = world.createBlankChunkAt_CP(cx, cz);
+
+        for (int lx = 0; lx < CHUNK_SIZE; lx++) {
+            for (int lz = 0; lz < CHUNK_SIZE; lz++) {
+                generateColumn(chunk, lx, lz);
             }
         }
 
-        Chunk chunk = world.getChunkAt_CP(cx, cz);
-        assert chunk != null;
+        shaveVoxelsInChunk(chunk);
 
         treeSpawner.spawnEntitiesInChunk(chunk);
         flowerSpawner.spawnEntitiesInChunk(chunk);
         tallGrassSpawner.spawnEntitiesInChunk(chunk);
-
         world.updateChunk(cx, cz);
     }
 
-    private void generateTileAtPosition(int cx, int cz, int lx, int lz) {
-        generateTileAtPosition(cx, cz, lx, lz, -1);
+    private void shaveVoxelsInChunk(Chunk chunk) {
+        assert world != null : "Missing world";
+        int startWx = CxWx(chunk.cx);
+        int startWz = CzWz(chunk.cz);
+        for (int lx = 0, wx = startWx; lx < CHUNK_SIZE; lx++, wx++) {
+            for (int y = 0; y < CHUNK_DEPTH; y++) {
+                for (int lz = 0, wz = startWz; lz < CHUNK_SIZE; lz++, wz++) {
+                    byte voxel = chunk.getVoxelAt_LP(lx, y, lz);
+                    if (voxel == 0) continue;
+                    VoxelSpec voxelSpec = VoxelSpecs.VOXEL_TYPES[voxel];
+                    if (!voxelSpec.canBeSloped) continue;
+
+                    boolean isVoxelAbove = y < CHUNK_DEPTH - 1 && world.getVoxelAt_WP(wx, y + 1, wz) > 0;
+                    if (isVoxelAbove) {
+                        continue;
+                    }
+
+                    boolean isVoxelBelow = y > 0 && world.getVoxelAt_WP(wx, y - 1, wz) > 0;
+
+                    boolean isVoxelWest = world.getVoxelAt_WP(wx - 1, y, wz) > 0;
+                    boolean isVoxelEast = world.getVoxelAt_WP(wx + 1, y, wz) > 0;
+                    boolean isVoxelSouth = world.getVoxelAt_WP(wx, y, wz + 1) > 0;
+                    boolean isVoxelNorth = world.getVoxelAt_WP(wx, y, wz - 1) > 0;
+
+                    boolean isVoxelNorthwest = world.getVoxelAt_WP(wx - 1, y, wz - 1) > 0;
+                    boolean isVoxelNortheast = world.getVoxelAt_WP(wx + 1, y, wz - 1) > 0;
+                    boolean isVoxelSouthwest = world.getVoxelAt_WP(wx - 1, y, wz + 1) > 0;
+                    boolean isVoxelSoutheast = world.getVoxelAt_WP(wx + 1, y, wz + 1) > 0;
+
+                    /*
+                      Southwest-facing corner
+                      ▢ ▢
+                      ▢ ◢
+                     */
+                    if (!isVoxelNorthwest && !isVoxelWest && !isVoxelNorth) {
+                        VoxelAttributes attrs = chunk.getVoxelAttrsAt_G_LP(lx, y, lz);
+                        attrs.configureSlope(Direction.NORTHWEST, false);
+                        continue;
+                    }
+
+                    /*
+                      Northeast-facing corner
+                      ▢ ▢
+                      ◣ ▢
+                     */
+                    if (!isVoxelNorth && !isVoxelNortheast && !isVoxelEast) {
+                        VoxelAttributes attrs = chunk.getVoxelAttrsAt_G_LP(lx, y, lz);
+                        attrs.configureSlope(Direction.NORTHEAST, false);
+                        continue;
+                    }
+
+                    /*
+                      Southwest-facing corner
+                      ▢ ◥
+                      ▢ ▢
+                     */
+                    if (!isVoxelSouthwest && !isVoxelWest && !isVoxelSouth) {
+                        VoxelAttributes attrs = chunk.getVoxelAttrsAt_G_LP(lx, y, lz);
+                        attrs.configureSlope(Direction.SOUTHWEST, false);
+                        continue;
+                    }
+
+                    /*
+                      Southeast-facing corner
+                      ◤ ▢
+                      ▢ ▢
+                     */
+                    if (!isVoxelSoutheast && !isVoxelEast && !isVoxelSouth) {
+                        VoxelAttributes attrs = chunk.getVoxelAttrsAt_G_LP(lx, y, lz);
+                        attrs.configureSlope(Direction.SOUTHEAST, false);
+                        continue;
+                    }
+
+
+                    /*
+                      Northwest-facing inner corner
+                      ▢ |
+                      _ 」←
+                     */
+                    if (!isVoxelNorthwest && isVoxelWest && isVoxelNorth) {
+                        VoxelAttributes attrs = chunk.getVoxelAttrsAt_G_LP(lx, y, lz);
+                        attrs.configureSlope(Direction.NORTHWEST, true);
+                        continue;
+                    }
+
+                    /*
+                     Northeast-facing inner corner
+                       | ▢
+                     → ⌞ _
+                     */
+                    if (!isVoxelNortheast && isVoxelEast && isVoxelNorth) {
+                        VoxelAttributes attrs = chunk.getVoxelAttrsAt_G_LP(lx, y, lz);
+                        attrs.configureSlope(Direction.NORTHEAST, true);
+                        continue;
+                    }
+
+                    /*
+                     Southwest-facing inner corner
+                        ̅ ⌝ ←
+                       ▢ |
+                     */
+                    if (!isVoxelSouthwest && isVoxelWest && isVoxelSouth) {
+                        VoxelAttributes attrs = chunk.getVoxelAttrsAt_G_LP(lx, y, lz);
+                        attrs.configureSlope(Direction.SOUTHWEST, true);
+                        continue;
+                    }
+
+                    /*
+                     Southeast-facing inner corner
+                      → ⌜  ̅
+                        | ▢
+                     */
+                    if (!isVoxelSoutheast && isVoxelEast && isVoxelSouth) {
+                        VoxelAttributes attrs = chunk.getVoxelAttrsAt_G_LP(lx, y, lz);
+                        attrs.configureSlope(Direction.SOUTHEAST, true);
+                        continue;
+                    }
+
+                    /*  West edge */
+                    if (!isVoxelWest) {
+                        VoxelAttributes attrs = chunk.getVoxelAttrsAt_G_LP(lx, y, lz);
+                        attrs.configureSlope(Direction.WEST, false);
+                        continue;
+                    }
+
+                    /* East edge */
+                    if (!isVoxelEast) {
+                        VoxelAttributes attrs = chunk.getVoxelAttrsAt_G_LP(lx, y, lz);
+                        attrs.configureSlope(Direction.EAST, false);
+                        continue;
+                    }
+
+                    /* South edge */
+                    if (!isVoxelSouth) {
+                        VoxelAttributes attrs = chunk.getVoxelAttrsAt_G_LP(lx, y, lz);
+                        attrs.configureSlope(Direction.SOUTH, false);
+                        continue;
+                    }
+
+                    /* North edge */
+                    if (!isVoxelNorth) {
+                        VoxelAttributes attrs = chunk.getVoxelAttrsAt_G_LP(lx, y, lz);
+                        attrs.configureSlope(Direction.NORTH, false);
+                        //noinspection UnnecessaryContinue
+                        continue;
+                    }
+                }
+            }
+        }
     }
 
-    private void generateTileAtPosition(int cx, int cz, int lx, int lz, int y) {
-        assert world != null;
-        int wx = LxWx(cx, lx);
-        int wz = LzWz(cz, lz);
-        y = y < 0 ? altitudeMapGenerator.getAtPosition(wx, wz) : y;
+    private void generateColumn(Chunk chunk, int lx, int lz) {
+        generateColumn(chunk, lx, lz, -1);
+    }
+
+    /**
+     * Generates a column at the specified chunk (cx,cz) at the chunk pos (lx,lz), with y as its starting point,
+     * working its way down.
+     *
+     * @param chunk Chunk
+     * @param lx    Chunk local x
+     * @param lz    Chunk local z
+     * @param y     If -1, y will start at the altitude at the world position of lx,lz
+     */
+    private void generateColumn(Chunk chunk, int lx, int lz, int y) {
+        assert world != null : "Missing world";
+        {
+            int wx = LxWx(chunk.cx, lx);
+            int wz = LzWz(chunk.cz, lz);
+            y = y < 0 ? altitudeMapGenerator.getAtPosition(wx, wz) : y;
+        }
 
         if (y <= params.waterLevel) {
             // Is water tile
-            world.putTileAt_WP(wx, params.waterLevel, wz, VoxelTypes.getId(VoxelTypes.WATER));
-            return;
-        }
-
-        if (generateWalls(wx, y, wz)) {
-            // Wall tile generated
-            generateTileAtPosition(cx, cz, lx, lz, y - 1);
-            return;
-        }
-
-        if (y <= params.beachAltitude) {
+            chunk.putVoxelAt_LP(lx, params.waterLevel, lz, VoxelSpecs.getId(VoxelSpecs.WATER));
+        } else if (y <= params.beachAltitude) {
             // Is sand tile
-            world.putTileAt_WP(wx, y, wz, VoxelTypes.getId(VoxelTypes.SAND));
-            return;
+            chunk.putVoxelAt_LP(lx, y, lz, VoxelSpecs.getId(VoxelSpecs.SAND));
+        } else {
+            // Spawn grass
+            chunk.putVoxelAt_LP(lx, y, lz, VoxelSpecs.getId(VoxelSpecs.GRASS));
         }
 
-        // Spawn grass
-        world.putTileAt_WP(wx, y, wz, VoxelTypes.getId(VoxelTypes.GRASS));
-    }
-
-    @SuppressWarnings("DuplicatedCode")
-    private boolean generateWalls(int wx, int y, int wz) {
-        assert world != null;
-
-        float southwestY = altitudeMapGenerator.getAtPosition(wx - 1, wz + 1);
-        float southY = altitudeMapGenerator.getAtPosition(wx, wz + 1);
-        float southeastY = altitudeMapGenerator.getAtPosition(wx + 1, wz + 1);
-        float westY = altitudeMapGenerator.getAtPosition(wx - 1, wz);
-        float eastY = altitudeMapGenerator.getAtPosition(wx + 1, wz);
-        float northwestY = altitudeMapGenerator.getAtPosition(wx - 1, wz - 1);
-        float northY = altitudeMapGenerator.getAtPosition(wx, wz - 1);
-        float northeastY = altitudeMapGenerator.getAtPosition(wx + 1, wz - 1);
-
-        if (y > northwestY && y > westY && y > northY) {
-            world.putTileAt_WP(wx, y, wz, VoxelTypes.getId(NORTHWEST_CORNER));
-            return true;
+        if (y > 0) {
+            generateColumn(chunk, lx, lz, y - 1);
         }
-
-        if (y > northeastY && y > northY && y > eastY) {
-            world.putTileAt_WP(wx, y, wz, VoxelTypes.getId(NORTHEAST_CORNER));
-            return true;
-        }
-
-        if (y > southwestY && y > westY && y > southY) {
-            world.putTileAt_WP(wx, y, wz, VoxelTypes.getId(SOUTHWEST_CORNER));
-            return true;
-        }
-
-        if (y > southeastY && y > eastY && y > southY) {
-            world.putTileAt_WP(wx, y, wz, VoxelTypes.getId(SOUTHEAST_CORNER));
-            return true;
-        }
-
-        if (y > southwestY && MathUtils.isEqual(y, westY) && MathUtils.isEqual(y, southY)) {
-            world.putTileAt_WP(wx, y, wz, VoxelTypes.getId(SOUTHWEST_INNER_CORNER));
-            return true;
-        }
-
-        if (y > southeastY && MathUtils.isEqual(y, eastY) && MathUtils.isEqual(y, southY)) {
-            world.putTileAt_WP(wx, y, wz, VoxelTypes.getId(SOUTHEAST_INNER_CORNER));
-            return true;
-        }
-
-        if (y > northwestY && MathUtils.isEqual(y, westY) && MathUtils.isEqual(y, northY)) {
-            world.putTileAt_WP(wx, y, wz, VoxelTypes.getId(NORTHWEST_INNER_CORNER));
-            return true;
-        }
-
-        if (y > northeastY && MathUtils.isEqual(y, eastY) && MathUtils.isEqual(y, northY)) {
-            world.putTileAt_WP(wx, y, wz, VoxelTypes.getId(NORTHEAST_INNER_CORNER));
-            return true;
-        }
-
-        if (westY < y) {
-            world.putTileAt_WP(wx, y, wz, VoxelTypes.getId(WEST_EDGE));
-            return true;
-        }
-
-        if (eastY < y) {
-            world.putTileAt_WP(wx, y, wz, VoxelTypes.getId(EAST_EDGE));
-            return true;
-        }
-
-        if (southY < y) {
-            world.putTileAt_WP(wx, y, wz, VoxelTypes.getId(SOUTH_EDGE));
-            return true;
-        }
-
-        if (northY < y) {
-            world.putTileAt_WP(wx, y, wz, VoxelTypes.getId(NORTH_EDGE));
-            return true;
-        }
-
-        return false;
     }
 }
