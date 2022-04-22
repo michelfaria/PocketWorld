@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import vc.andro.poketest.Assets;
 import vc.andro.poketest.PocketWorld;
+import vc.andro.poketest.util.ArrayUtil;
 import vc.andro.poketest.voxel.FaceGenerationStrategy;
 
 import static vc.andro.poketest.voxel.VoxelTypes.VOXEL_TYPES;
@@ -71,6 +72,7 @@ public class ChunkRenderingStrategy implements RenderableProvider {
                 for (int lz = 0; lz < CHUNK_SIZE; lz++) {
                     for (int lx = 0; lx < CHUNK_SIZE; lx++) {
                         byte voxel = chunk.getVoxelAt_LP(lx, ly, lz);
+
                         if (voxel == 0) {
                             continue;
                         }

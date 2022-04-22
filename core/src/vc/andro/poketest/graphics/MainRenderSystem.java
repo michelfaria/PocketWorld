@@ -38,9 +38,9 @@ public class MainRenderSystem implements Disposable {
         worldRenderingStrategy = new WorldRenderingStrategy(cam, world);
 
         {
-            byte t00 = world.getSurfaceVoxel_WP(0, 0);
-            if (t00 != 0) {
-                cam.getPosition().set(0, world.getSurfaceVoxel_WP__SUPRETVAL__wy + 10, 0);
+            int surfaceWy = world.getSurfaceVoxelWy_WP(0, 0);
+            if (surfaceWy != -1) {
+                cam.getPosition().set(0, surfaceWy + 10, 0);
             }
         }
     }

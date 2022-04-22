@@ -75,17 +75,13 @@ public class Chunk implements Pool.Poolable {
         }
     }
 
-    public int getSurfaceVoxel_LP__SUPRETVAL__wy;
-
-    public synchronized byte getSurfaceVoxel_LP(int lx, int lz) {
+    public synchronized int getSurfaceVoxelWy_LP(int lx, int lz) {
         for (int wy = CHUNK_DEPTH - 1; wy >= 0; wy--) {
             byte v = getVoxelAt_LP(lx, wy, lz);
             if (v != 0) {
-                getSurfaceVoxel_LP__SUPRETVAL__wy = wy;
-                return v;
+                return wy;
             }
         }
-        getSurfaceVoxel_LP__SUPRETVAL__wy = -1;
-        return 0;
+        return -1;
     }
 }

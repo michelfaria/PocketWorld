@@ -111,28 +111,23 @@ public class World {
         return chunks.get(cx, cz);
     }
 
-    public int getSurfaceVoxel_WP__SUPRETVAL__wy;
-
-    public byte getSurfaceVoxel_WP(int wx, int wz) {
+    public int getSurfaceVoxelWy_WP(int wx, int wz) {
         Chunk chunk = getChunkAt_CP(
                 WxCx(wx),
                 WzCz(wz)
         );
         if (chunk == null) {
-            getSurfaceVoxel_WP__SUPRETVAL__wy = -1;
             return -1;
         }
-        byte voxel = chunk.getSurfaceVoxel_LP(
+        return chunk.getSurfaceVoxelWy_LP(
                 WxLx(wx),
                 WzLz(wz)
         );
-        getSurfaceVoxel_WP__SUPRETVAL__wy = chunk.getSurfaceVoxel_LP__SUPRETVAL__wy;
-        return voxel;
     }
 
-    public byte getSurfaceVoxel_G_WP(int wx, int wz) {
+    public int getSurfaceVoxelWy_G_WP(int wx, int wz) {
         Chunk chunk = getChunkAt_G_WP(wx, wz);
-        return chunk.getSurfaceVoxel_LP(WxLx(wx), WzLz(wz));
+        return chunk.getSurfaceVoxelWy_LP(WxLx(wx), WzLz(wz));
     }
 
     public static int WxCx(float wx) {
