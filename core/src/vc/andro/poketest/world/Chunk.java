@@ -2,12 +2,14 @@ package vc.andro.poketest.world;
 
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pools;
+import vc.andro.poketest.util.ArrayUtil;
 
 import java.util.Arrays;
 
 public class Chunk implements Pool.Poolable {
 
     public static final Pool<Chunk> POOL = Pools.get(Chunk.class);
+
     public static final int CHUNK_SIZE = 16; // in tiles
     public static final int CHUNK_DEPTH = 128;
 
@@ -45,7 +47,7 @@ public class Chunk implements Pool.Poolable {
     }
 
     private int calcVoxelArrayPosition_LP(int lx, int ly, int lz) {
-        return lx + CHUNK_SIZE * (ly + CHUNK_DEPTH * lz);
+        return ArrayUtil.xyzToI(CHUNK_SIZE, CHUNK_DEPTH, lx, ly, lz);
     }
 
     public void putVoxelAt_LP(int lx, int ly, int lz, byte voxel) {
