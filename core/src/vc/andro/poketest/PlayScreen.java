@@ -1,8 +1,11 @@
 package vc.andro.poketest;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import vc.andro.poketest.graphics.DebugRenderSystem;
 import vc.andro.poketest.graphics.MainRenderSystem;
+import vc.andro.poketest.world.Chunk;
 import vc.andro.poketest.world.World;
 import vc.andro.poketest.world.WorldCreationParams;
 import vc.andro.poketest.world.generation.WorldGenerator;
@@ -18,7 +21,7 @@ public class PlayScreen implements Screen {
 
     public PlayScreen(WorldCreationParams worldCreationParams) {
         cam = new PocketCamera();
-        world = new WorldGenerator(worldCreationParams).createNewWorld();
+        world = new WorldGenerator(worldCreationParams).getWorld();
         mainRenderSystem = new MainRenderSystem(world, cam);
         debugRenderSystem = new DebugRenderSystem(world, cam);
     }
@@ -43,6 +46,10 @@ public class PlayScreen implements Screen {
         timeSinceLastTick += delta;
         world.update(delta);
         cam.update();
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+            world.getChunks().values().forEach(Chunk::forceRerender);
+        }
     }
 
     @Override

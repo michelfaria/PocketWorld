@@ -77,12 +77,8 @@ public class ChunkRenderingStrategy implements RenderableProvider {
                             continue;
                         }
 
-                        VoxelAttributes voxelAttributes = chunk.getVoxelAttrsAt_LP(lx, ly, lz);
-
-                        // int wx = LxWx(chunk.cx, lx); // TODO : UNCOMMENT THIS
-                        // int wz = LzWz(chunk.cz, lz); // TODO : UNCOMMENT THIS
-                        int wx = LxWx(chunk.cx, lx) + (chunk.cx * 2); // TODO: REMOVE THIS. This spaces the chunks 1 tile apart
-                        int wz = LzWz(chunk.cz, lz) + (chunk.cz * 2); // TODO: REMOVE THIS. This spaces the chunks 1 tile apart
+                        int wx = LxWx(chunk.cx, lx);
+                        int wz = LzWz(chunk.cz, lz);
 
                         byte voxelAbove = ly < CHUNK_DEPTH - 1 ? chunk.getVoxelAt_LP(lx, ly + 1, lz) : -1;
                         byte voxelUnder = ly > 0 ? chunk.getVoxelAt_LP(lx, ly - 1, lz) : -1;
@@ -90,25 +86,25 @@ public class ChunkRenderingStrategy implements RenderableProvider {
                         byte voxelWest = chunk.world.getVoxelAt_WP(LxWx(chunk.cx, lx) - 1, ly, LzWz(chunk.cz, lz));
                         byte voxelNorth = chunk.world.getVoxelAt_WP(LxWx(chunk.cx, lx), ly, LzWz(chunk.cz, lz) - 1);
                         byte voxelSouth = chunk.world.getVoxelAt_WP(LxWx(chunk.cx, lx), ly, LzWz(chunk.cz, lz) + 1);
-
                         FaceGenerationStrategy faceGenStrat = VOXEL_TYPES[voxel].faceGenerationStrategy;
+                        VoxelAttributes voxelAttributes = chunk.getVoxelAttrsAt_LP(lx, ly, lz);
 
-                        if (voxelAbove <= 0 || VOXEL_TYPES[voxelAbove].transparent) {
+                        if (voxelAbove <= 0 || chunk.world.isVoxelAtPosEffectivelyTransparent_WP(wx, ly + 1, wz)) {
                             faceGenStrat.createTopVertices(vertexArray8f, indicesArray, voxel, voxelAttributes, wx, ly, wz);
                         }
-                        if (voxelUnder <= 0 || VOXEL_TYPES[voxelUnder].transparent) {
+                        if (voxelUnder <= 0 || chunk.world.isVoxelAtPosEffectivelyTransparent_WP(wx, ly - 1, wz)) {
                             faceGenStrat.createBottomVertices(vertexArray8f, indicesArray, voxel, voxelAttributes, wx, ly, wz);
                         }
-                        if (voxelWest <= 0 || VOXEL_TYPES[voxelWest].transparent) {
+                        if (voxelWest <= 0 || chunk.world.isVoxelAtPosEffectivelyTransparent_WP(wx - 1, ly, wz)) {
                             faceGenStrat.createWestVertices(vertexArray8f, indicesArray, voxel, voxelAttributes, wx, ly, wz);
                         }
-                        if (voxelEast <= 0 || VOXEL_TYPES[voxelEast].transparent) {
+                        if (voxelEast <= 0 || chunk.world.isVoxelAtPosEffectivelyTransparent_WP(wx + 1, ly, wz)) {
                             faceGenStrat.createEastVertices(vertexArray8f, indicesArray, voxel, voxelAttributes, wx, ly, wz);
                         }
-                        if (voxelNorth <= 0 || VOXEL_TYPES[voxelNorth].transparent) {
+                        if (voxelNorth <= 0 || chunk.world.isVoxelAtPosEffectivelyTransparent_WP(wx, ly, wz - 1)) {
                             faceGenStrat.createNorthVertices(vertexArray8f, indicesArray, voxel, voxelAttributes, wx, ly, wz);
                         }
-                        if (voxelSouth <= 0 || VOXEL_TYPES[voxelSouth].transparent) {
+                        if (voxelSouth <= 0 || chunk.world.isVoxelAtPosEffectivelyTransparent_WP(wx, ly, wz + 1)) {
                             faceGenStrat.createSouthVertices(vertexArray8f, indicesArray, voxel, voxelAttributes, wx, ly, wz);
                         }
                     }

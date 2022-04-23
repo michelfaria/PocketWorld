@@ -5,10 +5,16 @@ import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pools;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import vc.andro.poketest.Direction;
 import vc.andro.poketest.util.ArrayUtil;
 import vc.andro.poketest.voxel.VoxelAttributes;
+import vc.andro.poketest.voxel.VoxelSpec;
+import vc.andro.poketest.voxel.VoxelSpecs;
 
 import java.util.Arrays;
+
+import static vc.andro.poketest.world.World.LxWx;
+import static vc.andro.poketest.world.World.LzWz;
 
 public class Chunk implements Pool.Poolable {
 
@@ -49,7 +55,7 @@ public class Chunk implements Pool.Poolable {
             voxelAttributesMap.clear();
         }
         voxelCount = 0;
-        chunkRenderingStrategy = null;
+        chunkRenderingStrategy = new ChunkRenderingStrategy(this);
     }
 
     /**
@@ -160,17 +166,33 @@ public class Chunk implements Pool.Poolable {
      * @param lx    Local chunk x
      * @param ly    Local chunk y
      * @param lz    Local chunk z
-     * @param voxel
+     * @param voxel Voxel to put
      */
     public void putVoxelAt_LP(int lx, int ly, int lz, byte voxel) {
+        putVoxelAt_LP(lx, ly, lz, voxel, false);
+    }
+
+    /**
+     * Puts a voxel at the given (lx,ly,lz). If a voxel already exists in that position, it will be replaced.
+     *
+     * @param lx             Local chunk x
+     * @param ly             Local chunk y
+     * @param lz             Local chunk z
+     * @param voxel          Voxel to put
+     * @param keepAttributes If set to true, the attributes of the previous voxel won't be deleted.
+     */
+    public void putVoxelAt_LP(int lx, int ly, int lz, byte voxel, boolean keepAttributes) {
         byte prevVoxel = getVoxelAt_LP(lx, ly, lz);
         if (prevVoxel == 0 && voxel != 0) {
             voxelCount++;
         } else if (prevVoxel != 0 && voxel == 0) {
             voxelCount--;
-            delVoxelAttrsAt_LP(lx, ly, lz, true);
+            if (!keepAttributes) {
+                delVoxelAttrsAt_LP(lx, ly, lz, true);
+            }
         }
         voxels[calcVoxelArrayPosition_LP(lx, ly, lz)] = voxel;
+        chunkRenderingStrategy.needsRenderingUpdate = true;
     }
 
     public void updateVoxels() {
@@ -203,5 +225,228 @@ public class Chunk implements Pool.Poolable {
             }
         }
         return -1;
+    }
+
+    /**
+     * Turns a voxel at (lx, y, lz) into a slope if it meets the conditions to be a slope.
+     *
+     * @param lx Chunk local x
+     * @param y  y
+     * @param lz Chunk local z
+     */
+    public void slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(int lx, int y, int lz) {
+        slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(lx, y, lz, true);
+    }
+
+    /**
+     * Turns a voxel at (lx, y, lz) into a slope if it meets the conditions to be a slope.
+     *
+     * @param lx                           Chunk local x
+     * @param y                            y
+     * @param lz                           Chunk local z
+     * @param propagateToSurroundingChunks If set to true, sloping will propagate to adjacent voxels that are outside the specified chunk
+     */
+    private void slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(int lx, int y, int lz, boolean propagateToSurroundingChunks) {
+        byte voxel = getVoxelAt_LP(lx, y, lz);
+        if (voxel == 0) {
+            return;
+        }
+        VoxelSpec voxelSpec = VoxelSpecs.VOXEL_TYPES[voxel];
+        if (!voxelSpec.canBeSloped) {
+            return;
+        }
+
+        int wx = LxWx(cx, lx);
+        int wz = LzWz(cz, lz);
+
+        boolean isVoxelAbove = y < CHUNK_DEPTH - 1 && world.getVoxelAt_WP(wx, y + 1, wz) != 0;
+        if (isVoxelAbove) {
+            return;
+        }
+
+        boolean isVoxelBelow = y > 0 && world.getVoxelAt_WP(wx, y - 1, wz) != 0;
+        if (!isVoxelBelow) {
+            return;
+        }
+
+        byte voxelWest = world.getVoxelAt_WP(wx - 1, y, wz);
+        byte voxelEast = world.getVoxelAt_WP(wx + 1, y, wz);
+        byte voxelSouth = world.getVoxelAt_WP(wx, y, wz + 1);
+        byte voxelNorth = world.getVoxelAt_WP(wx, y, wz - 1);
+        byte voxelNorthwest = world.getVoxelAt_WP(wx - 1, y, wz - 1);
+        byte voxelNortheast = world.getVoxelAt_WP(wx + 1, y, wz - 1);
+        byte voxelSouthwest = world.getVoxelAt_WP(wx - 1, y, wz + 1);
+        byte voxelSoutheast = world.getVoxelAt_WP(wx + 1, y, wz + 1);
+
+        /*
+          Southwest-facing corner
+          ▢ ▢
+          ▢ ◢
+         */
+        if (voxelNorthwest == 0 && voxelWest == 0 && voxelNorth == 0) {
+            slopifyVoxel(lx, y, lz, Direction.NORTHWEST, false);
+        }
+        /*
+          Northeast-facing corner
+          ▢ ▢
+          ◣ ▢
+         */
+        else if (voxelNorth == 0 && voxelNortheast == 0 && voxelEast == 0) {
+            slopifyVoxel(lx, y, lz, Direction.NORTHEAST, false);
+        }
+        /*
+          Southwest-facing corner
+          ▢ ◥
+          ▢ ▢
+         */
+        else if (voxelSouthwest == 0 && voxelWest == 0 && voxelSouth == 0) {
+            slopifyVoxel(lx, y, lz, Direction.SOUTHWEST, false);
+        }
+        /*
+          Southeast-facing corner
+          ◤ ▢
+          ▢ ▢
+         */
+        else if (voxelSoutheast == 0 && voxelEast == 0 && voxelSouth == 0) {
+            slopifyVoxel(lx, y, lz, Direction.SOUTHEAST, false);
+        }
+        /*
+          Northwest-facing inner corner
+          ▢ |
+          _ 」←
+         */
+        else if (voxelNorthwest == 0 && voxelWest > 0 && voxelNorth > 0) {
+            slopifyVoxel(lx, y, lz, Direction.NORTHWEST, true);
+        }
+        /*
+         Northeast-facing inner corner
+           | ▢
+         → ⌞ _
+         */
+        else if (voxelNortheast == 0 && voxelEast > 0 && voxelNorth > 0) {
+            slopifyVoxel(lx, y, lz, Direction.NORTHEAST, true);
+        }
+        /*
+         Southwest-facing inner corner
+            ̅ ⌝ ←
+           ▢ |
+         */
+        else if (voxelSouthwest == 0 && voxelWest > 0 && voxelSouth > 0) {
+            slopifyVoxel(lx, y, lz, Direction.SOUTHWEST, true);
+        }
+        /*
+         Southeast-facing inner corner
+          → ⌜  ̅
+            | ▢
+         */
+        else if (voxelSoutheast == 0 && voxelEast > 0 && voxelSouth > 0) {
+            slopifyVoxel(lx, y, lz, Direction.SOUTHEAST, true);
+        }
+        /*  West edge */
+        else if (voxelWest == 0) {
+            slopifyVoxel(lx, y, lz, Direction.WEST, false);
+        }
+        /* East edge */
+        else if (voxelEast == 0) {
+            slopifyVoxel(lx, y, lz, Direction.EAST, false);
+        }
+        /* South edge */
+        else if (voxelSouth == 0) {
+            slopifyVoxel(lx, y, lz, Direction.SOUTH, false);
+        }
+        /* North edge */
+        else if (voxelNorth == 0) {
+            slopifyVoxel(lx, y, lz, Direction.NORTH, false);
+        }
+
+        if (propagateToSurroundingChunks) {
+//            for (int ilx = 0; ilx < CHUNK_SIZE; ilx += CHUNK_SIZE - 1) {
+//                for (int ilz = 0; ilz < CHUNK_SIZE; ilz += CHUNK_SIZE - 1) {
+//                    if (lx == ilx || lz == ilz) {
+//                        Chunk c = world.getChunkAt_CP(cx + (ilx == 0 ? -1 : 1), cz + (ilz == 0 ? -1 : 1));
+//                        if (c != null) {
+//                            c.chunkRenderingStrategy.needsRenderingUpdate = true;
+//                            c.slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(
+//                                    ilx == 0 ? CHUNK_SIZE - 1 : 0,
+//                                    y,
+//                                    ilz == 0 ? CHUNK_SIZE - 1 : 0,
+//                                    false);
+//                        }
+//                    }
+//                }
+//            }
+
+            // West
+            if (lx == 0) {
+                Chunk w = world.getChunkAt_CP(cx - 1, cz);
+                if (w != null) {
+                    w.slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(CHUNK_SIZE - 1, y, lz, false);
+                }
+            }
+            // East
+            if (lx == CHUNK_SIZE - 1) {
+                Chunk e = world.getChunkAt_CP(cx + 1, cz);
+                if (e != null) {
+                    e.slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(0, y, lz, false);
+                }
+            }
+            // North
+            if (lz == 0) {
+                Chunk n = world.getChunkAt_CP(cx, cz - 1);
+                if (n != null) {
+                    n.slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(lx, y, CHUNK_SIZE - 1, false);
+                }
+            }
+            // South
+            if (lz == CHUNK_SIZE - 1) {
+                Chunk s = world.getChunkAt_CP(cx, cz + 1);
+                if (s != null) {
+                    s.slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(lx, y, CHUNK_SIZE - 1, false);
+                }
+            }
+            // Northwest
+            if (lx == 0 && lz == 0) {
+                Chunk nw = world.getChunkAt_CP(cx - 1, cz - 1);
+                if (nw != null ){
+                    nw.slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(CHUNK_SIZE - 1, y, CHUNK_SIZE - 1, false);
+                }
+            }
+            // Northeast
+            if (lx == CHUNK_SIZE - 1 && lz == 0) {
+                Chunk ne = world.getChunkAt_CP(cx + 1, cz - 1);
+                if (ne != null ){
+                    ne.slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(0, y, CHUNK_SIZE - 1, false);
+                }
+            }
+            // Southwest
+            if (lx == 0 && lz == CHUNK_SIZE - 1) {
+                Chunk sw = world.getChunkAt_CP(cx - 1, cz + 1);
+                if (sw != null) {
+                    sw.slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(CHUNK_SIZE - 1, y, 0, false);
+                }
+            }
+            //Southeast
+            if (lx == CHUNK_SIZE - 1 && lz == CHUNK_SIZE - 1) {
+                Chunk se = world.getChunkAt_CP(cx + 1, cz + 1);
+                if (se != null) {
+                    se.slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(0, y, 0, false);
+                }
+            }
+        }
+    }
+
+    private void slopifyVoxel(int lx, int y, int lz, byte slopeDirection, boolean isInnerCorner) {
+        VoxelAttributes attrs = getVoxelAttrsAt_G_LP(lx, y, lz);
+        attrs.configureSlope(slopeDirection, isInnerCorner);
+
+        byte voxel = getVoxelAt_LP(lx, y, lz);
+        if (VoxelSpecs.VOXEL_TYPES[voxel] == VoxelSpecs.GRASS) {
+            putVoxelAt_LP(lx, y, lz, VoxelSpecs.getVoxelId(VoxelSpecs.DIRT), true);
+        }
+    }
+
+    @Deprecated
+    public void forceRerender() {
+        chunkRenderingStrategy.needsRenderingUpdate = true;
     }
 }

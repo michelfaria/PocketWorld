@@ -4,6 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.entity.Entity;
+import vc.andro.poketest.voxel.VoxelAttributes;
+import vc.andro.poketest.voxel.VoxelSpec;
+import vc.andro.poketest.voxel.VoxelSpecs;
 import vc.andro.poketest.world.generation.WorldGenerator;
 
 import static vc.andro.poketest.world.Chunk.CHUNK_SIZE;
@@ -80,7 +83,7 @@ public class World {
     Chunk getChunkAt_WP(int wx, int wz) {
         return getChunkAt_CP(
                 WxCx(wx),
-                WzLz(wz));
+                WzCz(wz));
     }
 
     public Chunk getChunkAt_G_CP(int cx, int cz) {
@@ -147,7 +150,7 @@ public class World {
         return cz * CHUNK_SIZE + lz;
     }
 
-    CoordMat<Chunk> getChunks() {
+    public CoordMat<Chunk> getChunks() {
         return chunks;
     }
 
@@ -164,4 +167,29 @@ public class World {
             Gdx.app.log("World", "UNLOADED chunk at (" + chunk.cx + "," + chunk.cz + ")");
         }
     }
+
+    public boolean isVoxelAtPosEffectivelyTransparent_WP(int wx, int y, int wz) {
+        Chunk chunk = getChunkAt_WP(wx, wz);
+        if (chunk == null) {
+            return false;
+        }
+        int lx = WxLx(wx);
+        int lz = WzLz(wz);
+        byte voxel = chunk.getVoxelAt_LP(lx, y, lz);
+        if (voxel <= 0) {
+            return true;
+        }
+        VoxelSpec spec = VoxelSpecs.VOXEL_TYPES[voxel];
+        assert spec != null : "Voxel spec not found";
+        if (spec.transparent) {
+            return true;
+        }
+        VoxelAttributes attrs = chunk.getVoxelAttrsAt_LP(lx, y, lz);
+        if (attrs != null && attrs.isSlope()) {
+            return true;
+        }
+        return false;
+    }
+
+
 }

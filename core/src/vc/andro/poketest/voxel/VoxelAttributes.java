@@ -36,6 +36,7 @@ public class VoxelAttributes implements Pool.Poolable {
         ) {
             throw new IllegalArgumentException("An inner corner tile must face an intercardinal direction");
         }
+        //noinspection ConstantConditions
         assert !isInnerCorner
                 || (facingDirection != Direction.NORTH && facingDirection != Direction.WEST
                 && facingDirection != Direction.SOUTH && facingDirection != Direction.EAST)
@@ -70,5 +71,9 @@ public class VoxelAttributes implements Pool.Poolable {
 
     private void setBoolIsInnerCornerSlope(boolean value) {
         bools[BOOL_IS_INNER_CORNER_SLOPE] = value;
+    }
+
+    public boolean isSlope() {
+        return bytes[BYTE_SLOPE_FACING_DIRECTION] != Direction.NA;
     }
 }

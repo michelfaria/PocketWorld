@@ -28,13 +28,19 @@ public class VoxelSpecs {
             false,
             true
     );
+    public static final VoxelSpec DIRT = new VoxelSpec(
+            CubicGroup.newAllSameFaces("tile/bwwall"),
+            null,
+            false,
+            true
+    );
 
     public static final VoxelSpec[] VOXEL_TYPES = new VoxelSpec[]{
             /*   0 */ null, // Null voxel
             /*   1 */ GRASS,
             /*   2 */ WATER,
             /*   3 */ SAND,
-            /*   4 */ null,
+            /*   4 */ DIRT,
             /*   5 */ null,
             /*   6 */ null,
             /*   7 */ null,
@@ -165,7 +171,7 @@ public class VoxelSpecs {
         assert VOXEL_TYPES.length == 128 : "Size of VOXEL_TYPES seems incorrect, should be 128 but is " + VOXEL_TYPES.length;
     }
 
-    public static byte getId(VoxelSpec voxelSpec) {
+    public static byte getVoxelId(VoxelSpec voxelSpec) {
         for (int i = 0; i < VOXEL_TYPES.length; i++) {
             VoxelSpec type = VOXEL_TYPES[i];
             if (type == voxelSpec) {
