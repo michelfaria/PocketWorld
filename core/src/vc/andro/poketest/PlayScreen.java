@@ -45,7 +45,7 @@ public class PlayScreen implements Screen {
         }
         timeSinceLastTick += delta;
         world.update(delta);
-        cam.update();
+        mainRenderSystem.update();
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
             world.getChunks().values().forEach(Chunk::forceRerender);

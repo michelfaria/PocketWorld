@@ -82,10 +82,10 @@ public class ChunkRenderingStrategy implements RenderableProvider {
 
                         byte voxelAbove = ly < CHUNK_DEPTH - 1 ? chunk.getVoxelAt_LP(lx, ly + 1, lz) : -1;
                         byte voxelUnder = ly > 0 ? chunk.getVoxelAt_LP(lx, ly - 1, lz) : -1;
-                        byte voxelEast = chunk.world.getVoxelAt_WP(LxWx(chunk.cx, lx) + 1, ly, LzWz(chunk.cz, lz));
-                        byte voxelWest = chunk.world.getVoxelAt_WP(LxWx(chunk.cx, lx) - 1, ly, LzWz(chunk.cz, lz));
-                        byte voxelNorth = chunk.world.getVoxelAt_WP(LxWx(chunk.cx, lx), ly, LzWz(chunk.cz, lz) - 1);
-                        byte voxelSouth = chunk.world.getVoxelAt_WP(LxWx(chunk.cx, lx), ly, LzWz(chunk.cz, lz) + 1);
+                        byte voxelEast = chunk.world.getVoxelAt_WP(wx + 1, ly, wz);
+                        byte voxelWest = chunk.world.getVoxelAt_WP(wx - 1, ly, wz);
+                        byte voxelNorth = chunk.world.getVoxelAt_WP(wx, ly, wz - 1);
+                        byte voxelSouth = chunk.world.getVoxelAt_WP(wx, ly, wz + 1);
                         FaceGenerationStrategy faceGenStrat = VOXEL_TYPES[voxel].faceGenerationStrategy;
                         VoxelAttributes voxelAttributes = chunk.getVoxelAttrsAt_LP(lx, ly, lz);
 

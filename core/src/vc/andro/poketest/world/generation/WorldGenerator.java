@@ -86,25 +86,13 @@ public class WorldGenerator {
             }
         }
 
-        shaveVoxelsInChunk(chunk);
+        chunk.slopifyAllVoxels();
 
         treeSpawner.spawnEntitiesInChunk(chunk);
         flowerSpawner.spawnEntitiesInChunk(chunk);
         tallGrassSpawner.spawnEntitiesInChunk(chunk);
 
         world.updateChunk(cx, cz);
-    }
-
-    private void shaveVoxelsInChunk(Chunk chunk) {
-        int startWx = CxWx(chunk.cx);
-        int startWz = CzWz(chunk.cz);
-        for (int lx = 0, wx = startWx; lx < CHUNK_SIZE; lx++, wx++) {
-            for (int y = 0; y < CHUNK_DEPTH; y++) {
-                for (int lz = 0, wz = startWz; lz < CHUNK_SIZE; lz++, wz++) {
-                    chunk.slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(lx, y, lz);
-                }
-            }
-        }
     }
 
     private void generateColumn(Chunk chunk, int lx, int lz) {

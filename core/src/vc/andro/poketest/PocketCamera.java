@@ -23,8 +23,9 @@ public class PocketCamera {
     public PocketCamera() {
         camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.near = 0.5f;
-        camera.far = 10000f;
+        camera.far = 150f;
         camera.lookAt(0, -1, 0);
+        camera.position.set(0, 128, 0);
     }
 
     public Matrix4 getProjectionMatrix() {

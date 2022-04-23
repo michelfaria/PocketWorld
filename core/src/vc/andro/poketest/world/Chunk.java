@@ -228,14 +228,16 @@ public class Chunk implements Pool.Poolable {
     }
 
     /**
-     * Turns a voxel at (lx, y, lz) into a slope if it meets the conditions to be a slope.
-     *
-     * @param lx Chunk local x
-     * @param y  y
-     * @param lz Chunk local z
+     * Slopifies every voxel in this chunk if they need to become slopes.
      */
-    public void slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(int lx, int y, int lz) {
-        slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(lx, y, lz, true);
+    public void slopifyAllVoxels() {
+        for (int lx = 0; lx < CHUNK_SIZE; lx++) {
+            for (int y = 0; y < CHUNK_DEPTH; y++) {
+                for (int lz = 0; lz < CHUNK_SIZE; lz++) {
+                    slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(lx, y, lz, true);
+                }
+            }
+        }
     }
 
     /**
@@ -360,76 +362,19 @@ public class Chunk implements Pool.Poolable {
         }
 
         if (propagateToSurroundingChunks) {
-//            for (int ilx = 0; ilx < CHUNK_SIZE; ilx += CHUNK_SIZE - 1) {
-//                for (int ilz = 0; ilz < CHUNK_SIZE; ilz += CHUNK_SIZE - 1) {
-//                    if (lx == ilx || lz == ilz) {
-//                        Chunk c = world.getChunkAt_CP(cx + (ilx == 0 ? -1 : 1), cz + (ilz == 0 ? -1 : 1));
-//                        if (c != null) {
-//                            c.chunkRenderingStrategy.needsRenderingUpdate = true;
-//                            c.slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(
-//                                    ilx == 0 ? CHUNK_SIZE - 1 : 0,
-//                                    y,
-//                                    ilz == 0 ? CHUNK_SIZE - 1 : 0,
-//                                    false);
-//                        }
-//                    }
-//                }
-//            }
-
-            // West
-            if (lx == 0) {
-                Chunk w = world.getChunkAt_CP(cx - 1, cz);
-                if (w != null) {
-                    w.slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(CHUNK_SIZE - 1, y, lz, false);
-                }
-            }
-            // East
-            if (lx == CHUNK_SIZE - 1) {
-                Chunk e = world.getChunkAt_CP(cx + 1, cz);
-                if (e != null) {
-                    e.slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(0, y, lz, false);
-                }
-            }
-            // North
-            if (lz == 0) {
-                Chunk n = world.getChunkAt_CP(cx, cz - 1);
-                if (n != null) {
-                    n.slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(lx, y, CHUNK_SIZE - 1, false);
-                }
-            }
-            // South
-            if (lz == CHUNK_SIZE - 1) {
-                Chunk s = world.getChunkAt_CP(cx, cz + 1);
-                if (s != null) {
-                    s.slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(lx, y, CHUNK_SIZE - 1, false);
-                }
-            }
-            // Northwest
-            if (lx == 0 && lz == 0) {
-                Chunk nw = world.getChunkAt_CP(cx - 1, cz - 1);
-                if (nw != null ){
-                    nw.slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(CHUNK_SIZE - 1, y, CHUNK_SIZE - 1, false);
-                }
-            }
-            // Northeast
-            if (lx == CHUNK_SIZE - 1 && lz == 0) {
-                Chunk ne = world.getChunkAt_CP(cx + 1, cz - 1);
-                if (ne != null ){
-                    ne.slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(0, y, CHUNK_SIZE - 1, false);
-                }
-            }
-            // Southwest
-            if (lx == 0 && lz == CHUNK_SIZE - 1) {
-                Chunk sw = world.getChunkAt_CP(cx - 1, cz + 1);
-                if (sw != null) {
-                    sw.slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(CHUNK_SIZE - 1, y, 0, false);
-                }
-            }
-            //Southeast
-            if (lx == CHUNK_SIZE - 1 && lz == CHUNK_SIZE - 1) {
-                Chunk se = world.getChunkAt_CP(cx + 1, cz + 1);
-                if (se != null) {
-                    se.slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(0, y, 0, false);
+            for (int ilx = 0; ilx < CHUNK_SIZE; ilx += CHUNK_SIZE - 1) {
+                for (int ilz = 0; ilz < CHUNK_SIZE; ilz += CHUNK_SIZE - 1) {
+                    if (lx == ilx || lz == ilz) {
+                        Chunk c = world.getChunkAt_CP(cx + (ilx == 0 ? -1 : 1), cz + (ilz == 0 ? -1 : 1));
+                        if (c != null) {
+                            c.chunkRenderingStrategy.needsRenderingUpdate = true;
+                            c.slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(
+                                    ilx == 0 ? CHUNK_SIZE - 1 : 0,
+                                    y,
+                                    ilz == 0 ? CHUNK_SIZE - 1 : 0,
+                                    false);
+                        }
+                    }
                 }
             }
         }
@@ -438,7 +383,6 @@ public class Chunk implements Pool.Poolable {
     private void slopifyVoxel(int lx, int y, int lz, byte slopeDirection, boolean isInnerCorner) {
         VoxelAttributes attrs = getVoxelAttrsAt_G_LP(lx, y, lz);
         attrs.configureSlope(slopeDirection, isInnerCorner);
-
         byte voxel = getVoxelAt_LP(lx, y, lz);
         if (VoxelSpecs.VOXEL_TYPES[voxel] == VoxelSpecs.GRASS) {
             putVoxelAt_LP(lx, y, lz, VoxelSpecs.getVoxelId(VoxelSpecs.DIRT), true);
