@@ -32,7 +32,7 @@ public class WorldRenderingStrategy implements RenderableProvider {
                 if (!cam.isChunkVisible(ix, iz)) {
                     continue;
                 }
-                Chunk chunk = world.getChunkAt_G_CP(ix, iz);
+                Chunk chunk = world.getChunkAt_CP(ix, iz);
                 if (chunk == null) {
                     continue;
                 }
