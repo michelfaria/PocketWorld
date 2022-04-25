@@ -203,6 +203,12 @@ public class World {
         return viewpointWp;
     }
 
+    public @Nullable Chunk getChunkAtViewpoint() {
+        int cx = WxCx(viewpointWp.x);
+        int cz = WzCz(viewpointWp.z);
+        return getChunkAt_CP(cx, cz);
+    }
+
     public boolean isChunkOutsideOfRenderDistance(Chunk chunk) {
         return isChunkOutsideOfRenderDistance_CP(chunk.cx, chunk.cz);
     }
@@ -216,5 +222,11 @@ public class World {
         if (!entities.removeValue(e, true)) {
             throw new IllegalArgumentException("Entity does not exist in world");
         }
+    }
+
+    public void generateChunkAtViewpoint() {
+        int cx = WxCx(viewpointWp.x);
+        int cz = WzCz(viewpointWp.z);
+        getChunkAt_G_CP(cx, cz);
     }
 }

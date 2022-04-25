@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import vc.andro.poketest.graphics.DebugRenderSystem;
 import vc.andro.poketest.graphics.MainRenderSystem;
+import vc.andro.poketest.registry.GeneralSettingsRegistry;
 import vc.andro.poketest.world.Chunk;
 import vc.andro.poketest.world.World;
 import vc.andro.poketest.world.WorldCreationParams;
@@ -50,6 +51,17 @@ public class PlayScreen implements Screen {
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
             world.getChunks().values().forEach(Chunk::forceRerender);
         }
+
+        if (GeneralSettingsRegistry.debugChunkGenerateOnKeyPress && Gdx.input.isKeyJustPressed(Input.Keys.G)) {
+            world.generateChunkAtViewpoint();
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
+            Chunk c = world.getChunkAtViewpoint();
+            if (c != null) {
+                c.slopifyVoxels(true);
+            }
+        }
     }
 
     @Override
@@ -59,17 +71,15 @@ public class PlayScreen implements Screen {
 
     @Override
     public void pause() {
-
     }
 
     @Override
     public void resume() {
-
     }
 
     @Override
     public void hide() {
-
+        Gdx.input.setCursorCatched(false);
     }
 
     @Override

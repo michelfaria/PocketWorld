@@ -57,7 +57,6 @@ public class ChunkRenderingStrategy implements RenderableProvider {
         material = new Material(
                 new TextureAttribute(
                         TextureAttribute.Diffuse,
-                        // TODO: This might be insufficient when the Tile atlas grows to have more than one texture
                         PocketWorld.assetManager.get(Assets.tileAtlas).getTextures().first()
                 ),
                 new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)

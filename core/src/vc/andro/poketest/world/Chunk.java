@@ -230,11 +230,11 @@ public class Chunk implements Pool.Poolable {
     /**
      * Slopifies every voxel in this chunk if they need to become slopes.
      */
-    public void slopifyAllVoxels() {
+    public void slopifyVoxels(boolean propagateToSurroundingChunks) {
         for (int lx = 0; lx < CHUNK_SIZE; lx++) {
             for (int y = 0; y < CHUNK_DEPTH; y++) {
                 for (int lz = 0; lz < CHUNK_SIZE; lz++) {
-                    slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(lx, y, lz, true);
+                    slopifyVoxel_LP(lx, y, lz, propagateToSurroundingChunks);
                 }
             }
         }
@@ -248,7 +248,7 @@ public class Chunk implements Pool.Poolable {
      * @param lz                           Chunk local z
      * @param propagateToSurroundingChunks If set to true, sloping will propagate to adjacent voxels that are outside the specified chunk
      */
-    private void slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(int lx, int y, int lz, boolean propagateToSurroundingChunks) {
+    private void slopifyVoxel_LP(int lx, int y, int lz, boolean propagateToSurroundingChunks) {
         byte voxel = getVoxelAt_LP(lx, y, lz);
         if (voxel == 0) {
             return;
@@ -362,19 +362,22 @@ public class Chunk implements Pool.Poolable {
         }
 
         if (propagateToSurroundingChunks) {
-            for (int ilx = 0; ilx < CHUNK_SIZE; ilx += CHUNK_SIZE - 1) {
-                for (int ilz = 0; ilz < CHUNK_SIZE; ilz += CHUNK_SIZE - 1) {
-                    if (lx == ilx || lz == ilz) {
-                        Chunk c = world.getChunkAt_CP(cx + (ilx == 0 ? -1 : 1), cz + (ilz == 0 ? -1 : 1));
-                        if (c != null) {
-                            c.chunkRenderingStrategy.needsRenderingUpdate = true;
-                            c.slopifyVoxelAndAdjacentVoxelsIfConditionsMet_LP(
-                                    ilx == 0 ? CHUNK_SIZE - 1 : 0,
-                                    y,
-                                    ilz == 0 ? CHUNK_SIZE - 1 : 0,
-                                    false);
-                        }
-                    }
+            if (lx == 0 || lz == 0 || lx == CHUNK_SIZE - 1 || lz == CHUNK_SIZE - 1) {
+                int cxΔ = 0;
+                if (lx == 0) {
+                    cxΔ = -1;
+                } else if (lx == CHUNK_SIZE - 1) {
+                    cxΔ = 1;
+                }
+                int czΔ = 0;
+                if (lz == 0) {
+                    czΔ = -1;
+                } else if (lz == CHUNK_SIZE - 1) {
+                    czΔ = 1;
+                }
+                Chunk c = world.getChunkAt_CP(cx + cxΔ, cz + czΔ);
+                if (c != null) {
+                    c.slopifyVoxels(false);
                 }
             }
         }
@@ -392,5 +395,13 @@ public class Chunk implements Pool.Poolable {
     @Deprecated
     public void forceRerender() {
         chunkRenderingStrategy.needsRenderingUpdate = true;
+    }
+
+    @Override
+    public String toString() {
+        return "Chunk{" +
+                "cx=" + cx +
+                ", cz=" + cz +
+                '}';
     }
 }

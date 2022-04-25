@@ -2,97 +2,97 @@ package vc.andro.poketest;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import vc.andro.poketest.entity.Entity;
 import vc.andro.poketest.world.World;
 
-import static vc.andro.poketest.PocketWorld.PPU;
 import static vc.andro.poketest.world.Chunk.CHUNK_DEPTH;
 import static vc.andro.poketest.world.Chunk.CHUNK_SIZE;
 import static vc.andro.poketest.world.World.CxWx;
 import static vc.andro.poketest.world.World.CzWz;
 
-public class PocketCamera {
+public class PocketCamera extends InputAdapter {
 
     public static final float CAM_SPEED = 0.25f;
 
     private final PerspectiveCamera camera;
     private final World world;
+    private final Vector3 tmp;
+
+    private float rotateSpeed = 1.0f;
 
     public PocketCamera(World world) {
         this.world = world;
+        tmp = new Vector3();
         camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.near = 0.5f;
         camera.far = 150f;
-        camera.lookAt(0, -1, 0);
+        camera.lookAt(0, 0, 0);
         camera.position.set(0, 128, 0);
     }
 
-    public Matrix4 getProjectionMatrix() {
-        return camera.combined;
-    }
-
-    public Vector3 project(Vector3 worldCoords) {
-        return camera.project(worldCoords);
-    }
-
-    public boolean isPosOutsideOfCameraView(float x, float z) {
-        return !camera.frustum.boundsInFrustum(x, z, 0, PPU, PPU, 0);
-    }
-
     public void update() {
-        updatePosition();
-        camera.update();
-        world.setViewpoint(camera.position.x, camera.position.y, camera.position.z);
-    }
-
-    private void updatePosition() {
         /*
          * Update camera translation
          */
-        float dx = 0;
-        float dy = 0;
-        float dz = 0;
-        if (Gdx.input.isKeyPressed(Input.Keys.J)) {
-            dx = -CAM_SPEED;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.L)) {
-            dx = CAM_SPEED;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.K)) {
-            dz = CAM_SPEED;
-        }
+        // Forward
         if (Gdx.input.isKeyPressed(Input.Keys.I)) {
-            dz = -CAM_SPEED;
+            tmp.set(camera.direction).nor().scl(1.0f, 0.0f, 1.0f).scl(CAM_SPEED);
+            camera.position.add(tmp);
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.U)) {
-            dy = -CAM_SPEED;
+        // Backward
+        if (Gdx.input.isKeyPressed(Input.Keys.K)) {
+            tmp.set(camera.direction).nor().scl(1.0f, 0.0f, 1.0f).scl(-CAM_SPEED);
+            camera.position.add(tmp);
         }
+        // Left
+        if (Gdx.input.isKeyPressed(Input.Keys.J)) {
+            tmp.set(camera.direction).crs(camera.up).nor().scl(-CAM_SPEED);
+            camera.position.add(tmp);
+        }
+        // Right
+        if (Gdx.input.isKeyPressed(Input.Keys.L)) {
+            tmp.set(camera.direction).crs(camera.up).nor().scl(CAM_SPEED);
+            camera.position.add(tmp);
+        }
+        // Up
         if (Gdx.input.isKeyPressed(Input.Keys.O)) {
-            dy = CAM_SPEED;
+            tmp.set(camera.up).nor().scl(CAM_SPEED);
+            camera.position.add(tmp);
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT_BRACKET)) {
-            camera.rotate(0.2f, 1, 0, 0);
+        // Down
+        if (Gdx.input.isKeyPressed(Input.Keys.U)) {
+            tmp.set(camera.up).nor().scl(-CAM_SPEED);
+            camera.position.add(tmp);
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT_BRACKET)) {
-            camera.rotate(-0.2f, 1, 0, 0);
+        // Yaw +
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+            camera.rotate(Vector3.Y, rotateSpeed);
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.COMMA)) {
-            camera.rotate(-90f, 0, 1, 0);
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.PERIOD)) {
-            camera.rotate(90f, 0, 1, 0);
+        // Yaw -
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            camera.rotate(Vector3.Y, -rotateSpeed);
         }
 
-        camera.translate(dx, dy, dz);
-        camera.up.set(
-                Math.round(camera.up.x),
-                Math.round(camera.up.y),
-                Math.round(camera.up.z)
-        );
+        // Pitch +
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+            camera.direction.y += rotateSpeed / 10.0f;
+            camera.direction.y = MathUtils.clamp(camera.direction.y, -1.0f, 1.0f);
+        }
+
+        // Pitch -
+        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+            camera.direction.y -= rotateSpeed / 10.0f;
+            camera.direction.y = MathUtils.clamp(camera.direction.y, -1.0f, 1.0f);
+        }
+
+
+        camera.update();
+        world.setViewpoint(camera.position.x, camera.position.y, camera.position.z);
     }
 
     public void resize(int width, int height) {

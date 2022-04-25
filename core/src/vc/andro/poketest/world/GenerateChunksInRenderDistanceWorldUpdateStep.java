@@ -1,5 +1,6 @@
 package vc.andro.poketest.world;
 
+import vc.andro.poketest.registry.GeneralSettingsRegistry;
 import vc.andro.poketest.registry.RenderSettingsRegistry;
 
 import static vc.andro.poketest.world.World.WxCx;
@@ -30,6 +31,10 @@ public class GenerateChunksInRenderDistanceWorldUpdateStep implements WorldUpdat
 
     @Override
     public void update(World world, float delta) {
+        if (GeneralSettingsRegistry.debugChunkGenerateOnKeyPress) {
+            return;
+        }
+
         int cx = WxCx(world.getViewpointWp().x);
         int cz = WzCz(world.getViewpointWp().z);
         for (int ix = cx - RenderSettingsRegistry.renderDistance; ix < cx + RenderSettingsRegistry.renderDistance; ix++) {

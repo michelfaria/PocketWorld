@@ -2,7 +2,6 @@ package vc.andro.poketest.world.generation;
 
 import com.badlogic.gdx.Gdx;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.entity.FlowerEntity;
 import vc.andro.poketest.entity.TallGrassEntity;
 import vc.andro.poketest.entity.TreeEntity;
@@ -21,7 +20,6 @@ import vc.andro.poketest.world.generation.map.VegetationMapGenerator;
 
 import java.util.Random;
 
-import static vc.andro.poketest.world.Chunk.CHUNK_DEPTH;
 import static vc.andro.poketest.world.Chunk.CHUNK_SIZE;
 import static vc.andro.poketest.world.World.*;
 
@@ -86,7 +84,7 @@ public class WorldGenerator {
             }
         }
 
-        chunk.slopifyAllVoxels();
+        chunk.slopifyVoxels(true);
 
         treeSpawner.spawnEntitiesInChunk(chunk);
         flowerSpawner.spawnEntitiesInChunk(chunk);
