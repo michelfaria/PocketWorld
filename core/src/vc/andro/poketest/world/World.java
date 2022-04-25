@@ -1,9 +1,11 @@
 package vc.andro.poketest.world;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.entity.Entity;
+import vc.andro.poketest.registry.RenderSettingsRegistry;
 import vc.andro.poketest.voxel.VoxelAttributes;
 import vc.andro.poketest.voxel.VoxelSpec;
 import vc.andro.poketest.voxel.VoxelSpecs;
@@ -15,21 +17,22 @@ public class World {
     private final WorldGenerator worldGenerator;
     private final CoordMat<Chunk> chunks;
     private final Array<Entity> entities;
+    private final Array<WorldUpdateStep> updateSteps;
+    private final Vector3 viewpointWp;
 
     public World(WorldGenerator worldGenerator) {
         this.worldGenerator = worldGenerator;
         chunks = new CoordMat<>();
         entities = new Array<>(Entity.class);
+        updateSteps = new Array<>(WorldUpdateStep.class);
+        viewpointWp = new Vector3();
+
+        updateSteps.add(UnloadChunksWorldUpdateStep.getInstance());
+        updateSteps.add(UnloadEntitiesWorldUpdateStep.getInstance());
     }
 
     public void addEntity(Entity e) {
         entities.add(e);
-    }
-
-    public void addEntities(Array<Entity> entities) {
-        for (Entity entity : entities) {
-            this.entities.add(entity);
-        }
     }
 
     public void tick() {
@@ -39,8 +42,8 @@ public class World {
     }
 
     public void update(float delta) {
-        for (Entity entity : entities) {
-            entity.update(delta);
+        for (WorldUpdateStep step : updateSteps) {
+            step.update(this, delta);
         }
     }
 
@@ -158,14 +161,12 @@ public class World {
         return entities;
     }
 
-    public void unloadChunks(Array<Chunk> chunksToUnload) {
-        for (Chunk chunk : chunksToUnload) {
-            if (chunks.remove(chunk.cx, chunk.cz) == null) {
-                throw new IllegalStateException("failed to remove chunk from chunk map");
-            }
-            Chunk.POOL.free(chunk);
-            Gdx.app.log("World", "UNLOADED chunk at (" + chunk.cx + "," + chunk.cz + ")");
+    public void unloadChunk(Chunk chunk) {
+        if (chunks.remove(chunk.cx, chunk.cz) == null) {
+            throw new IllegalStateException("failed to remove chunk from chunk map");
         }
+        Gdx.app.log("World", "Unloaded chunk at (" + chunk.cx + ", " + chunk.cz + ")!");
+        Chunk.POOL.free(chunk);
     }
 
     public boolean isVoxelAtPosEffectivelyTransparent_WP(int wx, int y, int wz) {
@@ -191,5 +192,28 @@ public class World {
         return false;
     }
 
+    public void setViewpoint(float wx, float wy, float wz) {
+        viewpointWp.x = wx;
+        viewpointWp.y = wy;
+        viewpointWp.z = wz;
+    }
 
+    public Vector3 getViewpointWp() {
+        return viewpointWp;
+    }
+
+    public boolean isChunkOutsideOfRenderDistance(Chunk chunk) {
+        return isChunkOutsideOfRenderDistance_CP(chunk.cx, chunk.cz);
+    }
+
+    public boolean isChunkOutsideOfRenderDistance_CP(int cx, int cz) {
+        return Math.abs(WxCx(viewpointWp.x) - cx) > RenderSettingsRegistry.renderDistance
+                || Math.abs(WzCz(viewpointWp.z) - cz) > RenderSettingsRegistry.renderDistance;
+    }
+
+    public void removeEntity(Entity e) {
+        if (!entities.removeValue(e, true)) {
+            throw new IllegalArgumentException("Entity does not exist in world");
+        }
+    }
 }

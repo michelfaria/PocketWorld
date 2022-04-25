@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader;
-import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
 import com.badlogic.gdx.utils.Disposable;
 import vc.andro.poketest.PocketCamera;
 import vc.andro.poketest.world.World;
@@ -33,7 +32,6 @@ public class MainRenderSystem implements Disposable {
         this.cam = cam;
         env = new Environment();
         env.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1.0f));
-        env.set(new ColorAttribute(ColorAttribute.Fog, clearColorR, clearColorG, clearColorB, clearColorA));
         env.add(new DirectionalLight().set(1.0f, 1.0f, 0.8f, 0.0f, -0.7f, 1.0f));
         cameraGroupStrategy = new MyCameraGroupStrategy(cam.getUnderlying());
         decalBatch = new DecalBatch(cameraGroupStrategy);
@@ -57,7 +55,6 @@ public class MainRenderSystem implements Disposable {
         modelBatch.render(worldRenderingStrategy, env);
         modelBatch.end();
 
-        worldRenderingStrategy.updateViewpoint();
         worldRenderingStrategy.renderEntities(decalBatch);
 
         decalBatch.flush();

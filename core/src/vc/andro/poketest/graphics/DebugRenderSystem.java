@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.Disposable;
 import vc.andro.poketest.Assets;
 import vc.andro.poketest.PocketCamera;
 import vc.andro.poketest.PocketWorld;
-import vc.andro.poketest.Registry;
+import vc.andro.poketest.registry.DebugInfoRegistry;
 import vc.andro.poketest.world.World;
 
 
@@ -35,10 +35,10 @@ public class DebugRenderSystem implements Disposable {
                 "fps: " + Gdx.graphics.getFramesPerSecond()
                         + ", camPos: (%.2f, %.2f, %.2f)".formatted(cam.getPosition().x, cam.getPosition().y, cam.getPosition().z)
                         + ", camDir: " + cam.getDirection().toString()
-                        + ", chunksRendered: " + Registry.debugInfoMap.get("chunksRendered", "(UNSET)"),
+                        + ", chunksRendered: " + DebugInfoRegistry.chunksRendered,
                 0, 40);
         font.draw(spriteBatch,
-                "entities rendered: " + Registry.debugInfoMap.get("entitiesRendered", "(UNSET)") +
+                "entities rendered: " + DebugInfoRegistry.entitiesRendered +
                         ", camUp: " + cam.getUp(),
                 0, 28);
         spriteBatch.end();

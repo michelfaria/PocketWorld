@@ -20,8 +20,8 @@ public class PlayScreen implements Screen {
     private float timeSinceLastTick;
 
     public PlayScreen(WorldCreationParams worldCreationParams) {
-        cam = new PocketCamera();
         world = new WorldGenerator(worldCreationParams).getWorld();
+        cam = new PocketCamera(world);
         mainRenderSystem = new MainRenderSystem(world, cam);
         debugRenderSystem = new DebugRenderSystem(world, cam);
     }

@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import vc.andro.poketest.entity.Entity;
+import vc.andro.poketest.world.World;
 
 import static vc.andro.poketest.PocketWorld.PPU;
 import static vc.andro.poketest.world.Chunk.CHUNK_DEPTH;
@@ -19,8 +20,10 @@ public class PocketCamera {
     public static final float CAM_SPEED = 0.25f;
 
     private final PerspectiveCamera camera;
+    private final World world;
 
-    public PocketCamera() {
+    public PocketCamera(World world) {
+        this.world = world;
         camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.near = 0.5f;
         camera.far = 150f;
@@ -43,6 +46,7 @@ public class PocketCamera {
     public void update() {
         updatePosition();
         camera.update();
+        world.setViewpoint(camera.position.x, camera.position.y, camera.position.z);
     }
 
     private void updatePosition() {

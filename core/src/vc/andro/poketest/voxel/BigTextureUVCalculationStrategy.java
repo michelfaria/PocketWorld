@@ -8,16 +8,26 @@ import static vc.andro.poketest.voxel.VoxelSpecs.VOXEL_TYPES;
 
 public class BigTextureUVCalculationStrategy implements UVCalculationStrategy {
 
-    private static BigTextureUVCalculationStrategy INSTANCE;
-
-    public static BigTextureUVCalculationStrategy getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new BigTextureUVCalculationStrategy();
-        }
-        return INSTANCE;
-    }
+    private static volatile BigTextureUVCalculationStrategy sInstance = null;
 
     private BigTextureUVCalculationStrategy() {
+        if (sInstance != null) {
+            throw new AssertionError(
+                    "Another instance of "
+                            + BigTextureUVCalculationStrategy.class.getName()
+                            + " class already exists - can't create a new instance.");
+        }
+    }
+
+    public static BigTextureUVCalculationStrategy getInstance() {
+        if (sInstance == null) {
+            synchronized (BigTextureUVCalculationStrategy.class) {
+                if (sInstance == null) {
+                    sInstance = new BigTextureUVCalculationStrategy();
+                }
+            }
+        }
+        return sInstance;
     }
 
     private float u;

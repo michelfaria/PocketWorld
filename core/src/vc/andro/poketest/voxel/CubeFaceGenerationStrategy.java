@@ -2,8 +2,8 @@ package vc.andro.poketest.voxel;
 
 import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.util.CubicGroup;
-import vc.andro.poketest.world.IndexArray;
-import vc.andro.poketest.world.VertexArray;
+import vc.andro.poketest.util.IndexArray;
+import vc.andro.poketest.util.VertexArray;
 
 import static vc.andro.poketest.voxel.VoxelSpecs.VOXEL_TYPES;
 

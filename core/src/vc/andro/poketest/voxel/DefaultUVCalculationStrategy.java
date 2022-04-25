@@ -6,13 +6,26 @@ import static vc.andro.poketest.voxel.VoxelSpecs.VOXEL_TYPES;
 
 public class DefaultUVCalculationStrategy implements UVCalculationStrategy {
 
-    private static DefaultUVCalculationStrategy INSTANCE;
+    private static volatile DefaultUVCalculationStrategy sInstance = null;
 
-    public static synchronized DefaultUVCalculationStrategy getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new DefaultUVCalculationStrategy();
+    private DefaultUVCalculationStrategy() {
+        if (sInstance != null) {
+            throw new AssertionError(
+                    "Another instance of "
+                            + DefaultUVCalculationStrategy.class.getName()
+                            + " class already exists - can't create a new instance.");
         }
-        return INSTANCE;
+    }
+
+    public static DefaultUVCalculationStrategy getInstance() {
+        if (sInstance == null) {
+            synchronized (DefaultUVCalculationStrategy.class) {
+                if (sInstance == null) {
+                    sInstance = new DefaultUVCalculationStrategy();
+                }
+            }
+        }
+        return sInstance;
     }
 
     @Override

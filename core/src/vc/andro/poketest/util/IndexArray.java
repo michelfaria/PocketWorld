@@ -1,4 +1,4 @@
-package vc.andro.poketest.world;
+package vc.andro.poketest.util;
 
 import com.badlogic.gdx.utils.ShortArray;
 

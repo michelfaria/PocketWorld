@@ -13,13 +13,15 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import vc.andro.poketest.Assets;
 import vc.andro.poketest.PocketWorld;
+import vc.andro.poketest.util.IndexArray;
+import vc.andro.poketest.util.VertexArray;
 import vc.andro.poketest.voxel.FaceGenerationStrategy;
 import vc.andro.poketest.voxel.VoxelAttributes;
 
 import static vc.andro.poketest.voxel.VoxelSpecs.VOXEL_TYPES;
 import static vc.andro.poketest.world.Chunk.CHUNK_DEPTH;
 import static vc.andro.poketest.world.Chunk.CHUNK_SIZE;
-import static vc.andro.poketest.world.VertexArray.VERTEX_SIZE;
+import static vc.andro.poketest.util.VertexArray.VERTEX_SIZE;
 import static vc.andro.poketest.world.World.LxWx;
 import static vc.andro.poketest.world.World.LzWz;
 

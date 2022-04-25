@@ -4,16 +4,26 @@ import vc.andro.poketest.util.CubicGroup;
 
 public final class NullUVCalculationStrategy implements UVCalculationStrategy {
 
-    private static NullUVCalculationStrategy INSTANCE;
+    private static volatile NullUVCalculationStrategy sInstance = null;
 
     private NullUVCalculationStrategy() {
+        if (sInstance != null) {
+            throw new AssertionError(
+                    "Another instance of "
+                            + NullUVCalculationStrategy.class.getName()
+                            + " class already exists - can't create a new instance.");
+        }
     }
 
-    public static synchronized NullUVCalculationStrategy getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new NullUVCalculationStrategy();
+    public static NullUVCalculationStrategy getInstance() {
+        if (sInstance == null) {
+            synchronized (NullUVCalculationStrategy.class) {
+                if (sInstance == null) {
+                    sInstance = new NullUVCalculationStrategy();
+                }
+            }
         }
-        return INSTANCE;
+        return sInstance;
     }
 
     @Override

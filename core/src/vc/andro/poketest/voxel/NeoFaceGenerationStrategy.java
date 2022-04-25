@@ -3,24 +3,34 @@ package vc.andro.poketest.voxel;
 import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.Direction;
 import vc.andro.poketest.util.CubicGroup;
-import vc.andro.poketest.world.IndexArray;
-import vc.andro.poketest.world.VertexArray;
+import vc.andro.poketest.util.IndexArray;
+import vc.andro.poketest.util.VertexArray;
 
 import static vc.andro.poketest.Direction.*;
 import static vc.andro.poketest.voxel.VoxelSpecs.VOXEL_TYPES;
 
 public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
 
-    private static NeoFaceGenerationStrategy INSTANCE;
-
-    public static synchronized NeoFaceGenerationStrategy getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new NeoFaceGenerationStrategy();
-        }
-        return INSTANCE;
-    }
+    private static volatile NeoFaceGenerationStrategy sInstance;
 
     private NeoFaceGenerationStrategy() {
+        if (sInstance != null) {
+            throw new AssertionError(
+                    "Another instance of "
+                            + NeoFaceGenerationStrategy.class.getName()
+                            + " class already exists - can't create a new instance.");
+        }
+    }
+
+    public static NeoFaceGenerationStrategy getInstance() {
+        if (sInstance == null) {
+            synchronized (NeoFaceGenerationStrategy.class) {
+                if (sInstance == null) {
+                    sInstance = new NeoFaceGenerationStrategy();
+                }
+            }
+        }
+        return sInstance;
     }
 
     @SuppressWarnings("DuplicatedCode")
