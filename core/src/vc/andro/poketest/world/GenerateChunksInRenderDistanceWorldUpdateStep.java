@@ -1,8 +1,6 @@
-package vc.andro.poketest.world.generation;
+package vc.andro.poketest.world;
 
 import vc.andro.poketest.registry.RenderSettingsRegistry;
-import vc.andro.poketest.world.World;
-import vc.andro.poketest.world.WorldUpdateStep;
 
 import static vc.andro.poketest.world.World.WxCx;
 import static vc.andro.poketest.world.World.WzCz;

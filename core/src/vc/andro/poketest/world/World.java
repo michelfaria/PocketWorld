@@ -9,7 +9,6 @@ import vc.andro.poketest.registry.RenderSettingsRegistry;
 import vc.andro.poketest.voxel.VoxelAttributes;
 import vc.andro.poketest.voxel.VoxelSpec;
 import vc.andro.poketest.voxel.VoxelSpecs;
-import vc.andro.poketest.world.generation.GenerateChunksInRenderDistanceWorldUpdateStep;
 import vc.andro.poketest.world.generation.WorldGenerator;
 
 import static vc.andro.poketest.world.Chunk.CHUNK_SIZE;
