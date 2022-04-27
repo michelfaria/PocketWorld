@@ -16,7 +16,7 @@ public class SimpleEntitySpawner<T extends Entity> implements EntitySpawner<Pros
         try {
             T entity = entityClass.getDeclaredConstructor().newInstance();
             entity.setPosition(wx, y, wz);
-            chunk.world.addEntity(entity);
+            chunk.getWorld().addEntity(entity);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

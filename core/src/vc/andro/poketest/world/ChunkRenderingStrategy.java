@@ -40,7 +40,7 @@ public class ChunkRenderingStrategy implements RenderableProvider {
     private final IndexArray indicesArray;
     private final Mesh mesh;
     private final Material material;
-    public boolean needsRenderingUpdate;
+    private boolean needsRenderingUpdate;
 
     public ChunkRenderingStrategy(Chunk chunk) {
         this.chunk = chunk;
@@ -52,20 +52,17 @@ public class ChunkRenderingStrategy implements RenderableProvider {
                 MAX_INDICES_PER_CHUNK,
                 VertexAttribute.Position(),
                 VertexAttribute.Normal(),
-                VertexAttribute.TexCoords(0)
-        );
+                VertexAttribute.TexCoords(0));
         material = new Material(
                 new TextureAttribute(
                         TextureAttribute.Diffuse,
-                        PocketWorld.assetManager.get(Assets.tileAtlas).getTextures().first()
-                ),
-                new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
-        );
+                        PocketWorld.assetManager.get(Assets.tileAtlas).getTextures().first()),
+                new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
         needsRenderingUpdate = true;
     }
 
 
-    private void updateVerticesIfDirty() {
+    private void rerenderIfNeeded() {
         if (needsRenderingUpdate) {
             vertexArray8f.clear();
             indicesArray.clear();
@@ -78,34 +75,34 @@ public class ChunkRenderingStrategy implements RenderableProvider {
                             continue;
                         }
 
-                        int wx = LxWx(chunk.cx, lx);
-                        int wz = LzWz(chunk.cz, lz);
+                        int wx = LxWx(chunk.getCx(), lx);
+                        int wz = LzWz(chunk.getCz(), lz);
 
                         byte voxelAbove = ly < CHUNK_DEPTH - 1 ? chunk.getVoxelAt_LP(lx, ly + 1, lz) : -1;
                         byte voxelUnder = ly > 0 ? chunk.getVoxelAt_LP(lx, ly - 1, lz) : -1;
-                        byte voxelEast = chunk.world.getVoxelAt_WP(wx + 1, ly, wz);
-                        byte voxelWest = chunk.world.getVoxelAt_WP(wx - 1, ly, wz);
-                        byte voxelNorth = chunk.world.getVoxelAt_WP(wx, ly, wz - 1);
-                        byte voxelSouth = chunk.world.getVoxelAt_WP(wx, ly, wz + 1);
+                        byte voxelEast = chunk.getWorld().getVoxelAt_WP(wx + 1, ly, wz);
+                        byte voxelWest = chunk.getWorld().getVoxelAt_WP(wx - 1, ly, wz);
+                        byte voxelNorth = chunk.getWorld().getVoxelAt_WP(wx, ly, wz - 1);
+                        byte voxelSouth = chunk.getWorld().getVoxelAt_WP(wx, ly, wz + 1);
                         FaceGenerationStrategy faceGenStrat = VOXEL_TYPES[voxel].faceGenerationStrategy;
                         VoxelAttributes voxelAttributes = chunk.getVoxelAttrsAt_LP(lx, ly, lz);
 
-                        if (voxelAbove <= 0 || chunk.world.isVoxelAtPosEffectivelyTransparent_WP(wx, ly + 1, wz)) {
+                        if (voxelAbove <= 0 || chunk.getWorld().isVoxelAtPosEffectivelyTransparent_WP(wx, ly + 1, wz)) {
                             faceGenStrat.createTopVertices(vertexArray8f, indicesArray, voxel, voxelAttributes, wx, ly, wz);
                         }
-                        if (voxelUnder <= 0 || chunk.world.isVoxelAtPosEffectivelyTransparent_WP(wx, ly - 1, wz)) {
+                        if (voxelUnder <= 0 || chunk.getWorld().isVoxelAtPosEffectivelyTransparent_WP(wx, ly - 1, wz)) {
                             faceGenStrat.createBottomVertices(vertexArray8f, indicesArray, voxel, voxelAttributes, wx, ly, wz);
                         }
-                        if (voxelWest <= 0 || chunk.world.isVoxelAtPosEffectivelyTransparent_WP(wx - 1, ly, wz)) {
+                        if (voxelWest <= 0 || chunk.getWorld().isVoxelAtPosEffectivelyTransparent_WP(wx - 1, ly, wz)) {
                             faceGenStrat.createWestVertices(vertexArray8f, indicesArray, voxel, voxelAttributes, wx, ly, wz);
                         }
-                        if (voxelEast <= 0 || chunk.world.isVoxelAtPosEffectivelyTransparent_WP(wx + 1, ly, wz)) {
+                        if (voxelEast <= 0 || chunk.getWorld().isVoxelAtPosEffectivelyTransparent_WP(wx + 1, ly, wz)) {
                             faceGenStrat.createEastVertices(vertexArray8f, indicesArray, voxel, voxelAttributes, wx, ly, wz);
                         }
-                        if (voxelNorth <= 0 || chunk.world.isVoxelAtPosEffectivelyTransparent_WP(wx, ly, wz - 1)) {
+                        if (voxelNorth <= 0 || chunk.getWorld().isVoxelAtPosEffectivelyTransparent_WP(wx, ly, wz - 1)) {
                             faceGenStrat.createNorthVertices(vertexArray8f, indicesArray, voxel, voxelAttributes, wx, ly, wz);
                         }
-                        if (voxelSouth <= 0 || chunk.world.isVoxelAtPosEffectivelyTransparent_WP(wx, ly, wz + 1)) {
+                        if (voxelSouth <= 0 || chunk.getWorld().isVoxelAtPosEffectivelyTransparent_WP(wx, ly, wz + 1)) {
                             faceGenStrat.createSouthVertices(vertexArray8f, indicesArray, voxel, voxelAttributes, wx, ly, wz);
                         }
                     }
@@ -122,7 +119,7 @@ public class ChunkRenderingStrategy implements RenderableProvider {
 
     @Override
     public void getRenderables(Array<Renderable> renderables, Pool<Renderable> pool) {
-        updateVerticesIfDirty();
+        rerenderIfNeeded();
         if (vertexArray8f.getAmountVertices() == 0) {
             return;
         }
@@ -133,5 +130,9 @@ public class ChunkRenderingStrategy implements RenderableProvider {
         r.meshPart.size = vertexArray8f.getItems().length / VERTEX_SIZE / POINTS_IN_A_SQUARE * FACES_IN_A_CUBE;
         r.meshPart.primitiveType = GL20.GL_TRIANGLES;
         renderables.add(r);
+    }
+
+    void setNeedsRenderingUpdate() {
+        this.needsRenderingUpdate = true;
     }
 }

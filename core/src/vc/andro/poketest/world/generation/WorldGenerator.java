@@ -108,8 +108,8 @@ public class WorldGenerator {
      */
     private void generateColumn(Chunk chunk, int lx, int lz, int y) {
         {
-            int wx = LxWx(chunk.cx, lx);
-            int wz = LzWz(chunk.cz, lz);
+            int wx = LxWx(chunk.getCx(), lx);
+            int wz = LzWz(chunk.getCz(), lz);
             y = y < 0 ? altitudeMapGenerator.getAtPosition(wx, wz) : y;
         }
 

@@ -20,12 +20,12 @@ public class WorldGenEntitySpawner<T extends ProspectorResult> {
     public void spawnEntitiesInChunk(@NotNull Chunk chunk) {
         for (int lx = 0; lx < CHUNK_SIZE; lx++) {
             for (int lz = 0; lz < CHUNK_SIZE; lz++) {
-                int wx = LxWx(chunk.cx, lx);
-                int wz = LzWz(chunk.cz, lz);
-                T result = spawnProspector.prospect(chunk, wx, wz, chunk.cx, chunk.cz, lx, lz);
+                int wx = LxWx(chunk.getCx(), lx);
+                int wz = LzWz(chunk.getCz(), lz);
+                T result = spawnProspector.prospect(chunk, wx, wz, chunk.getCx(), chunk.getCz(), lx, lz);
                 if (result.shouldSpawn) {
                     assert result.spawnY != null : "Prospector should have determined Y position";
-                    entitySpawner.spawnEntity(result, chunk, wx, result.spawnY, wz, chunk.cx, chunk.cz, lx, lz);
+                    entitySpawner.spawnEntity(result, chunk, wx, result.spawnY, wz, chunk.getCx(), chunk.getCz(), lx, lz);
                 }
             }
         }

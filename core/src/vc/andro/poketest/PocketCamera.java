@@ -30,7 +30,7 @@ public class PocketCamera extends InputAdapter {
         tmp = new Vector3();
         camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.near = 0.5f;
-        camera.far = 150f;
+        camera.far = 3000f;
         camera.lookAt(0, 0, 0);
         camera.position.set(0, 128, 0);
     }

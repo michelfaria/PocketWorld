@@ -22,13 +22,14 @@ public class Chunk implements Pool.Poolable {
     public static final int CHUNK_SIZE = 16; // in tiles
     public static final int CHUNK_DEPTH = 128;
 
-    public World world;
-    public int cx;
-    public int cz;
+    private World world;
+    private int cx;
+    private int cz;
     private final byte[] voxels;
     private final IntMap<VoxelAttributes> voxelAttributesMap;
-    protected int voxelCount; // Amount of voxels that exist in this chunk
-    protected ChunkRenderingStrategy chunkRenderingStrategy;
+    private int voxelCount; // Amount of voxels that exist in this chunk
+    private ChunkRenderingStrategy chunkRenderingStrategy;
+    private boolean initialized;
 
     private Chunk() {
         voxels = new byte[CHUNK_SIZE * CHUNK_DEPTH * CHUNK_SIZE];
@@ -40,6 +41,7 @@ public class Chunk implements Pool.Poolable {
         this.cx = cx;
         this.cz = cz;
         chunkRenderingStrategy = new ChunkRenderingStrategy(this);
+        initialized = true;
     }
 
     @Override
@@ -55,7 +57,14 @@ public class Chunk implements Pool.Poolable {
             voxelAttributesMap.clear();
         }
         voxelCount = 0;
-        chunkRenderingStrategy = new ChunkRenderingStrategy(this);
+        chunkRenderingStrategy = null;
+        initialized = false;
+    }
+
+    private void throwIfUninitialized() {
+        if (!isInitialized()) {
+            throw new IllegalStateException("Attempted to perform an operation on an uninitialized chunk");
+        }
     }
 
     /**
@@ -67,6 +76,7 @@ public class Chunk implements Pool.Poolable {
      * @return Voxel
      */
     public byte getVoxelAt_LP(int lx, int ly, int lz) {
+        throwIfUninitialized();
         return voxels[calcVoxelArrayPosition_LP(lx, ly, lz)];
     }
 
@@ -80,6 +90,7 @@ public class Chunk implements Pool.Poolable {
      */
     @Nullable
     public VoxelAttributes getVoxelAttrsAt_LP(int lx, int ly, int lz) {
+        throwIfUninitialized();
         return voxelAttributesMap.get(calcVoxelArrayPosition_LP(lx, ly, lz));
     }
 
@@ -92,6 +103,7 @@ public class Chunk implements Pool.Poolable {
      * @return VoxelAttributes or null
      */
     public VoxelAttributes getVoxelAttrsAt_G_LP(int lx, int ly, int lz) {
+        throwIfUninitialized();
         VoxelAttributes attrs = voxelAttributesMap.get(calcVoxelArrayPosition_LP(lx, ly, lz));
         if (attrs == null) {
             attrs = VoxelAttributes.POOL.obtain();
@@ -110,6 +122,7 @@ public class Chunk implements Pool.Poolable {
      * @param voxelAttributes
      */
     public void putVoxelAttrsAt_LP(int lx, int ly, int lz, @NotNull VoxelAttributes voxelAttributes) {
+        throwIfUninitialized();
         int pos = calcVoxelArrayPosition_LP(lx, ly, lz);
         VoxelAttributes oldValue = voxelAttributesMap.put(pos, voxelAttributes);
         if (oldValue != null) {
@@ -126,6 +139,7 @@ public class Chunk implements Pool.Poolable {
      * @throws IllegalStateException If there is no voxel attribute associated with the voxel at position (lx, ly, lz).
      */
     public void delVoxelAttrsAt_LP(int lx, int ly, int lz) {
+        throwIfUninitialized();
         delVoxelAttrsAt_LP(lx, ly, lz, false);
     }
 
@@ -140,6 +154,7 @@ public class Chunk implements Pool.Poolable {
      *                               attribute associated with the voxel at position (lx, ly, lz).
      */
     public void delVoxelAttrsAt_LP(int lx, int ly, int lz, boolean ignoreNonexisting) {
+        throwIfUninitialized();
         int pos = calcVoxelArrayPosition_LP(lx, ly, lz);
         VoxelAttributes removedValue = voxelAttributesMap.remove(pos);
         if (removedValue == null) {
@@ -157,6 +172,7 @@ public class Chunk implements Pool.Poolable {
      * @return
      */
     private int calcVoxelArrayPosition_LP(int lx, int ly, int lz) {
+        throwIfUninitialized();
         return ArrayUtil.xyzToI(CHUNK_SIZE, CHUNK_DEPTH, lx, ly, lz);
     }
 
@@ -169,6 +185,7 @@ public class Chunk implements Pool.Poolable {
      * @param voxel Voxel to put
      */
     public void putVoxelAt_LP(int lx, int ly, int lz, byte voxel) {
+        throwIfUninitialized();
         putVoxelAt_LP(lx, ly, lz, voxel, false);
     }
 
@@ -182,6 +199,7 @@ public class Chunk implements Pool.Poolable {
      * @param keepAttributes If set to true, the attributes of the previous voxel won't be deleted.
      */
     public void putVoxelAt_LP(int lx, int ly, int lz, byte voxel, boolean keepAttributes) {
+        throwIfUninitialized();
         byte prevVoxel = getVoxelAt_LP(lx, ly, lz);
         if (prevVoxel == 0 && voxel != 0) {
             voxelCount++;
@@ -192,10 +210,11 @@ public class Chunk implements Pool.Poolable {
             }
         }
         voxels[calcVoxelArrayPosition_LP(lx, ly, lz)] = voxel;
-        chunkRenderingStrategy.needsRenderingUpdate = true;
+        chunkRenderingStrategy.setNeedsRenderingUpdate();
     }
 
     public void updateVoxels() {
+        throwIfUninitialized();
         for (int lx = 0; lx < CHUNK_SIZE; lx++) {
             for (int wy = 0; wy < CHUNK_DEPTH; wy++) {
                 for (int lz = 0; lz < CHUNK_SIZE; lz++) {
@@ -218,6 +237,7 @@ public class Chunk implements Pool.Poolable {
      * @return The voxel or invalid value (-1)
      */
     public int getSurfaceVoxelWy_LP(int lx, int lz) {
+        throwIfUninitialized();
         for (int wy = CHUNK_DEPTH - 1; wy >= 0; wy--) {
             byte v = getVoxelAt_LP(lx, wy, lz);
             if (v != 0) {
@@ -231,6 +251,7 @@ public class Chunk implements Pool.Poolable {
      * Slopifies every voxel in this chunk if they need to become slopes.
      */
     public void slopifyVoxels(boolean propagateToSurroundingChunks) {
+        throwIfUninitialized();
         for (int lx = 0; lx < CHUNK_SIZE; lx++) {
             for (int y = 0; y < CHUNK_DEPTH; y++) {
                 for (int lz = 0; lz < CHUNK_SIZE; lz++) {
@@ -249,6 +270,7 @@ public class Chunk implements Pool.Poolable {
      * @param propagateToSurroundingChunks If set to true, sloping will propagate to adjacent voxels that are outside the specified chunk
      */
     private void slopifyVoxel_LP(int lx, int y, int lz, boolean propagateToSurroundingChunks) {
+        throwIfUninitialized();
         byte voxel = getVoxelAt_LP(lx, y, lz);
         if (voxel == 0) {
             return;
@@ -261,12 +283,12 @@ public class Chunk implements Pool.Poolable {
         int wx = LxWx(cx, lx);
         int wz = LzWz(cz, lz);
 
-        boolean isVoxelAbove = y < CHUNK_DEPTH - 1 && world.getVoxelAt_WP(wx, y + 1, wz) != 0;
+        boolean isVoxelAbove = y < CHUNK_DEPTH - 1 && getWorld().getVoxelAt_WP(wx, y + 1, wz) != 0;
         if (isVoxelAbove) {
             return;
         }
 
-        boolean isVoxelBelow = y > 0 && world.getVoxelAt_WP(wx, y - 1, wz) != 0;
+        boolean isVoxelBelow = y > 0 && getWorld().getVoxelAt_WP(wx, y - 1, wz) != 0;
         if (!isVoxelBelow) {
             return;
         }
@@ -375,7 +397,7 @@ public class Chunk implements Pool.Poolable {
                 } else if (lz == CHUNK_SIZE - 1) {
                     czΔ = 1;
                 }
-                Chunk c = world.getChunkAt_CP(cx + cxΔ, cz + czΔ);
+                Chunk c = world.getChunkAt_CP(getCx() + cxΔ, getCz() + czΔ);
                 if (c != null) {
                     c.slopifyVoxels(false);
                 }
@@ -384,6 +406,7 @@ public class Chunk implements Pool.Poolable {
     }
 
     private void slopifyVoxel(int lx, int y, int lz, byte slopeDirection, boolean isInnerCorner) {
+        throwIfUninitialized();
         VoxelAttributes attrs = getVoxelAttrsAt_G_LP(lx, y, lz);
         attrs.configureSlope(slopeDirection, isInnerCorner);
         byte voxel = getVoxelAt_LP(lx, y, lz);
@@ -394,7 +417,8 @@ public class Chunk implements Pool.Poolable {
 
     @Deprecated
     public void forceRerender() {
-        chunkRenderingStrategy.needsRenderingUpdate = true;
+        throwIfUninitialized();
+        chunkRenderingStrategy.setNeedsRenderingUpdate();
     }
 
     @Override
@@ -403,5 +427,29 @@ public class Chunk implements Pool.Poolable {
                 "cx=" + cx +
                 ", cz=" + cz +
                 '}';
+    }
+
+    public World getWorld() {
+        throwIfUninitialized();
+        return world;
+    }
+
+    public int getCx() {
+        throwIfUninitialized();
+        return cx;
+    }
+
+    public int getCz() {
+        throwIfUninitialized();
+        return cz;
+    }
+
+    public ChunkRenderingStrategy getChunkRenderingStrategy() {
+        throwIfUninitialized();
+        return chunkRenderingStrategy;
+    }
+
+    public boolean isInitialized() {
+        return initialized;
     }
 }

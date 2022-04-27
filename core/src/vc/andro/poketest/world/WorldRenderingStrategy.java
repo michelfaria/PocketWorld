@@ -36,7 +36,7 @@ public class WorldRenderingStrategy implements RenderableProvider {
                 if (chunk == null) {
                     continue;
                 }
-                chunk.chunkRenderingStrategy.getRenderables(renderables, pool);
+                chunk.getChunkRenderingStrategy().getRenderables(renderables, pool);
                 chunksRendered++;
             }
         }

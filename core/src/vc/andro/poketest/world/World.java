@@ -83,11 +83,9 @@ public class World {
         return blankChunk;
     }
 
-    public @Nullable
-    Chunk getChunkAt_WP(int wx, int wz) {
-        return getChunkAt_CP(
-                WxCx(wx),
-                WzCz(wz));
+    @Nullable
+    public Chunk getChunkAt_WP(int wx, int wz) {
+        return getChunkAt_CP(WxCx(wx), WzCz(wz));
     }
 
     public Chunk getChunkAt_G_CP(int cx, int cz) {
@@ -100,21 +98,17 @@ public class World {
         return chunk;
     }
 
-    public @Nullable
-    Chunk getChunkAt_CP(int cx, int cz) {
+    @Nullable
+    public Chunk getChunkAt_CP(int cx, int cz) {
         return chunks.get(cx, cz);
     }
 
     public int getSurfaceVoxelWy_WP(int wx, int wz) {
-        Chunk chunk = getChunkAt_CP(
-                WxCx(wx),
-                WzCz(wz));
+        Chunk chunk = getChunkAt_CP(WxCx(wx), WzCz(wz));
         if (chunk == null) {
             return -1;
         }
-        return chunk.getSurfaceVoxelWy_LP(
-                WxLx(wx),
-                WzLz(wz));
+        return chunk.getSurfaceVoxelWy_LP(WxLx(wx), WzLz(wz));
     }
 
     public int getSurfaceVoxelWy_G_WP(int wx, int wz) {
@@ -163,10 +157,10 @@ public class World {
     }
 
     public void unloadChunk(Chunk chunk) {
-        if (chunks.remove(chunk.cx, chunk.cz) == null) {
+        if (chunks.remove(chunk.getCx(), chunk.getCz()) == null) {
             throw new IllegalStateException("failed to remove chunk from chunk map");
         }
-        Gdx.app.log("World", "Unloaded chunk at (" + chunk.cx + ", " + chunk.cz + ")!");
+        Gdx.app.log("World", "Unloaded chunk at (" + chunk.getCx() + ", " + chunk.getCz() + ")!");
         Chunk.POOL.free(chunk);
     }
 
@@ -203,19 +197,19 @@ public class World {
         return viewpointWp;
     }
 
-    public @Nullable Chunk getChunkAtViewpoint() {
+    @Nullable
+    public Chunk getChunkAtViewpoint() {
         int cx = WxCx(viewpointWp.x);
         int cz = WzCz(viewpointWp.z);
         return getChunkAt_CP(cx, cz);
     }
 
     public boolean isChunkOutsideOfRenderDistance(Chunk chunk) {
-        return isChunkOutsideOfRenderDistance_CP(chunk.cx, chunk.cz);
+        return isChunkOutsideOfRenderDistance_CP(chunk.getCx(), chunk.getCz());
     }
 
     public boolean isChunkOutsideOfRenderDistance_CP(int cx, int cz) {
-        return Math.abs(WxCx(viewpointWp.x) - cx) > RenderSettingsRegistry.renderDistance
-                || Math.abs(WzCz(viewpointWp.z) - cz) > RenderSettingsRegistry.renderDistance;
+        return Math.abs(WxCx(viewpointWp.x) - cx) > RenderSettingsRegistry.renderDistance || Math.abs(WzCz(viewpointWp.z) - cz) > RenderSettingsRegistry.renderDistance;
     }
 
     public void removeEntity(Entity e) {
