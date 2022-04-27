@@ -39,8 +39,7 @@ public class GenerateChunksInRenderDistanceWorldUpdateStep implements WorldUpdat
         int cz = WzCz(world.getViewpointWp().z);
         for (int ix = cx - RenderSettingsRegistry.renderDistance; ix < cx + RenderSettingsRegistry.renderDistance; ix++) {
             for (int iz = cz - RenderSettingsRegistry.renderDistance; iz < cz + RenderSettingsRegistry.renderDistance; iz++) {
-                // Generate chunk using generating side-effect of World#getChunkAt_G_CP
-                world.getChunkAt_G_CP(ix, iz);
+                world.generateChunkAt_CP_IfNotExists(ix, iz);
             }
         }
     }

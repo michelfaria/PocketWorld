@@ -76,7 +76,7 @@ public class WorldGenerator {
 
     public void generateChunk(int cx, int cz) {
         log("Generating chunk: " + cx + ", " + cz);
-        Chunk chunk = world.createBlankChunkAt_CP(cx, cz);
+        Chunk chunk = world.putEmptyChunkAt_CP(cx, cz);
 
         for (int lx = 0; lx < CHUNK_SIZE; lx++) {
             for (int lz = 0; lz < CHUNK_SIZE; lz++) {

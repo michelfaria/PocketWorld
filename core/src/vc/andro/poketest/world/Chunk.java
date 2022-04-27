@@ -12,6 +12,8 @@ import vc.andro.poketest.voxel.VoxelSpec;
 import vc.andro.poketest.voxel.VoxelSpecs;
 
 import java.util.Arrays;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static vc.andro.poketest.world.World.LxWx;
 import static vc.andro.poketest.world.World.LzWz;
@@ -31,12 +33,19 @@ public class Chunk implements Pool.Poolable {
     private ChunkRenderingStrategy chunkRenderingStrategy;
     private boolean initialized;
 
+    public final ReentrantReadWriteLock lock;
+    public final Lock writeLock;
+    public final Lock readLock;
+
     private Chunk() {
         voxels = new byte[CHUNK_SIZE * CHUNK_DEPTH * CHUNK_SIZE];
         voxelAttributesMap = new IntMap<>();
+        lock = new ReentrantReadWriteLock();
+        writeLock = lock.writeLock();
+        readLock = lock.readLock();
     }
 
-    public void init(World world, int cx, int cz) {
+    public void init(@NotNull World world, int cx, int cz) {
         this.world = world;
         this.cx = cx;
         this.cz = cz;
@@ -50,7 +59,7 @@ public class Chunk implements Pool.Poolable {
         cx = 0;
         cz = 0;
         Arrays.fill(voxels, (byte) 0);
-        {
+        { // reset: voxelAttributesMap
             for (VoxelAttributes a : voxelAttributesMap.values()) {
                 VoxelAttributes.POOL.free(a);
             }

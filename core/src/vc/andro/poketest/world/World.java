@@ -73,7 +73,7 @@ public class World {
         return getChunkAt_G_CP(WxCx(wx), WzCz(wz));
     }
 
-    public Chunk createBlankChunkAt_CP(int cx, int cz) {
+    public Chunk putEmptyChunkAt_CP(int cx, int cz) {
         if (getChunkAt_CP(cx, cz) != null) {
             throw new IllegalArgumentException("A chunk already exists at %d,%d".formatted(cx, cz));
         }
@@ -88,10 +88,21 @@ public class World {
         return getChunkAt_CP(WxCx(wx), WzCz(wz));
     }
 
+    public void generateChunkAt_CP(int cx, int cz) {
+        worldGenerator.generateChunk(cx, cz);
+    }
+
+    public void generateChunkAt_CP_IfNotExists(int cx, int cz) {
+        Chunk chunk = getChunkAt_CP(cx, cz);
+        if (chunk == null) {
+            generateChunkAt_CP(cx, cz);
+        }
+    }
+
     public Chunk getChunkAt_G_CP(int cx, int cz) {
         Chunk chunk = getChunkAt_CP(cx, cz);
         if (chunk == null) {
-            worldGenerator.generateChunk(cx, cz);
+            generateChunkAt_CP(cx, cz);
             chunk = getChunkAt_CP(cx, cz);
             assert chunk != null : "chunk should have generated";
         }
