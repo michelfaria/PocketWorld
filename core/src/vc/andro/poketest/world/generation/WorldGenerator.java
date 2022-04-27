@@ -39,8 +39,7 @@ public class WorldGenerator {
 
         altitudeMapGenerator = new AltitudeMapGenerator(
                 new FastNoise(params.seed, FastNoise.NoiseType.Perlin),
-                params
-        );
+                params);
         treeSpawner = new WorldGenEntitySpawner<>(
                 new SimpleVegetationEntitySpawnProspector(
                         new VegetationMapGenerator(new BlueNoise(params.seed)) {
@@ -50,8 +49,7 @@ public class WorldGenerator {
                             }
                         },
                         2, 2),
-                new SimpleEntitySpawner<>(TreeEntity.class)
-        );
+                new SimpleEntitySpawner<>(TreeEntity.class));
         flowerSpawner = new WorldGenEntitySpawner<>(
                 new SimpleVegetationEntitySpawnProspector(
                         new VegetationMapGenerator(new BlueNoise(params.seed + 1)) {
@@ -60,13 +58,11 @@ public class WorldGenerator {
                                 return params.flowerMapRValue;
                             }
                         }),
-                new SimpleEntitySpawner<>(FlowerEntity.class)
-        );
+                new SimpleEntitySpawner<>(FlowerEntity.class));
         tallGrassSpawner = new WorldGenEntitySpawner<>(
                 new SimpleVegetationEntitySpawnProspector(
                         new GrassPatchMapGenerator(new FastNoise(params.seed + 1, FastNoise.NoiseType.Perlin))),
-                new SimpleEntitySpawner<>(TallGrassEntity.class)
-        );
+                new SimpleEntitySpawner<>(TallGrassEntity.class));
         world = new World(this);
     }
 
@@ -129,6 +125,7 @@ public class WorldGenerator {
         }
     }
 
+    @NotNull
     public World getWorld() {
         return world;
     }

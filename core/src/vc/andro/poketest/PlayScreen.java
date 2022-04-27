@@ -49,7 +49,7 @@ public class PlayScreen implements Screen {
         mainRenderSystem.update();
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
-            world.getChunks().values().forEach(Chunk::forceRerender);
+            world.getChunks().forEach(Chunk::forceRerender);
         }
 
         if (GeneralSettingsRegistry.debugChunkGenerateOnKeyPress && Gdx.input.isKeyJustPressed(Input.Keys.G)) {

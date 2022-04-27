@@ -3,10 +3,7 @@ package vc.andro.poketest.world;
 import com.badlogic.gdx.utils.IntMap;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import java.util.function.Consumer;
 
 public class CoordMat<T> {
 
@@ -19,8 +16,8 @@ public class CoordMat<T> {
     /**
      * Gets an entry at (x, y) or null
      */
-    public @Nullable
-    T get(int x, int y) {
+    @Nullable
+    public synchronized T get(int x, int y) {
         IntMap<T> ym = map.get(x);
         if (ym == null) {
             return null;
@@ -31,8 +28,8 @@ public class CoordMat<T> {
     /**
      * Sets an entry at (x, y). Returns a T if it replaced something.
      */
-    public @Nullable
-    T set(int x, int y, T val) {
+    @Nullable
+    public synchronized T set(int x, int y, T val) {
         IntMap<T> ym = map.get(x);
         if (ym == null) {
             ym = new IntMap<>();
@@ -41,14 +38,16 @@ public class CoordMat<T> {
         return ym.put(y, val);
     }
 
-    public Stream<T> values() {
-        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(map.values(), Spliterator.ORDERED), false)
-                .map(IntMap::values)
-                .flatMap(it -> StreamSupport.stream(Spliterators.spliteratorUnknownSize(it, Spliterator.ORDERED), false));
+    public synchronized void forEach(Consumer<T> fn) {
+        for (IntMap<T> ym : map.values()) {
+            for (T v : ym.values()) {
+                fn.accept(v);
+            }
+        }
     }
 
-    public @Nullable
-    T remove(int x, int y) {
+    @Nullable
+    public synchronized T remove(int x, int y) {
         IntMap<T> ym = map.get(x);
         if (ym == null) {
             return null;

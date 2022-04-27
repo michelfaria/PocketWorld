@@ -33,9 +33,9 @@ public class Chunk implements Pool.Poolable {
     private ChunkRenderingStrategy chunkRenderingStrategy;
     private boolean initialized;
 
-    public final ReentrantReadWriteLock lock;
-    public final Lock writeLock;
-    public final Lock readLock;
+    private final ReentrantReadWriteLock lock;
+    private final Lock writeLock;
+    private final Lock readLock;
 
     private Chunk() {
         voxels = new byte[CHUNK_SIZE * CHUNK_DEPTH * CHUNK_SIZE];
@@ -113,7 +113,7 @@ public class Chunk implements Pool.Poolable {
      */
     public VoxelAttributes getVoxelAttrsAt_G_LP(int lx, int ly, int lz) {
         throwIfUninitialized();
-        VoxelAttributes attrs = voxelAttributesMap.get(calcVoxelArrayPosition_LP(lx, ly, lz));
+        VoxelAttributes attrs = getVoxelAttrsAt_LP(lx, ly, lz);
         if (attrs == null) {
             attrs = VoxelAttributes.POOL.obtain();
             putVoxelAttrsAt_LP(lx, ly, lz, attrs);
@@ -460,5 +460,15 @@ public class Chunk implements Pool.Poolable {
 
     public boolean isInitialized() {
         return initialized;
+    }
+
+    public Lock getWriteLock() {
+        throwIfUninitialized();
+        return writeLock;
+    }
+
+    public Lock getReadLock() {
+        throwIfUninitialized();
+        return readLock;
     }
 }

@@ -31,7 +31,7 @@ public class UnloadChunksWorldUpdateStep implements WorldUpdateStep {
     @Override
     public void update(World world, float delta) {
         chunks.clear();
-        world.getChunks().values().forEach(chunk -> {
+        world.getChunks().forEach(chunk -> {
             if (world.isChunkOutsideOfRenderDistance(chunk)) {
                 chunks.add(chunk);
             }
