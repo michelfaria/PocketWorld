@@ -1,6 +1,6 @@
 package vc.andro.poketest.voxel.rendering.faces;
 
-import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.Direction;
@@ -205,65 +205,69 @@ public class NeoFaceGenerator implements FaceGenerator {
         }
     }
 
-    private float flip1and0(float n) {
-        if (MathUtils.isEqual(n, 0.0f)) {
-            return 1.0f;
-        } else if (MathUtils.isEqual(n, 1.0f)) {
-            return 0.0f;
-        } else {
-            return n;
-        }
+    private Vector3 calculateNormals(Vector3 vert0, Vector3 vert1, Vector3 vert2) {
+        Vector3 vp = vert1.cpy().sub(vert0);
+        Vector3 vq = vert1.cpy().sub(vert2);
+        Vector3 vp_cross_vq = vp.cpy().crs(vq);
+        return vp_cross_vq.nor();
     }
 
     @Override
-    public void createTopVertices(VertexArray vertices, IndexArray indices, byte voxel,
-                                  @Nullable VoxelAttributes attributes, int wx, int wy, int wz) {
+    public synchronized void createTopVertices(VertexArray vertices, IndexArray indices, byte voxel,
+                                               @Nullable VoxelAttributes attributes, int wx, int wy, int wz) {
         UVCalculator uvCalc = uvCalculators.getFace(CubicGroup.Face.TOP);
 
         float hNorthwest = getHeightInDirection(NORTHWEST, attributes);
+        float hNortheast = getHeightInDirection(NORTHEAST, attributes);
+        float hSouthEast = getHeightInDirection(SOUTHEAST, attributes);
+        float hSouthwest = getHeightInDirection(SOUTHWEST, attributes);
+        Vector3 nwVert = new Vector3(wx, wy + hNorthwest, wz);
+        Vector3 neVert = new Vector3(wx + 1, wy + hNortheast, wz);
+        Vector3 swVert = new Vector3(wx + 1, wy + hSouthEast, wz + 1);
+        Vector3 seVert = new Vector3(wx, wy + hSouthEast, wz + 1);
+
+        Vector3 normals = calculateNormals(nwVert, neVert, seVert);
+
         vertices.addVertex8f(
                 wx,
                 wy + hNorthwest,
                 wz,
-                hNorthwest > 0.0f ? 0.0f : 0.5f,
-                hNorthwest,
-                hNorthwest > 0.0f ? 0.0f : 0.5f,
+                normals.x,
+                normals.y,
+                normals.z,
                 uvCalc.getU(CubicGroup.Face.TOP, voxel, wx, wy, wz),
                 uvCalc.getV(CubicGroup.Face.TOP, voxel, wx, wy, wz)
         );
 
-        float hNortheast = getHeightInDirection(NORTHEAST, attributes);
         vertices.addVertex8f(
                 wx + 1,
                 wy + hNortheast,
                 wz,
-                hNortheast > 0.0f ? 0.0f : 0.5f,
-                hNortheast,
-                hNortheast > 0.0f ? 0.0f : 0.5f,
+                normals.x,
+                normals.y,
+                normals.z,
                 uvCalc.getU2(CubicGroup.Face.TOP, voxel, wx, wy, wz),
                 uvCalc.getV(CubicGroup.Face.TOP, voxel, wx, wy, wz)
         );
 
-        float hSouthEast = getHeightInDirection(SOUTHEAST, attributes);
         vertices.addVertex8f(
                 wx + 1,
                 wy + hSouthEast,
                 wz + 1,
-                hSouthEast > 0.0f ? 0.0f : 0.5f,
-                hSouthEast,
-                hSouthEast > 0.0f ? 0.0f : 0.5f,
+                normals.x,
+                normals.y,
+                normals.z,
                 uvCalc.getU2(CubicGroup.Face.TOP, voxel, wx, wy, wz),
                 uvCalc.getV2(CubicGroup.Face.TOP, voxel, wx, wy, wz)
         );
 
-        float hSouthwest = getHeightInDirection(SOUTHWEST, attributes);
         vertices.addVertex8f(
                 wx,
                 wy + hSouthwest,
                 wz + 1,
-                hSouthwest > 0.0f ? 0.0f : 0.5f,
-                hSouthwest,
-                hSouthwest > 0.0f ? 0.0f : 0.5f,
+                normals.x,
+                normals.y,
+                normals.z,
                 uvCalc.getU(CubicGroup.Face.TOP, voxel, wx, wy, wz),
                 uvCalc.getV2(CubicGroup.Face.TOP, voxel, wx, wy, wz)
         );
