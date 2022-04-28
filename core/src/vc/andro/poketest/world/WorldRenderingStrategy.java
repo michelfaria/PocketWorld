@@ -36,7 +36,15 @@ public class WorldRenderingStrategy implements RenderableProvider {
                 if (chunk == null) {
                     continue;
                 }
-                chunk.getChunkRenderingStrategy().getRenderables(renderables, pool);
+                chunk.getLock().writeLock().lock();
+                try {
+                    if (!chunk.isFullyInitialized()) {
+                        chunk.fullyInitialize();
+                    }
+                    chunk.getChunkRenderingStrategy().getRenderables(renderables, pool);
+                } finally {
+                    chunk.getLock().writeLock().unlock();
+                }
                 chunksRendered++;
             }
         }
@@ -45,12 +53,17 @@ public class WorldRenderingStrategy implements RenderableProvider {
 
     public void renderEntities(DecalBatch decalBatch) {
         int rendered = 0;
-        for (Entity entity : world.getEntities()) {
-            if (!cam.isVisible(entity)) {
-                continue;
+        world.getEntitiesLock().readLock().lock();
+        try {
+            for (Entity entity : world.getEntities()) {
+                if (!cam.isVisible(entity)) {
+                    continue;
+                }
+                entity.draw(decalBatch);
+                rendered++;
             }
-            entity.draw(decalBatch);
-            rendered++;
+        } finally {
+            world.getEntitiesLock().readLock().unlock();
         }
         DebugInfoRegistry.entitiesRendered = rendered;
     }

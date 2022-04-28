@@ -48,13 +48,11 @@ public class PlayScreen implements Screen {
         world.update(delta);
         mainRenderSystem.update();
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
-            world.getChunks().forEach(Chunk::forceRerender);
-        }
-
         if (GeneralSettingsRegistry.debugChunkGenerateOnKeyPress && Gdx.input.isKeyJustPressed(Input.Keys.G)) {
             world.generateChunkAtViewpoint();
         }
+
+        world.generateQueuedChunks();
 
         if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
             Chunk c = world.getChunkAtViewpoint();
