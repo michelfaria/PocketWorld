@@ -12,7 +12,6 @@ import vc.andro.poketest.voxel.VoxelSpec;
 import vc.andro.poketest.voxel.VoxelSpecs;
 
 import java.util.Arrays;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static vc.andro.poketest.world.World.LxWx;
 import static vc.andro.poketest.world.World.LzWz;
@@ -32,26 +31,19 @@ public class Chunk implements Pool.Poolable {
     private       ChunkRenderingStrategy  chunkRenderingStrategy;
     private       boolean                 initialized;
     private       boolean                 graphicsInitialized;
-    private final ReentrantReadWriteLock  lock;
     private       boolean                 needsRenderingUpdate;
 
     private Chunk() {
         voxels = new byte[CHUNK_SIZE * CHUNK_DEPTH * CHUNK_SIZE];
         voxelAttributesMap = new IntMap<>();
-        lock = new ReentrantReadWriteLock();
     }
 
     public void init(@NotNull World world, int cx, int cz) {
-        lock.writeLock().lock();
-        try {
-            this.world = world;
-            this.cx = cx;
-            this.cz = cz;
-            initialized = true;
-            needsRenderingUpdate = true;
-        } finally {
-            lock.writeLock().unlock();
-        }
+        this.world = world;
+        this.cx = cx;
+        this.cz = cz;
+        initialized = true;
+        needsRenderingUpdate = true;
     }
 
     public void fullyInitialize() {
@@ -61,26 +53,21 @@ public class Chunk implements Pool.Poolable {
 
     @Override
     public void reset() {
-        lock.writeLock().lock();
-        try {
-            world = null;
-            cx = 0;
-            cz = 0;
-            Arrays.fill(voxels, (byte) 0);
-            { // reset: voxelAttributesMap
-                for (VoxelAttributes a : voxelAttributesMap.values()) {
-                    VoxelAttributes.POOL.free(a);
-                }
-                voxelAttributesMap.clear();
+        world = null;
+        cx = 0;
+        cz = 0;
+        Arrays.fill(voxels, (byte) 0);
+        { // reset: voxelAttributesMap
+            for (VoxelAttributes a : voxelAttributesMap.values()) {
+                VoxelAttributes.POOL.free(a);
             }
-            voxelCount = 0;
-            chunkRenderingStrategy = null;
-            initialized = false;
-            graphicsInitialized = false;
-            needsRenderingUpdate = false;
-        } finally {
-            lock.writeLock().unlock();
+            voxelAttributesMap.clear();
         }
+        voxelCount = 0;
+        chunkRenderingStrategy = null;
+        initialized = false;
+        graphicsInitialized = false;
+        needsRenderingUpdate = false;
     }
 
     private void throwIfUninitialized() {
@@ -104,13 +91,8 @@ public class Chunk implements Pool.Poolable {
      * @return Voxel
      */
     public byte getVoxelAt_LP(int lx, int ly, int lz) {
-        lock.readLock().lock();
-        try {
-            throwIfUninitialized();
-            return voxels[calcVoxelArrayPosition_LP(lx, ly, lz)];
-        } finally {
-            lock.readLock().unlock();
-        }
+        throwIfUninitialized();
+        return voxels[calcVoxelArrayPosition_LP(lx, ly, lz)];
     }
 
     /**
@@ -123,13 +105,8 @@ public class Chunk implements Pool.Poolable {
      */
     @Nullable
     public VoxelAttributes getVoxelAttrsAt_LP(int lx, int ly, int lz) {
-        lock.readLock().lock();
-        try {
-            throwIfUninitialized();
-            return voxelAttributesMap.get(calcVoxelArrayPosition_LP(lx, ly, lz));
-        } finally {
-            lock.readLock().unlock();
-        }
+        throwIfUninitialized();
+        return voxelAttributesMap.get(calcVoxelArrayPosition_LP(lx, ly, lz));
     }
 
     /**
@@ -142,18 +119,13 @@ public class Chunk implements Pool.Poolable {
      * @return VoxelAttributes or null
      */
     public VoxelAttributes getVoxelAttrsAt_G_LP(int lx, int ly, int lz) {
-        lock.readLock().lock();
-        try {
-            throwIfUninitialized();
-            VoxelAttributes attrs = getVoxelAttrsAt_LP(lx, ly, lz);
-            if (attrs == null) {
-                attrs = VoxelAttributes.POOL.obtain();
-                putVoxelAttrsAt_LP(lx, ly, lz, attrs);
-            }
-            return attrs;
-        } finally {
-            lock.readLock().unlock();
+        throwIfUninitialized();
+        VoxelAttributes attrs = getVoxelAttrsAt_LP(lx, ly, lz);
+        if (attrs == null) {
+            attrs = VoxelAttributes.POOL.obtain();
+            putVoxelAttrsAt_LP(lx, ly, lz, attrs);
         }
+        return attrs;
     }
 
     /**
@@ -166,16 +138,11 @@ public class Chunk implements Pool.Poolable {
      * @param voxelAttributes
      */
     public void putVoxelAttrsAt_LP(int lx, int ly, int lz, @NotNull VoxelAttributes voxelAttributes) {
-        lock.writeLock().lock();
-        try {
-            throwIfUninitialized();
-            int pos = calcVoxelArrayPosition_LP(lx, ly, lz);
-            VoxelAttributes oldValue = voxelAttributesMap.put(pos, voxelAttributes);
-            if (oldValue != null) {
-                VoxelAttributes.POOL.free(oldValue);
-            }
-        } finally {
-            lock.writeLock().unlock();
+        throwIfUninitialized();
+        int pos = calcVoxelArrayPosition_LP(lx, ly, lz);
+        VoxelAttributes oldValue = voxelAttributesMap.put(pos, voxelAttributes);
+        if (oldValue != null) {
+            VoxelAttributes.POOL.free(oldValue);
         }
     }
 
@@ -189,13 +156,8 @@ public class Chunk implements Pool.Poolable {
      * @throws IllegalStateException If there is no voxel attribute associated with the voxel at position (lx, ly, lz).
      */
     public void delVoxelAttrsAt_LP(int lx, int ly, int lz) {
-        lock.writeLock().lock();
-        try {
-            throwIfUninitialized();
-            delVoxelAttrsAt_LP(lx, ly, lz, false);
-        } finally {
-            lock.writeLock().unlock();
-        }
+        throwIfUninitialized();
+        delVoxelAttrsAt_LP(lx, ly, lz, false);
     }
 
     /**
@@ -210,18 +172,13 @@ public class Chunk implements Pool.Poolable {
      *                               attribute associated with the voxel at position (lx, ly, lz).
      */
     public void delVoxelAttrsAt_LP(int lx, int ly, int lz, boolean ignoreNonexisting) {
-        lock.writeLock().lock();
-        try {
-            throwIfUninitialized();
-            int pos = calcVoxelArrayPosition_LP(lx, ly, lz);
-            VoxelAttributes removedValue = voxelAttributesMap.remove(pos);
-            if (removedValue == null) {
-                throw new IllegalStateException("No attribute for voxel (%d, %d, %d)".formatted(lx, ly, lz));
-            }
-            VoxelAttributes.POOL.free(removedValue);
-        } finally {
-            lock.writeLock().unlock();
+        throwIfUninitialized();
+        int pos = calcVoxelArrayPosition_LP(lx, ly, lz);
+        VoxelAttributes removedValue = voxelAttributesMap.remove(pos);
+        if (removedValue == null) {
+            throw new IllegalStateException("No attribute for voxel (%d, %d, %d)".formatted(lx, ly, lz));
         }
+        VoxelAttributes.POOL.free(removedValue);
     }
 
     /**
@@ -234,13 +191,8 @@ public class Chunk implements Pool.Poolable {
      * @return
      */
     private int calcVoxelArrayPosition_LP(int lx, int ly, int lz) {
-        lock.readLock().lock();
-        try {
-            throwIfUninitialized();
-            return ArrayUtil.xyzToI(CHUNK_SIZE, CHUNK_DEPTH, lx, ly, lz);
-        } finally {
-            lock.readLock().unlock();
-        }
+        throwIfUninitialized();
+        return ArrayUtil.xyzToI(CHUNK_SIZE, CHUNK_DEPTH, lx, ly, lz);
     }
 
     /**
@@ -253,13 +205,8 @@ public class Chunk implements Pool.Poolable {
      * @param voxel Voxel to put
      */
     public void putVoxelAt_LP(int lx, int ly, int lz, byte voxel) {
-        lock.writeLock().lock();
-        try {
-            throwIfUninitialized();
-            putVoxelAt_LP(lx, ly, lz, voxel, false);
-        } finally {
-            lock.writeLock().unlock();
-        }
+        throwIfUninitialized();
+        putVoxelAt_LP(lx, ly, lz, voxel, false);
     }
 
     /**
@@ -273,46 +220,36 @@ public class Chunk implements Pool.Poolable {
      * @param keepAttributes If set to true, the attributes of the previous voxel won't be deleted.
      */
     public void putVoxelAt_LP(int lx, int ly, int lz, byte voxel, boolean keepAttributes) {
-        lock.writeLock().lock();
-        try {
-            throwIfUninitialized();
-            byte prevVoxel = getVoxelAt_LP(lx, ly, lz);
-            if (prevVoxel == 0 && voxel != 0) {
-                voxelCount++;
-            } else if (prevVoxel != 0 && voxel == 0) {
-                voxelCount--;
-                if (!keepAttributes) {
-                    delVoxelAttrsAt_LP(lx, ly, lz, true);
-                }
+        throwIfUninitialized();
+        byte prevVoxel = getVoxelAt_LP(lx, ly, lz);
+        if (prevVoxel == 0 && voxel != 0) {
+            voxelCount++;
+        } else if (prevVoxel != 0 && voxel == 0) {
+            voxelCount--;
+            if (!keepAttributes) {
+                delVoxelAttrsAt_LP(lx, ly, lz, true);
             }
-            voxels[calcVoxelArrayPosition_LP(lx, ly, lz)] = voxel;
-            needsRenderingUpdate = true;
-        } finally {
-            lock.writeLock().unlock();
         }
+        voxels[calcVoxelArrayPosition_LP(lx, ly, lz)] = voxel;
+        needsRenderingUpdate = true;
     }
 
     /**
      * Updates all voxels in this chunk. This method is thread safe.
      */
     public void updateVoxels() {
-        lock.writeLock().lock();
-        try {
-            throwIfUninitialized();
-            for (int lx = 0; lx < CHUNK_SIZE; lx++) {
-                for (int wy = 0; wy < CHUNK_DEPTH; wy++) {
-                    for (int lz = 0; lz < CHUNK_SIZE; lz++) {
-                        byte v = getVoxelAt_LP(lx, wy, lz);
-                        if (v == 0) {
-                            continue;
-                        }
-                        // FIXME
-                        // v.doTileUpdate();
+        throwIfUninitialized();
+        for (int lx = 0; lx < CHUNK_SIZE; lx++) {
+            for (int wy = 0; wy < CHUNK_DEPTH; wy++) {
+                for (int lz = 0; lz < CHUNK_SIZE; lz++) {
+                    byte v = getVoxelAt_LP(lx, wy, lz);
+                    if (v == 0) {
+                        continue;
                     }
+                    // FIXME
+                    // v.doTileUpdate();
                 }
             }
-        } finally {
-            lock.writeLock().unlock();
         }
     }
 
@@ -325,19 +262,14 @@ public class Chunk implements Pool.Poolable {
      * @return The voxel or invalid value (-1)
      */
     public int getSurfaceVoxelWy_LP(int lx, int lz) {
-        lock.readLock().lock();
-        try {
-            throwIfUninitialized();
-            for (int wy = CHUNK_DEPTH - 1; wy >= 0; wy--) {
-                byte v = getVoxelAt_LP(lx, wy, lz);
-                if (v != 0) {
-                    return wy;
-                }
+        throwIfUninitialized();
+        for (int wy = CHUNK_DEPTH - 1; wy >= 0; wy--) {
+            byte v = getVoxelAt_LP(lx, wy, lz);
+            if (v != 0) {
+                return wy;
             }
-            return -1;
-        } finally {
-            lock.readLock().unlock();
         }
+        return -1;
     }
 
     /**
@@ -345,18 +277,13 @@ public class Chunk implements Pool.Poolable {
      * This method is thread safe.
      */
     public void slopifyVoxels(boolean propagateToSurroundingChunks) {
-        lock.writeLock().lock();
-        try {
-            throwIfUninitialized();
-            for (int lx = 0; lx < CHUNK_SIZE; lx++) {
-                for (int y = 0; y < CHUNK_DEPTH; y++) {
-                    for (int lz = 0; lz < CHUNK_SIZE; lz++) {
-                        slopifyVoxel_LP(lx, y, lz, propagateToSurroundingChunks);
-                    }
+        throwIfUninitialized();
+        for (int lx = 0; lx < CHUNK_SIZE; lx++) {
+            for (int y = 0; y < CHUNK_DEPTH; y++) {
+                for (int lz = 0; lz < CHUNK_SIZE; lz++) {
+                    slopifyVoxel_LP(lx, y, lz, propagateToSurroundingChunks);
                 }
             }
-        } finally {
-            lock.writeLock().unlock();
         }
     }
 
@@ -370,143 +297,138 @@ public class Chunk implements Pool.Poolable {
      * @param propagateToSurroundingChunks If set to true, sloping will propagate to adjacent voxels that are outside the specified chunk
      */
     private void slopifyVoxel_LP(int lx, int y, int lz, boolean propagateToSurroundingChunks) {
-        lock.writeLock().lock();
-        try {
-            throwIfUninitialized();
-            byte voxel = getVoxelAt_LP(lx, y, lz);
-            if (voxel == 0) {
-                return;
-            }
-            VoxelSpec voxelSpec = VoxelSpecs.VOXEL_TYPES[voxel];
-            if (!voxelSpec.canBeSloped) {
-                return;
-            }
+        throwIfUninitialized();
+        byte voxel = getVoxelAt_LP(lx, y, lz);
+        if (voxel == 0) {
+            return;
+        }
+        VoxelSpec voxelSpec = VoxelSpecs.VOXEL_TYPES[voxel];
+        if (!voxelSpec.canBeSloped) {
+            return;
+        }
 
-            int wx = LxWx(cx, lx);
-            int wz = LzWz(cz, lz);
+        int wx = LxWx(cx, lx);
+        int wz = LzWz(cz, lz);
 
-            boolean isVoxelAbove = y < CHUNK_DEPTH - 1 && getWorld().getVoxelAt_WP(wx, y + 1, wz) != 0;
-            if (isVoxelAbove) {
-                return;
-            }
+        boolean isVoxelAbove = y < CHUNK_DEPTH - 1 && getWorld().getVoxelAt_WP(wx, y + 1, wz) != 0;
+        if (isVoxelAbove) {
+            return;
+        }
 
-            boolean isVoxelBelow = y > 0 && getWorld().getVoxelAt_WP(wx, y - 1, wz) != 0;
-            if (!isVoxelBelow) {
-                return;
-            }
+        boolean isVoxelBelow = y > 0 && getWorld().getVoxelAt_WP(wx, y - 1, wz) != 0;
+        if (!isVoxelBelow) {
+            return;
+        }
 
-            byte voxelWest = world.getVoxelAt_WP(wx - 1, y, wz);
-            byte voxelEast = world.getVoxelAt_WP(wx + 1, y, wz);
-            byte voxelSouth = world.getVoxelAt_WP(wx, y, wz + 1);
-            byte voxelNorth = world.getVoxelAt_WP(wx, y, wz - 1);
-            byte voxelNorthwest = world.getVoxelAt_WP(wx - 1, y, wz - 1);
-            byte voxelNortheast = world.getVoxelAt_WP(wx + 1, y, wz - 1);
-            byte voxelSouthwest = world.getVoxelAt_WP(wx - 1, y, wz + 1);
-            byte voxelSoutheast = world.getVoxelAt_WP(wx + 1, y, wz + 1);
+        byte voxelWest = world.getVoxelAt_WP(wx - 1, y, wz);
+        byte voxelEast = world.getVoxelAt_WP(wx + 1, y, wz);
+        byte voxelSouth = world.getVoxelAt_WP(wx, y, wz + 1);
+        byte voxelNorth = world.getVoxelAt_WP(wx, y, wz - 1);
+        byte voxelNorthwest = world.getVoxelAt_WP(wx - 1, y, wz - 1);
+        byte voxelNortheast = world.getVoxelAt_WP(wx + 1, y, wz - 1);
+        byte voxelSouthwest = world.getVoxelAt_WP(wx - 1, y, wz + 1);
+        byte voxelSoutheast = world.getVoxelAt_WP(wx + 1, y, wz + 1);
 
         /*
           Southwest-facing corner
           ▢ ▢
           ▢ ◢
          */
-            if (voxelNorthwest == 0 && voxelWest == 0 && voxelNorth == 0) {
-                slopifyVoxel(lx, y, lz, Direction.NORTHWEST, false);
-            }
+        if (voxelNorthwest == 0 && voxelWest == 0 && voxelNorth == 0) {
+            slopifyVoxel(lx, y, lz, Direction.NORTHWEST, false);
+        }
         /*
           Northeast-facing corner
           ▢ ▢
           ◣ ▢
          */
-            else if (voxelNorth == 0 && voxelNortheast == 0 && voxelEast == 0) {
-                slopifyVoxel(lx, y, lz, Direction.NORTHEAST, false);
-            }
+        else if (voxelNorth == 0 && voxelNortheast == 0 && voxelEast == 0) {
+            slopifyVoxel(lx, y, lz, Direction.NORTHEAST, false);
+        }
         /*
           Southwest-facing corner
           ▢ ◥
           ▢ ▢
          */
-            else if (voxelSouthwest == 0 && voxelWest == 0 && voxelSouth == 0) {
-                slopifyVoxel(lx, y, lz, Direction.SOUTHWEST, false);
-            }
+        else if (voxelSouthwest == 0 && voxelWest == 0 && voxelSouth == 0) {
+            slopifyVoxel(lx, y, lz, Direction.SOUTHWEST, false);
+        }
         /*
           Southeast-facing corner
           ◤ ▢
           ▢ ▢
          */
-            else if (voxelSoutheast == 0 && voxelEast == 0 && voxelSouth == 0) {
-                slopifyVoxel(lx, y, lz, Direction.SOUTHEAST, false);
-            }
+        else if (voxelSoutheast == 0 && voxelEast == 0 && voxelSouth == 0) {
+            slopifyVoxel(lx, y, lz, Direction.SOUTHEAST, false);
+        }
         /*
           Northwest-facing inner corner
           ▢ |
           _ 」←
          */
-            else if (voxelNorthwest == 0 && voxelWest > 0 && voxelNorth > 0) {
-                slopifyVoxel(lx, y, lz, Direction.NORTHWEST, true);
-            }
+        else if (voxelNorthwest == 0 && voxelWest > 0 && voxelNorth > 0) {
+            slopifyVoxel(lx, y, lz, Direction.NORTHWEST, true);
+        }
         /*
          Northeast-facing inner corner
            | ▢
          → ⌞ _
          */
-            else if (voxelNortheast == 0 && voxelEast > 0 && voxelNorth > 0) {
-                slopifyVoxel(lx, y, lz, Direction.NORTHEAST, true);
-            }
+        else if (voxelNortheast == 0 && voxelEast > 0 && voxelNorth > 0) {
+            slopifyVoxel(lx, y, lz, Direction.NORTHEAST, true);
+        }
         /*
          Southwest-facing inner corner
             ̅ ⌝ ←
            ▢ |
          */
-            else if (voxelSouthwest == 0 && voxelWest > 0 && voxelSouth > 0) {
-                slopifyVoxel(lx, y, lz, Direction.SOUTHWEST, true);
-            }
+        else if (voxelSouthwest == 0 && voxelWest > 0 && voxelSouth > 0) {
+            slopifyVoxel(lx, y, lz, Direction.SOUTHWEST, true);
+        }
         /*
          Southeast-facing inner corner
           → ⌜  ̅
             | ▢
          */
-            else if (voxelSoutheast == 0 && voxelEast > 0 && voxelSouth > 0) {
-                slopifyVoxel(lx, y, lz, Direction.SOUTHEAST, true);
-            }
-            /*  West edge */
-            else if (voxelWest == 0) {
-                slopifyVoxel(lx, y, lz, Direction.WEST, false);
-            }
-            /* East edge */
-            else if (voxelEast == 0) {
-                slopifyVoxel(lx, y, lz, Direction.EAST, false);
-            }
-            /* South edge */
-            else if (voxelSouth == 0) {
-                slopifyVoxel(lx, y, lz, Direction.SOUTH, false);
-            }
-            /* North edge */
-            else if (voxelNorth == 0) {
-                slopifyVoxel(lx, y, lz, Direction.NORTH, false);
-            }
+        else if (voxelSoutheast == 0 && voxelEast > 0 && voxelSouth > 0) {
+            slopifyVoxel(lx, y, lz, Direction.SOUTHEAST, true);
+        }
+        /*  West edge */
+        else if (voxelWest == 0) {
+            slopifyVoxel(lx, y, lz, Direction.WEST, false);
+        }
+        /* East edge */
+        else if (voxelEast == 0) {
+            slopifyVoxel(lx, y, lz, Direction.EAST, false);
+        }
+        /* South edge */
+        else if (voxelSouth == 0) {
+            slopifyVoxel(lx, y, lz, Direction.SOUTH, false);
+        }
+        /* North edge */
+        else if (voxelNorth == 0) {
+            slopifyVoxel(lx, y, lz, Direction.NORTH, false);
+        }
 
-            if (propagateToSurroundingChunks) {
-                if (lx == 0 || lz == 0 || lx == CHUNK_SIZE - 1 || lz == CHUNK_SIZE - 1) {
-                    int cxΔ = 0;
-                    if (lx == 0) {
-                        cxΔ = -1;
-                    } else if (lx == CHUNK_SIZE - 1) {
-                        cxΔ = 1;
-                    }
-                    int czΔ = 0;
-                    if (lz == 0) {
-                        czΔ = -1;
-                    } else if (lz == CHUNK_SIZE - 1) {
-                        czΔ = 1;
-                    }
-                    Chunk c = world.getChunkAt_CP(getCx() + cxΔ, getCz() + czΔ);
-                    if (c != null) {
-                        c.slopifyVoxels(false);
-                    }
+        if (propagateToSurroundingChunks) {
+            if (lx == 0 || lz == 0 || lx == CHUNK_SIZE - 1 || lz == CHUNK_SIZE - 1) {
+                int cxΔ = 0;
+                if (lx == 0) {
+                    cxΔ = -1;
+                } else if (lx == CHUNK_SIZE - 1) {
+                    cxΔ = 1;
+                }
+                int czΔ = 0;
+                if (lz == 0) {
+                    czΔ = -1;
+                } else if (lz == CHUNK_SIZE - 1) {
+                    czΔ = 1;
+                }
+                Chunk c = world.getChunkAt_CP(getCx() + cxΔ, getCz() + czΔ);
+                if (c != null) {
+                    c.slopifyVoxels(false);
                 }
             }
-        } finally {
-            lock.writeLock().unlock();
         }
     }
 
@@ -520,29 +442,19 @@ public class Chunk implements Pool.Poolable {
      * @param isInnerCorner
      */
     private void slopifyVoxel(int lx, int y, int lz, byte slopeDirection, boolean isInnerCorner) {
-        lock.writeLock().lock();
-        try {
-            throwIfUninitialized();
-            VoxelAttributes attrs = getVoxelAttrsAt_G_LP(lx, y, lz);
-            attrs.configureSlope(slopeDirection, isInnerCorner);
-            byte voxel = getVoxelAt_LP(lx, y, lz);
-            if (VoxelSpecs.VOXEL_TYPES[voxel] == VoxelSpecs.GRASS) {
-                putVoxelAt_LP(lx, y, lz, VoxelSpecs.getVoxelId(VoxelSpecs.DIRT), true);
-            }
-        } finally {
-            lock.writeLock().unlock();
+        throwIfUninitialized();
+        VoxelAttributes attrs = getVoxelAttrsAt_G_LP(lx, y, lz);
+        attrs.configureSlope(slopeDirection, isInnerCorner);
+        byte voxel = getVoxelAt_LP(lx, y, lz);
+        if (VoxelSpecs.VOXEL_TYPES[voxel] == VoxelSpecs.GRASS) {
+            putVoxelAt_LP(lx, y, lz, VoxelSpecs.getVoxelId(VoxelSpecs.DIRT), true);
         }
     }
 
     @Deprecated
     public void forceRerender() {
-        lock.writeLock().lock();
-        try {
-            throwIfNotFullyInitialized();
-            setNeedsRenderingUpdate(true);
-        } finally {
-            lock.writeLock().unlock();
-        }
+        throwIfNotFullyInitialized();
+        setNeedsRenderingUpdate(true);
     }
 
     @Override
@@ -554,43 +466,23 @@ public class Chunk implements Pool.Poolable {
     }
 
     public World getWorld() {
-        lock.readLock().lock();
-        try {
-            throwIfUninitialized();
-            return world;
-        } finally {
-            lock.readLock().unlock();
-        }
+        throwIfUninitialized();
+        return world;
     }
 
     public int getCx() {
-        lock.readLock().lock();
-        try {
-            throwIfUninitialized();
-            return cx;
-        } finally {
-            lock.readLock().unlock();
-        }
+        throwIfUninitialized();
+        return cx;
     }
 
     public int getCz() {
-        lock.readLock().lock();
-        try {
-            throwIfUninitialized();
-            return cz;
-        } finally {
-            lock.readLock().unlock();
-        }
+        throwIfUninitialized();
+        return cz;
     }
 
     public ChunkRenderingStrategy getChunkRenderingStrategy() {
-        lock.readLock().lock();
-        try {
-            throwIfNotFullyInitialized();
-            return chunkRenderingStrategy;
-        } finally {
-            lock.readLock().unlock();
-        }
+        throwIfNotFullyInitialized();
+        return chunkRenderingStrategy;
     }
 
     public boolean isInitialized() {
@@ -599,10 +491,6 @@ public class Chunk implements Pool.Poolable {
 
     public boolean isFullyInitialized() {
         return initialized && graphicsInitialized;
-    }
-
-    public ReentrantReadWriteLock getLock() {
-        return lock;
     }
 
     boolean needsRenderingUpdate() {

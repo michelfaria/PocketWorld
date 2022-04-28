@@ -15,7 +15,7 @@ import static vc.andro.poketest.world.World.WzCz;
 
 public class WorldRenderingStrategy implements RenderableProvider {
     private final PocketCamera cam;
-    private final World world;
+    private final World        world;
 
     public WorldRenderingStrategy(PocketCamera cam, World world) {
         this.cam = cam;
@@ -36,15 +36,10 @@ public class WorldRenderingStrategy implements RenderableProvider {
                 if (chunk == null) {
                     continue;
                 }
-                chunk.getLock().writeLock().lock();
-                try {
-                    if (!chunk.isFullyInitialized()) {
-                        chunk.fullyInitialize();
-                    }
-                    chunk.getChunkRenderingStrategy().getRenderables(renderables, pool);
-                } finally {
-                    chunk.getLock().writeLock().unlock();
+                if (!chunk.isFullyInitialized()) {
+                    chunk.fullyInitialize();
                 }
+                chunk.getChunkRenderingStrategy().getRenderables(renderables, pool);
                 chunksRendered++;
             }
         }
@@ -53,17 +48,12 @@ public class WorldRenderingStrategy implements RenderableProvider {
 
     public void renderEntities(DecalBatch decalBatch) {
         int rendered = 0;
-        world.getEntitiesLock().readLock().lock();
-        try {
-            for (Entity entity : world.getEntities()) {
-                if (!cam.isVisible(entity)) {
-                    continue;
-                }
-                entity.draw(decalBatch);
-                rendered++;
+        for (Entity entity : world.getEntities()) {
+            if (!cam.isVisible(entity)) {
+                continue;
             }
-        } finally {
-            world.getEntitiesLock().readLock().unlock();
+            entity.draw(decalBatch);
+            rendered++;
         }
         DebugInfoRegistry.entitiesRendered = rendered;
     }

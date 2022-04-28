@@ -84,52 +84,41 @@ public class WorldGenerator {
      * @param cz Chunk Z
      */
     public void queueChunkForGeneration(int cx, int cz) {
-        synchronized (chunksQueued) {
-            chunksQueued.add(new Pair<>(cx, cz));
-        }
+        chunksQueued.add(new Pair<>(cx, cz));
     }
 
     public synchronized void generateQueuedChunks() {
-        //   ThreadService.submit(() -> {
-        //       synchronized (chunksQueued) {
-        for (Pair<Integer, Integer> queuedChunk : chunksQueued) {
-            int cx = queuedChunk.left;
-            int cz = queuedChunk.right;
+     //   ThreadService.submit(() -> {
+      //      synchronized (chunksQueued) {
+                for (Pair<Integer, Integer> queuedChunk : chunksQueued) {
+                    int cx = queuedChunk.left;
+                    int cz = queuedChunk.right;
 
-            log("Generating chunk: " + cx + ", " + cz);
-            Chunk chunk = world.putEmptyChunkAt_CP(cx, cz);
+                    log("Generating chunk: " + cx + ", " + cz);
+                    Chunk chunk = world.putEmptyChunkAt_CP(cx, cz);
 
-            chunk.getLock().writeLock().lock();
-            try {
-                for (int lx = 0; lx < CHUNK_SIZE; lx++) {
-                    for (int lz = 0; lz < CHUNK_SIZE; lz++) {
-                        generateColumn(chunk, lx, lz);
+
+                    for (int lx = 0; lx < CHUNK_SIZE; lx++) {
+                        for (int lz = 0; lz < CHUNK_SIZE; lz++) {
+                            generateColumn(chunk, lx, lz);
+                        }
                     }
+
+                    chunk.slopifyVoxels(true);
+
+                    treeSpawner.spawnEntitiesInChunk(chunk);
+                    flowerSpawner.spawnEntitiesInChunk(chunk);
+                    tallGrassSpawner.spawnEntitiesInChunk(chunk);
+
+                    world.updateChunk(cx, cz);
                 }
-
-                chunk.slopifyVoxels(true);
-
-                treeSpawner.spawnEntitiesInChunk(chunk);
-                flowerSpawner.spawnEntitiesInChunk(chunk);
-                tallGrassSpawner.spawnEntitiesInChunk(chunk);
-
-                world.updateChunk(cx, cz);
-            } finally {
-                chunk.getLock().writeLock().unlock();
-            }
-        }
-        chunksQueued.clear();
-        //      }
-        //  });
+                chunksQueued.clear();
+     //       }
+     //   });
     }
 
     private void generateColumn(Chunk chunk, int lx, int lz) {
-        chunk.getLock().writeLock().lock();
-        try {
-            generateColumn(chunk, lx, lz, -1);
-        } finally {
-            chunk.getLock().writeLock().unlock();
-        }
+        generateColumn(chunk, lx, lz, -1);
     }
 
     /**
@@ -142,30 +131,25 @@ public class WorldGenerator {
      * @param y     If -1, y will start at the altitude at the world position of lx,lz
      */
     private void generateColumn(Chunk chunk, int lx, int lz, int y) {
-        chunk.getLock().writeLock().lock();
-        try {
-            {
-                int wx = LxWx(chunk.getCx(), lx);
-                int wz = LzWz(chunk.getCz(), lz);
-                y = y < 0 ? altitudeMapGenerator.getAtPosition(wx, wz) : y;
-            }
+        {
+            int wx = LxWx(chunk.getCx(), lx);
+            int wz = LzWz(chunk.getCz(), lz);
+            y = y < 0 ? altitudeMapGenerator.getAtPosition(wx, wz) : y;
+        }
 
-            if (y <= params.waterLevel) {
-                // Is water tile
-                chunk.putVoxelAt_LP(lx, params.waterLevel, lz, VoxelSpecs.getVoxelId(VoxelSpecs.WATER));
-            } else if (y <= params.beachAltitude) {
-                // Is sand tile
-                chunk.putVoxelAt_LP(lx, y, lz, VoxelSpecs.getVoxelId(VoxelSpecs.SAND));
-            } else {
-                // Spawn grass
-                chunk.putVoxelAt_LP(lx, y, lz, VoxelSpecs.getVoxelId(VoxelSpecs.GRASS));
-            }
+        if (y <= params.waterLevel) {
+            // Is water tile
+            chunk.putVoxelAt_LP(lx, params.waterLevel, lz, VoxelSpecs.getVoxelId(VoxelSpecs.WATER));
+        } else if (y <= params.beachAltitude) {
+            // Is sand tile
+            chunk.putVoxelAt_LP(lx, y, lz, VoxelSpecs.getVoxelId(VoxelSpecs.SAND));
+        } else {
+            // Spawn grass
+            chunk.putVoxelAt_LP(lx, y, lz, VoxelSpecs.getVoxelId(VoxelSpecs.GRASS));
+        }
 
-            if (y > 0) {
-                generateColumn(chunk, lx, lz, y - 1);
-            }
-        } finally {
-            chunk.getLock().writeLock().unlock();
+        if (y > 0) {
+            generateColumn(chunk, lx, lz, y - 1);
         }
     }
 

@@ -12,17 +12,13 @@ import vc.andro.poketest.voxel.VoxelSpec;
 import vc.andro.poketest.voxel.VoxelSpecs;
 import vc.andro.poketest.world.generation.WorldGenerator;
 
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 import static vc.andro.poketest.world.Chunk.CHUNK_SIZE;
 
 public class World {
-    private final WorldGenerator         worldGenerator;
-    private final CoordMat<Chunk>        chunks       = new CoordMat<>();
-    private final Array<Entity>          entities     = new Array<>(Entity.class);
-    private final Vector3                viewpointWp  = new Vector3();
-    private final ReentrantReadWriteLock chunksLock   = new ReentrantReadWriteLock();
-    private final ReentrantReadWriteLock entitiesLock = new ReentrantReadWriteLock();
+    private final WorldGenerator  worldGenerator;
+    private final CoordMat<Chunk> chunks      = new CoordMat<>();
+    private final Array<Entity>   entities    = new Array<>(Entity.class);
+    private final Vector3         viewpointWp = new Vector3();
 
     private final Array<WorldUpdateStep> updateSteps = new Array<>(WorldUpdateStep.class);
 
@@ -37,35 +33,25 @@ public class World {
     }
 
     /**
-     * Adds an entity to this world. This method is thread safe.
+     * Adds an entity to this world.
      *
      * @param e Entity to add
      */
     public void addEntity(Entity e) {
-        entitiesLock.writeLock().lock();
-        try {
-            entities.add(e);
-        } finally {
-            entitiesLock.writeLock().unlock();
-        }
+        entities.add(e);
     }
 
     /**
-     * Ticks all entities in this world. This method is thread safe.
+     * Ticks all entities in this world.
      */
     public void tick() {
-        entitiesLock.readLock().lock();
-        try {
-            for (Entity entity : entities) {
-                entity.tick();
-            }
-        } finally {
-            entitiesLock.readLock().unlock();
+        for (Entity entity : entities) {
+            entity.tick();
         }
     }
 
     /**
-     * Updates this world. This method is thread safe.
+     * Updates this world.
      *
      * @param delta Delta
      */
@@ -76,26 +62,21 @@ public class World {
     }
 
     /**
-     * Updates the chunk at the specified chunk coordinates. This method is thread safe.
+     * Updates the chunk at the specified chunk coordinates.
      *
      * @param cx Chunk X
      * @param cz Chunk Z
      */
     public void updateChunk(int cx, int cz) {
-        chunksLock.writeLock().lock();
-        try {
-            Chunk chunk = getChunkAt_CP(cx, cz);
-            if (chunk == null) {
-                throw new NullPointerException("No chunk at (%d, %d)".formatted(cx, cz));
-            }
-            chunk.updateVoxels();
-        } finally {
-            chunksLock.writeLock().unlock();
+        Chunk chunk = getChunkAt_CP(cx, cz);
+        if (chunk == null) {
+            throw new NullPointerException("No chunk at (%d, %d)".formatted(cx, cz));
         }
+        chunk.updateVoxels();
     }
 
     /**
-     * Gets a voxel at a world coordinate. This method is thread safe.
+     * Gets a voxel at a world coordinate.
      *
      * @param wx World X
      * @param y  World Y
@@ -103,20 +84,15 @@ public class World {
      * @return The voxel, or -1 if it doesn't exist.
      */
     public byte getVoxelAt_WP(int wx, int y, int wz) {
-        chunksLock.readLock().lock();
-        try {
-            Chunk chunk = getChunkAt_CP(WxCx(wx), WzCz(wz));
-            if (chunk == null) {
-                return -1;
-            }
-            return chunk.getVoxelAt_LP(WxLx(wx), y, WzLz(wz));
-        } finally {
-            chunksLock.readLock().unlock();
+        Chunk chunk = getChunkAt_CP(WxCx(wx), WzCz(wz));
+        if (chunk == null) {
+            return -1;
         }
+        return chunk.getVoxelAt_LP(WxLx(wx), y, WzLz(wz));
     }
 
     /**
-     * Creates a blank chunk at the specified world coordinates. This method is thread safe.
+     * Creates a blank chunk at the specified world coordinates.
      *
      * @param cx Chunk X
      * @param cz Chunk Z
@@ -124,22 +100,17 @@ public class World {
      */
     @NotNull
     public Chunk putEmptyChunkAt_CP(int cx, int cz) {
-        chunksLock.writeLock().lock();
-        try {
-            if (getChunkAt_CP(cx, cz) != null) {
-                throw new IllegalArgumentException("A chunk already exists at %d,%d".formatted(cx, cz));
-            }
-            Chunk chunk = Chunk.POOL.obtain();
-            chunk.init(this, cx, cz);
-            chunks.set(cx, cz, chunk);
-            return chunk;
-        } finally {
-            chunksLock.writeLock().unlock();
+        if (getChunkAt_CP(cx, cz) != null) {
+            throw new IllegalArgumentException("A chunk already exists at %d,%d".formatted(cx, cz));
         }
+        Chunk chunk = Chunk.POOL.obtain();
+        chunk.init(this, cx, cz);
+        chunks.set(cx, cz, chunk);
+        return chunk;
     }
 
     /**
-     * Gets a chunk at the specified world coordinates. This method is thread safe.
+     * Gets a chunk at the specified world coordinates.
      *
      * @param wx World X
      * @param wz World Z
@@ -147,16 +118,11 @@ public class World {
      */
     @Nullable
     public Chunk getChunkAt_WP(int wx, int wz) {
-        chunksLock.readLock().lock();
-        try {
-            return getChunkAt_CP(WxCx(wx), WzCz(wz));
-        } finally {
-            chunksLock.readLock().unlock();
-        }
+        return getChunkAt_CP(WxCx(wx), WzCz(wz));
     }
 
     /**
-     * Generates a chunk at the specified chunk coordinates. This method is thread safe.
+     * Generates a chunk at the specified chunk coordinates.
      *
      * @param cx Chunk X
      * @param cz Chunk Z
@@ -166,25 +132,20 @@ public class World {
     }
 
     /**
-     * Generates a chunk at the specified chunk coordinates if it doesn't exist. This method is thread safe.
+     * Generates a chunk at the specified chunk coordinates if it doesn't exist.
      *
      * @param cx Chunk X
      * @param cz Chunk Z
      */
     public void generateChunkAt_CP_IfNotExists(int cx, int cz) {
-        chunksLock.writeLock().lock();
-        try {
-            Chunk chunk = getChunkAt_CP(cx, cz);
-            if (chunk == null) {
-                generateChunkAt_CP(cx, cz);
-            }
-        } finally {
-            chunksLock.writeLock().unlock();
+        Chunk chunk = getChunkAt_CP(cx, cz);
+        if (chunk == null) {
+            generateChunkAt_CP(cx, cz);
         }
     }
 
     /**
-     * Gets a Chunk at the specified chunk coordinates. This method is thread safe.
+     * Gets a Chunk at the specified chunk coordinates.
      *
      * @param cx Chunk X
      * @param cz Chunk Z
@@ -192,32 +153,22 @@ public class World {
      */
     @Nullable
     public Chunk getChunkAt_CP(int cx, int cz) {
-        chunksLock.readLock().lock();
-        try {
-            return chunks.get(cx, cz);
-        } finally {
-            chunksLock.readLock().unlock();
-        }
+        return chunks.get(cx, cz);
     }
 
     /**
-     * Gets the Y coordinate of the top-most voxel at the specified world X, Z coordinates. This method is thread safe.
+     * Gets the Y coordinate of the top-most voxel at the specified world X, Z coordinates.
      *
      * @param wx World X
      * @param wz World Z
      * @return Y coordinate of the top-most voxel at the specified (X, Z) position
      */
     public int getSurfaceVoxelWy_WP(int wx, int wz) {
-        chunksLock.readLock().lock();
-        try {
-            Chunk chunk = getChunkAt_CP(WxCx(wx), WzCz(wz));
-            if (chunk == null) {
-                return -1;
-            }
-            return chunk.getSurfaceVoxelWy_LP(WxLx(wx), WzLz(wz));
-        } finally {
-            chunksLock.readLock().unlock();
+        Chunk chunk = getChunkAt_CP(WxCx(wx), WzCz(wz));
+        if (chunk == null) {
+            return -1;
         }
+        return chunk.getSurfaceVoxelWy_LP(WxLx(wx), WzLz(wz));
     }
 
     public static int WxCx(float wx) {
@@ -257,26 +208,20 @@ public class World {
     }
 
     /**
-     * Removes the specified chunk from this world. This method is thread safe.
+     * Removes the specified chunk from this world.
      *
      * @param chunk Chunk to remove
      */
     public void unloadChunk(@NotNull Chunk chunk) {
-        chunksLock.writeLock().lock();
-        try {
-            if (chunks.remove(chunk.getCx(), chunk.getCz()) == null) {
-                throw new IllegalStateException("failed to remove chunk from chunk map");
-            }
-            Gdx.app.log("World", "Unloaded chunk at (" + chunk.getCx() + ", " + chunk.getCz() + ")!");
-            Chunk.POOL.free(chunk);
-        } finally {
-            chunksLock.writeLock().unlock();
+        if (chunks.remove(chunk.getCx(), chunk.getCz()) == null) {
+            throw new IllegalStateException("failed to remove chunk from chunk map");
         }
+        Gdx.app.log("World", "Unloaded chunk at (" + chunk.getCx() + ", " + chunk.getCz() + ")!");
+        Chunk.POOL.free(chunk);
     }
 
     /**
      * Returns true if the voxel at the specified world coordinates is effectively transparent.
-     * This method is thread safe.
      *
      * @param wx World X
      * @param y  World Y
@@ -284,36 +229,26 @@ public class World {
      * @return true if the voxel at the specified world coordinates is effectively transparent
      */
     public boolean isVoxelAtPosEffectivelyTransparent_WP(int wx, int y, int wz) {
-        chunksLock.readLock().lock();
-        try {
-            Chunk chunk = getChunkAt_WP(wx, wz);
-            if (chunk == null) {
-                return false;
-            }
-            chunk.getLock().readLock().lock();
-            try {
-                int lx = WxLx(wx);
-                int lz = WzLz(wz);
-                byte voxel = chunk.getVoxelAt_LP(lx, y, lz);
-                if (voxel <= 0) {
-                    return true;
-                }
-                VoxelSpec spec = VoxelSpecs.VOXEL_TYPES[voxel];
-                assert spec != null : "Voxel spec not found";
-                if (spec.transparent) {
-                    return true;
-                }
-                VoxelAttributes attrs = chunk.getVoxelAttrsAt_LP(lx, y, lz);
-                if (attrs != null && attrs.isSlope()) {
-                    return true;
-                }
-                return false;
-            } finally {
-                chunk.getLock().readLock().unlock();
-            }
-        } finally {
-            chunksLock.readLock().unlock();
+        Chunk chunk = getChunkAt_WP(wx, wz);
+        if (chunk == null) {
+            return false;
         }
+        int lx = WxLx(wx);
+        int lz = WzLz(wz);
+        byte voxel = chunk.getVoxelAt_LP(lx, y, lz);
+        if (voxel <= 0) {
+            return true;
+        }
+        VoxelSpec spec = VoxelSpecs.VOXEL_TYPES[voxel];
+        assert spec != null : "Voxel spec not found";
+        if (spec.transparent) {
+            return true;
+        }
+        VoxelAttributes attrs = chunk.getVoxelAttrsAt_LP(lx, y, lz);
+        if (attrs != null && attrs.isSlope()) {
+            return true;
+        }
+        return false;
     }
 
     public void setViewpoint(float wx, float wy, float wz) {
@@ -335,23 +270,16 @@ public class World {
 
     /**
      * Returns true if the specified chunk is outside the render distance.
-     * This method is thread safe.
      *
      * @param chunk
      * @return
      */
     public boolean isChunkOutsideOfRenderDistance(Chunk chunk) {
-        chunk.getLock().readLock().lock();
-        try {
-            return isChunkOutsideOfRenderDistance_CP(chunk.getCx(), chunk.getCz());
-        } finally {
-            chunk.getLock().readLock().unlock();
-        }
+        return isChunkOutsideOfRenderDistance_CP(chunk.getCx(), chunk.getCz());
     }
 
     /**
      * Returns true if the specified chunk coordinates are outside the render distance.
-     * This method is thread safe.
      *
      * @param cx Chunk X
      * @param cz Chunk Z
@@ -363,41 +291,23 @@ public class World {
     }
 
     /**
-     * Removes an entity from this world. This method is thread safe.
+     * Removes an entity from this world.
      *
      * @param e Entity to remove
      */
     public void removeEntity(Entity e) {
-        entitiesLock.writeLock().lock();
-        try {
-            if (!entities.removeValue(e, true)) {
-                throw new IllegalArgumentException("Entity does not exist in world");
-            }
-        } finally {
-            entitiesLock.writeLock().unlock();
+        if (!entities.removeValue(e, true)) {
+            throw new IllegalArgumentException("Entity does not exist in world");
         }
     }
 
     /**
-     * Generates a chunk at the world viewpoint. This method is thread safe.
+     * Generates a chunk at the world viewpoint.
      */
     public void generateChunkAtViewpoint() {
-        chunksLock.writeLock().lock();
-        try {
-            int cx = WxCx(viewpointWp.x);
-            int cz = WzCz(viewpointWp.z);
-            generateChunkAt_CP_IfNotExists(cx, cz);
-        } finally {
-            chunksLock.writeLock().unlock();
-        }
-    }
-
-    ReentrantReadWriteLock getChunksLock() {
-        return chunksLock;
-    }
-
-    ReentrantReadWriteLock getEntitiesLock() {
-        return entitiesLock;
+        int cx = WxCx(viewpointWp.x);
+        int cz = WzCz(viewpointWp.z);
+        generateChunkAt_CP_IfNotExists(cx, cz);
     }
 
     /**
