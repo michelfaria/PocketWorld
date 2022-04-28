@@ -1,4 +1,4 @@
-package vc.andro.poketest.world;
+package vc.andro.poketest.world.chunk.render;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -15,15 +15,16 @@ import vc.andro.poketest.Assets;
 import vc.andro.poketest.PocketWorld;
 import vc.andro.poketest.util.IndexArray;
 import vc.andro.poketest.util.VertexArray;
-import vc.andro.poketest.voxel.FaceGenerationStrategy;
 import vc.andro.poketest.voxel.VoxelAttributes;
+import vc.andro.poketest.voxel.VoxelSpec;
+import vc.andro.poketest.voxel.VoxelSpecs;
+import vc.andro.poketest.world.chunk.Chunk;
 
 import static vc.andro.poketest.util.VertexArray.VERTEX_SIZE;
-import static vc.andro.poketest.voxel.VoxelSpecs.VOXEL_TYPES;
-import static vc.andro.poketest.world.Chunk.CHUNK_DEPTH;
-import static vc.andro.poketest.world.Chunk.CHUNK_SIZE;
 import static vc.andro.poketest.world.World.LxWx;
 import static vc.andro.poketest.world.World.LzWz;
+import static vc.andro.poketest.world.chunk.Chunk.CHUNK_DEPTH;
+import static vc.andro.poketest.world.chunk.Chunk.CHUNK_SIZE;
 
 public class ChunkRenderingStrategy implements RenderableProvider {
 
@@ -68,40 +69,16 @@ public class ChunkRenderingStrategy implements RenderableProvider {
                 for (int lz = 0; lz < CHUNK_SIZE; lz++) {
                     for (int lx = 0; lx < CHUNK_SIZE; lx++) {
                         byte voxel = chunk.getVoxelAt_LP(lx, ly, lz);
-
                         if (voxel == 0) {
                             continue;
                         }
-
                         int wx = LxWx(chunk.getCx(), lx);
                         int wz = LzWz(chunk.getCz(), lz);
-
-                        byte voxelAbove = ly < CHUNK_DEPTH - 1 ? chunk.getVoxelAt_LP(lx, ly + 1, lz) : -1;
-                        byte voxelUnder = ly > 0 ? chunk.getVoxelAt_LP(lx, ly - 1, lz) : -1;
-                        byte voxelEast = chunk.getWorld().getVoxelAt_WP(wx + 1, ly, wz);
-                        byte voxelWest = chunk.getWorld().getVoxelAt_WP(wx - 1, ly, wz);
-                        byte voxelNorth = chunk.getWorld().getVoxelAt_WP(wx, ly, wz - 1);
-                        byte voxelSouth = chunk.getWorld().getVoxelAt_WP(wx, ly, wz + 1);
-                        FaceGenerationStrategy faceGenStrat = VOXEL_TYPES[voxel].faceGenerationStrategy;
-                        VoxelAttributes voxelAttributes = chunk.getVoxelAttrsAt_LP(lx, ly, lz);
-
-                        if (voxelAbove <= 0 || chunk.getWorld().isVoxelAtPosEffectivelyTransparent_WP(wx, ly + 1, wz)) {
-                            faceGenStrat.createTopVertices(vertexArray8f, indicesArray, voxel, voxelAttributes, wx, ly, wz);
-                        }
-                        if (voxelUnder <= 0 || chunk.getWorld().isVoxelAtPosEffectivelyTransparent_WP(wx, ly - 1, wz)) {
-                            faceGenStrat.createBottomVertices(vertexArray8f, indicesArray, voxel, voxelAttributes, wx, ly, wz);
-                        }
-                        if (voxelWest <= 0 || chunk.getWorld().isVoxelAtPosEffectivelyTransparent_WP(wx - 1, ly, wz)) {
-                            faceGenStrat.createWestVertices(vertexArray8f, indicesArray, voxel, voxelAttributes, wx, ly, wz);
-                        }
-                        if (voxelEast <= 0 || chunk.getWorld().isVoxelAtPosEffectivelyTransparent_WP(wx + 1, ly, wz)) {
-                            faceGenStrat.createEastVertices(vertexArray8f, indicesArray, voxel, voxelAttributes, wx, ly, wz);
-                        }
-                        if (voxelNorth <= 0 || chunk.getWorld().isVoxelAtPosEffectivelyTransparent_WP(wx, ly, wz - 1)) {
-                            faceGenStrat.createNorthVertices(vertexArray8f, indicesArray, voxel, voxelAttributes, wx, ly, wz);
-                        }
-                        if (voxelSouth <= 0 || chunk.getWorld().isVoxelAtPosEffectivelyTransparent_WP(wx, ly, wz + 1)) {
-                            faceGenStrat.createSouthVertices(vertexArray8f, indicesArray, voxel, voxelAttributes, wx, ly, wz);
+                        VoxelSpec spec = VoxelSpecs.getSpecForVoxel(voxel);
+                        VoxelRenderingStrategy renderStrat = spec.voxelRenderingStrategy;
+                        if (renderStrat != null) {
+                            VoxelAttributes attrs = chunk.getVoxelAttrsAt_LP(lx, ly, lz);
+                            renderStrat.render(chunk, voxel, lx, ly, lz, wx, wz, vertexArray8f, indicesArray, attrs);
                         }
                     }
                 }

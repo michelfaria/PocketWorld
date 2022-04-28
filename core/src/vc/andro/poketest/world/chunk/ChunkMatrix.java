@@ -1,15 +1,15 @@
-package vc.andro.poketest.world;
+package vc.andro.poketest.world.chunk;
 
 import com.badlogic.gdx.utils.IntMap;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-public class CoordMat<T> {
+public class ChunkMatrix<T> {
 
     public final IntMap<IntMap<T>> map; // (x -> y -> value)
 
-    public CoordMat() {
+    public ChunkMatrix() {
         map = new IntMap<>();
     }
 

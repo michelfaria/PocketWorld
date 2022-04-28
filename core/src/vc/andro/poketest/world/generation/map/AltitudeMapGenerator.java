@@ -5,7 +5,7 @@ import vc.andro.poketest.world.WorldCreationParams;
 import vc.andro.poketest.world.generation.FloatNoiseGenerator;
 import vc.andro.poketest.world.generation.IntNoiseGenerator;
 
-import static vc.andro.poketest.world.Chunk.CHUNK_DEPTH;
+import static vc.andro.poketest.world.chunk.Chunk.CHUNK_DEPTH;
 
 public class AltitudeMapGenerator implements IntNoiseGenerator {
 

@@ -1,8 +1,13 @@
 package vc.andro.poketest.voxel;
 
+import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.util.CubicGroup;
+import vc.andro.poketest.world.chunk.render.DefaultVoxelRenderingStrategy;
 
 public class VoxelSpecs {
+
+    public static final VoxelSpec AIR = new VoxelSpec(null, null, true, false, DefaultVoxelRenderingStrategy.getInstance());
+
     public static final VoxelSpec GRASS = new VoxelSpec(
             new CubicGroup<>(
                     "tile/bwgrass",
@@ -10,38 +15,42 @@ public class VoxelSpecs {
                     "tile/bwwall",
                     "tile/bwwall",
                     "tile/bwwall",
-                    "tile/bwwall"
-            ),
+                    "tile/bwwall"),
             null,
             false,
-            true
-    );
+            true, DefaultVoxelRenderingStrategy.getInstance());
+
     public static final VoxelSpec WATER = new VoxelSpec(
             CubicGroup.newAllSameFaces("tile/water"),
             null,
             false,
-            false
-    );
+            false, DefaultVoxelRenderingStrategy.getInstance());
+
     public static final VoxelSpec SAND = new VoxelSpec(
             CubicGroup.newAllSameFaces("tile/sand"),
             null,
             false,
-            true
-    );
+            true, DefaultVoxelRenderingStrategy.getInstance());
+
     public static final VoxelSpec DIRT = new VoxelSpec(
             CubicGroup.newAllSameFaces("tile/bwwall"),
             null,
             false,
-            true
-    );
+            true, DefaultVoxelRenderingStrategy.getInstance());
+
+    public static final VoxelSpec TALL_GRASS = new VoxelSpec(
+            CubicGroup.newOnlyTop("tile/tall_grass/tgrass00"),
+            null,
+            true,
+            false, DefaultVoxelRenderingStrategy.getInstance());
 
     public static final VoxelSpec[] VOXEL_TYPES = new VoxelSpec[]{
-            /*   0 */ null, // Null voxel
+            /*   0 */ AIR,
             /*   1 */ GRASS,
             /*   2 */ WATER,
             /*   3 */ SAND,
             /*   4 */ DIRT,
-            /*   5 */ null,
+            /*   5 */ TALL_GRASS,
             /*   6 */ null,
             /*   7 */ null,
             /*   8 */ null,
@@ -179,5 +188,13 @@ public class VoxelSpecs {
             }
         }
         return -1;
+    }
+
+    public static boolean canVoxelConnectWithSlopes(@Nullable VoxelSpec voxelSpec) {
+        return voxelSpec == null || voxelSpec.canBeSloped;
+    }
+
+    public static VoxelSpec getSpecForVoxel(byte voxel) {
+        return VoxelSpecs.VOXEL_TYPES[voxel];
     }
 }

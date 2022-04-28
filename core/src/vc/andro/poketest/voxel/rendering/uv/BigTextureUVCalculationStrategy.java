@@ -1,4 +1,4 @@
-package vc.andro.poketest.voxel;
+package vc.andro.poketest.voxel.rendering.uv;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import vc.andro.poketest.util.CubicGroup;

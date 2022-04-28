@@ -1,18 +1,18 @@
 package vc.andro.poketest.world.generation.entity;
 
 import org.jetbrains.annotations.NotNull;
-import vc.andro.poketest.world.Chunk;
+import vc.andro.poketest.world.chunk.Chunk;
 
-import static vc.andro.poketest.world.Chunk.CHUNK_SIZE;
+import static vc.andro.poketest.world.chunk.Chunk.CHUNK_SIZE;
 import static vc.andro.poketest.world.World.LxWx;
 import static vc.andro.poketest.world.World.LzWz;
 
-public class WorldGenEntitySpawner<T extends ProspectorResult> {
+public class WorldGenSpawner<T extends ProspectorResult> {
 
     private final SpawnProspector<T> spawnProspector;
-    private final EntitySpawner<T> entitySpawner;
+    private final Spawner<T>         entitySpawner;
 
-    public WorldGenEntitySpawner(SpawnProspector<T> spawnProspector, EntitySpawner<T> entitySpawner) {
+    public WorldGenSpawner(SpawnProspector<T> spawnProspector, Spawner<T> entitySpawner) {
         this.spawnProspector = spawnProspector;
         this.entitySpawner = entitySpawner;
     }
@@ -25,7 +25,7 @@ public class WorldGenEntitySpawner<T extends ProspectorResult> {
                 T result = spawnProspector.prospect(chunk, wx, wz, chunk.getCx(), chunk.getCz(), lx, lz);
                 if (result.shouldSpawn) {
                     assert result.spawnY != null : "Prospector should have determined Y position";
-                    entitySpawner.spawnEntity(result, chunk, wx, result.spawnY, wz, chunk.getCx(), chunk.getCz(), lx, lz);
+                    entitySpawner.spawn(result, chunk, wx, result.spawnY, wz, chunk.getCx(), chunk.getCz(), lx, lz);
                 }
             }
         }

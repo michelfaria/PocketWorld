@@ -1,6 +1,7 @@
 package vc.andro.poketest.world;
 
 import com.badlogic.gdx.utils.Array;
+import vc.andro.poketest.world.chunk.Chunk;
 
 public class UnloadChunksWorldUpdateStep implements WorldUpdateStep {
 

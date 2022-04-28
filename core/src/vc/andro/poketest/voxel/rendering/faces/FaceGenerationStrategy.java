@@ -1,8 +1,9 @@
-package vc.andro.poketest.voxel;
+package vc.andro.poketest.voxel.rendering.faces;
 
 import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.util.IndexArray;
 import vc.andro.poketest.util.VertexArray;
+import vc.andro.poketest.voxel.VoxelAttributes;
 
 public interface FaceGenerationStrategy {
     void createTopVertices(VertexArray vertices, IndexArray indices, byte voxel,

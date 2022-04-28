@@ -6,7 +6,7 @@ import com.badlogic.gdx.Screen;
 import vc.andro.poketest.graphics.DebugRenderSystem;
 import vc.andro.poketest.graphics.MainRenderSystem;
 import vc.andro.poketest.registry.GeneralSettingsRegistry;
-import vc.andro.poketest.world.Chunk;
+import vc.andro.poketest.world.chunk.Chunk;
 import vc.andro.poketest.world.World;
 import vc.andro.poketest.world.WorldCreationParams;
 import vc.andro.poketest.world.generation.WorldGenerator;

@@ -1,4 +1,4 @@
-package vc.andro.poketest.world;
+package vc.andro.poketest.world.chunk;
 
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Pool;
@@ -10,6 +10,8 @@ import vc.andro.poketest.util.ArrayUtil;
 import vc.andro.poketest.voxel.VoxelAttributes;
 import vc.andro.poketest.voxel.VoxelSpec;
 import vc.andro.poketest.voxel.VoxelSpecs;
+import vc.andro.poketest.world.World;
+import vc.andro.poketest.world.chunk.render.ChunkRenderingStrategy;
 
 import java.util.Arrays;
 
@@ -27,9 +29,9 @@ public class Chunk implements Pool.Poolable {
     private       int                     cz;
     private final byte[]                  voxels;
     private final IntMap<VoxelAttributes> voxelAttributesMap;
-    private       int                     voxelCount; // Amount of voxels that exist in this chunk
-    private       ChunkRenderingStrategy  chunkRenderingStrategy;
-    private       boolean                 initialized;
+    private int                    voxelCount; // Amount of voxels that exist in this chunk
+    private ChunkRenderingStrategy chunkRenderingStrategy;
+    private boolean                initialized;
     private       boolean                 graphicsInitialized;
     private       boolean                 needsRenderingUpdate;
 
@@ -320,21 +322,23 @@ public class Chunk implements Pool.Poolable {
             return;
         }
 
-        byte voxelWest = world.getVoxelAt_WP(wx - 1, y, wz);
-        byte voxelEast = world.getVoxelAt_WP(wx + 1, y, wz);
-        byte voxelSouth = world.getVoxelAt_WP(wx, y, wz + 1);
-        byte voxelNorth = world.getVoxelAt_WP(wx, y, wz - 1);
-        byte voxelNorthwest = world.getVoxelAt_WP(wx - 1, y, wz - 1);
-        byte voxelNortheast = world.getVoxelAt_WP(wx + 1, y, wz - 1);
-        byte voxelSouthwest = world.getVoxelAt_WP(wx - 1, y, wz + 1);
-        byte voxelSoutheast = world.getVoxelAt_WP(wx + 1, y, wz + 1);
-
+        @Nullable VoxelSpec voxelWest = world.getVoxelSpecAt_WP(wx - 1, y, wz);
+        @Nullable VoxelSpec voxelEast = world.getVoxelSpecAt_WP(wx + 1, y, wz);
+        @Nullable VoxelSpec voxelSouth = world.getVoxelSpecAt_WP(wx, y, wz + 1);
+        @Nullable VoxelSpec voxelNorth = world.getVoxelSpecAt_WP(wx, y, wz - 1);
+        @Nullable VoxelSpec voxelNorthwest = world.getVoxelSpecAt_WP(wx - 1, y, wz - 1);
+        @Nullable VoxelSpec voxelNortheast = world.getVoxelSpecAt_WP(wx + 1, y, wz - 1);
+        @Nullable VoxelSpec voxelSouthwest = world.getVoxelSpecAt_WP(wx - 1, y, wz + 1);
+        @Nullable VoxelSpec voxelSoutheast = world.getVoxelSpecAt_WP(wx + 1, y, wz + 1);
+        
         /*
           Southwest-facing corner
           ▢ ▢
           ▢ ◢
          */
-        if (voxelNorthwest == 0 && voxelWest == 0 && voxelNorth == 0) {
+        if (!VoxelSpecs.canVoxelConnectWithSlopes(voxelNorthwest)
+                && !VoxelSpecs.canVoxelConnectWithSlopes(voxelWest)
+                && !VoxelSpecs.canVoxelConnectWithSlopes(voxelNorth)) {
             slopifyVoxel(lx, y, lz, Direction.NORTHWEST, false);
         }
         /*
@@ -342,7 +346,9 @@ public class Chunk implements Pool.Poolable {
           ▢ ▢
           ◣ ▢
          */
-        else if (voxelNorth == 0 && voxelNortheast == 0 && voxelEast == 0) {
+        else if (!VoxelSpecs.canVoxelConnectWithSlopes(voxelNorth)
+                && !VoxelSpecs.canVoxelConnectWithSlopes(voxelNortheast)
+                && !VoxelSpecs.canVoxelConnectWithSlopes(voxelEast)) {
             slopifyVoxel(lx, y, lz, Direction.NORTHEAST, false);
         }
         /*
@@ -350,7 +356,9 @@ public class Chunk implements Pool.Poolable {
           ▢ ◥
           ▢ ▢
          */
-        else if (voxelSouthwest == 0 && voxelWest == 0 && voxelSouth == 0) {
+        else if (!VoxelSpecs.canVoxelConnectWithSlopes(voxelSouthwest)
+                && !VoxelSpecs.canVoxelConnectWithSlopes(voxelWest)
+                && !VoxelSpecs.canVoxelConnectWithSlopes(voxelSouth)) {
             slopifyVoxel(lx, y, lz, Direction.SOUTHWEST, false);
         }
         /*
@@ -358,7 +366,9 @@ public class Chunk implements Pool.Poolable {
           ◤ ▢
           ▢ ▢
          */
-        else if (voxelSoutheast == 0 && voxelEast == 0 && voxelSouth == 0) {
+        else if (!VoxelSpecs.canVoxelConnectWithSlopes(voxelSoutheast)
+                && !VoxelSpecs.canVoxelConnectWithSlopes(voxelEast)
+                && !VoxelSpecs.canVoxelConnectWithSlopes(voxelSouth)) {
             slopifyVoxel(lx, y, lz, Direction.SOUTHEAST, false);
         }
         /*
@@ -366,7 +376,9 @@ public class Chunk implements Pool.Poolable {
           ▢ |
           _ 」←
          */
-        else if (voxelNorthwest == 0 && voxelWest > 0 && voxelNorth > 0) {
+        else if (!VoxelSpecs.canVoxelConnectWithSlopes(voxelNorthwest)
+                && VoxelSpecs.canVoxelConnectWithSlopes(voxelWest)
+                && VoxelSpecs.canVoxelConnectWithSlopes(voxelNorth)) {
             slopifyVoxel(lx, y, lz, Direction.NORTHWEST, true);
         }
         /*
@@ -374,7 +386,9 @@ public class Chunk implements Pool.Poolable {
            | ▢
          → ⌞ _
          */
-        else if (voxelNortheast == 0 && voxelEast > 0 && voxelNorth > 0) {
+        else if (!VoxelSpecs.canVoxelConnectWithSlopes(voxelNortheast)
+                && VoxelSpecs.canVoxelConnectWithSlopes(voxelEast)
+                && VoxelSpecs.canVoxelConnectWithSlopes(voxelNorth)) {
             slopifyVoxel(lx, y, lz, Direction.NORTHEAST, true);
         }
         /*
@@ -382,7 +396,9 @@ public class Chunk implements Pool.Poolable {
             ̅ ⌝ ←
            ▢ |
          */
-        else if (voxelSouthwest == 0 && voxelWest > 0 && voxelSouth > 0) {
+        else if (!VoxelSpecs.canVoxelConnectWithSlopes(voxelSouthwest)
+                && VoxelSpecs.canVoxelConnectWithSlopes(voxelWest)
+                && VoxelSpecs.canVoxelConnectWithSlopes(voxelSouth)) {
             slopifyVoxel(lx, y, lz, Direction.SOUTHWEST, true);
         }
         /*
@@ -390,23 +406,25 @@ public class Chunk implements Pool.Poolable {
           → ⌜  ̅
             | ▢
          */
-        else if (voxelSoutheast == 0 && voxelEast > 0 && voxelSouth > 0) {
+        else if (!VoxelSpecs.canVoxelConnectWithSlopes(voxelSoutheast)
+                && VoxelSpecs.canVoxelConnectWithSlopes(voxelEast)
+                && VoxelSpecs.canVoxelConnectWithSlopes(voxelSouth)) {
             slopifyVoxel(lx, y, lz, Direction.SOUTHEAST, true);
         }
         /*  West edge */
-        else if (voxelWest == 0) {
+        else if (!VoxelSpecs.canVoxelConnectWithSlopes(voxelWest)) {
             slopifyVoxel(lx, y, lz, Direction.WEST, false);
         }
         /* East edge */
-        else if (voxelEast == 0) {
+        else if (!VoxelSpecs.canVoxelConnectWithSlopes(voxelEast)) {
             slopifyVoxel(lx, y, lz, Direction.EAST, false);
         }
         /* South edge */
-        else if (voxelSouth == 0) {
+        else if (!VoxelSpecs.canVoxelConnectWithSlopes(voxelSouth)) {
             slopifyVoxel(lx, y, lz, Direction.SOUTH, false);
         }
         /* North edge */
-        else if (voxelNorth == 0) {
+        else if (!VoxelSpecs.canVoxelConnectWithSlopes(voxelNorth)) {
             slopifyVoxel(lx, y, lz, Direction.NORTH, false);
         }
 
@@ -493,11 +511,11 @@ public class Chunk implements Pool.Poolable {
         return initialized && graphicsInitialized;
     }
 
-    boolean needsRenderingUpdate() {
+    public boolean needsRenderingUpdate() {
         return needsRenderingUpdate;
     }
 
-    void setNeedsRenderingUpdate(boolean needsRenderingUpdate) {
+    public void setNeedsRenderingUpdate(boolean needsRenderingUpdate) {
         this.needsRenderingUpdate = needsRenderingUpdate;
     }
 }

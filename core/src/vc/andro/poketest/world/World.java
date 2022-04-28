@@ -10,14 +10,16 @@ import vc.andro.poketest.registry.RenderSettingsRegistry;
 import vc.andro.poketest.voxel.VoxelAttributes;
 import vc.andro.poketest.voxel.VoxelSpec;
 import vc.andro.poketest.voxel.VoxelSpecs;
+import vc.andro.poketest.world.chunk.Chunk;
+import vc.andro.poketest.world.chunk.ChunkMatrix;
 import vc.andro.poketest.world.generation.WorldGenerator;
 
-import static vc.andro.poketest.world.Chunk.CHUNK_SIZE;
+import static vc.andro.poketest.world.chunk.Chunk.CHUNK_SIZE;
 
 public class World {
-    private final WorldGenerator  worldGenerator;
-    private final CoordMat<Chunk> chunks      = new CoordMat<>();
-    private final Array<Entity>   entities    = new Array<>(Entity.class);
+    private final WorldGenerator     worldGenerator;
+    private final ChunkMatrix<Chunk> chunks   = new ChunkMatrix<>();
+    private final Array<Entity>      entities = new Array<>(Entity.class);
     private final Vector3         viewpointWp = new Vector3();
 
     private final Array<WorldUpdateStep> updateSteps = new Array<>(WorldUpdateStep.class);
@@ -89,6 +91,23 @@ public class World {
             return -1;
         }
         return chunk.getVoxelAt_LP(WxLx(wx), y, WzLz(wz));
+    }
+
+    /**
+     * Gets a voxel at a world coordinate.
+     *
+     * @param wx World X
+     * @param y  World Y
+     * @param wz World Z
+     * @return The voxel spec, or -1 if it doesn't exist.
+     */
+    @Nullable
+    public VoxelSpec getVoxelSpecAt_WP(int wx, int y, int wz) {
+        byte voxel = getVoxelAt_WP(wx, y, wz);
+        if (voxel < 0) {
+            return null;
+        }
+        return VoxelSpecs.VOXEL_TYPES[voxel];
     }
 
     /**
@@ -315,7 +334,7 @@ public class World {
      *
      * @return
      */
-    CoordMat<Chunk> getChunks() {
+    ChunkMatrix<Chunk> getChunks() {
         return chunks;
     }
 

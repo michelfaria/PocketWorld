@@ -1,4 +1,4 @@
-package vc.andro.poketest.voxel;
+package vc.andro.poketest.voxel.rendering.uv;
 
 import vc.andro.poketest.util.CubicGroup;
 

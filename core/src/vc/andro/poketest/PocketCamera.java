@@ -10,8 +10,8 @@ import com.badlogic.gdx.math.Vector3;
 import vc.andro.poketest.entity.Entity;
 import vc.andro.poketest.world.World;
 
-import static vc.andro.poketest.world.Chunk.CHUNK_DEPTH;
-import static vc.andro.poketest.world.Chunk.CHUNK_SIZE;
+import static vc.andro.poketest.world.chunk.Chunk.CHUNK_DEPTH;
+import static vc.andro.poketest.world.chunk.Chunk.CHUNK_SIZE;
 import static vc.andro.poketest.world.World.CxWx;
 import static vc.andro.poketest.world.World.CzWz;
 

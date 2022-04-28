@@ -1,9 +1,9 @@
 package vc.andro.poketest.world.generation.entity;
 
 import vc.andro.poketest.entity.Entity;
-import vc.andro.poketest.world.Chunk;
+import vc.andro.poketest.world.chunk.Chunk;
 
-public class SimpleEntitySpawner<T extends Entity> implements EntitySpawner<ProspectorResult> {
+public class SimpleEntitySpawner<T extends Entity> implements Spawner<ProspectorResult> {
 
     private final Class<T> entityClass;
 
@@ -12,7 +12,7 @@ public class SimpleEntitySpawner<T extends Entity> implements EntitySpawner<Pros
     }
 
     @Override
-    public void spawnEntity(ProspectorResult prospectorResult, Chunk chunk, int wx, int y, int wz, int cx, int cz, int lx, int lz) {
+    public void spawn(ProspectorResult prospectorResult, Chunk chunk, int wx, int y, int wz, int cx, int cz, int lx, int lz) {
         try {
             T entity = entityClass.getDeclaredConstructor().newInstance();
             entity.setPosition(wx, y, wz);

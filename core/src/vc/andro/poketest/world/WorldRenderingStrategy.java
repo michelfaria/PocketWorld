@@ -9,6 +9,7 @@ import vc.andro.poketest.PocketCamera;
 import vc.andro.poketest.entity.Entity;
 import vc.andro.poketest.registry.DebugInfoRegistry;
 import vc.andro.poketest.registry.RenderSettingsRegistry;
+import vc.andro.poketest.world.chunk.Chunk;
 
 import static vc.andro.poketest.world.World.WxCx;
 import static vc.andro.poketest.world.World.WzCz;

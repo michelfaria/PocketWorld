@@ -32,6 +32,10 @@ public class CubicGroup<T> {
         return new CubicGroup<>(t, t, t, t, t, t);
     }
 
+    public static <T> CubicGroup<T> newOnlyTop(T t) {
+        return new CubicGroup<>(t, null, null, null, null, null);
+    }
+
     @CheckReturnValue
     public <R> CubicGroup<R> map(BiFunction<T, Face, R> mapper) {
         return new CubicGroup<>(

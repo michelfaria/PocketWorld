@@ -1,10 +1,12 @@
-package vc.andro.poketest.voxel;
+package vc.andro.poketest.voxel.rendering.faces;
 
 import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.Direction;
 import vc.andro.poketest.util.CubicGroup;
 import vc.andro.poketest.util.IndexArray;
 import vc.andro.poketest.util.VertexArray;
+import vc.andro.poketest.voxel.VoxelAttributes;
+import vc.andro.poketest.voxel.rendering.uv.UVCalculationStrategy;
 
 import static vc.andro.poketest.Direction.*;
 import static vc.andro.poketest.voxel.VoxelSpecs.VOXEL_TYPES;
