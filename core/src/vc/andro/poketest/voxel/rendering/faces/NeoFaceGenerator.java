@@ -1,5 +1,6 @@
 package vc.andro.poketest.voxel.rendering.faces;
 
+import com.badlogic.gdx.math.MathUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.Direction;
@@ -204,50 +205,65 @@ public class NeoFaceGenerator implements FaceGenerator {
         }
     }
 
+    private float flip1and0(float n) {
+        if (MathUtils.isEqual(n, 0.0f)) {
+            return 1.0f;
+        } else if (MathUtils.isEqual(n, 1.0f)) {
+            return 0.0f;
+        } else {
+            return n;
+        }
+    }
+
     @Override
-    public void createTopVertices(VertexArray vertices, IndexArray indices, byte voxel, @Nullable
-            VoxelAttributes attributes, int wx, int wy, int wz) {
+    public void createTopVertices(VertexArray vertices, IndexArray indices, byte voxel,
+                                  @Nullable VoxelAttributes attributes, int wx, int wy, int wz) {
         UVCalculator uvCalc = uvCalculators.getFace(CubicGroup.Face.TOP);
+
+        float hNorthwest = getHeightInDirection(NORTHWEST, attributes);
         vertices.addVertex8f(
                 wx,
-                wy + getHeightInDirection(NORTHWEST, attributes),
+                wy + hNorthwest,
                 wz,
-                0,
-                1,
-                0,
+                hNorthwest > 0.0f ? 0.0f : 0.5f,
+                hNorthwest,
+                hNorthwest > 0.0f ? 0.0f : 0.5f,
                 uvCalc.getU(CubicGroup.Face.TOP, voxel, wx, wy, wz),
                 uvCalc.getV(CubicGroup.Face.TOP, voxel, wx, wy, wz)
         );
 
+        float hNortheast = getHeightInDirection(NORTHEAST, attributes);
         vertices.addVertex8f(
                 wx + 1,
-                wy + getHeightInDirection(NORTHEAST, attributes),
+                wy + hNortheast,
                 wz,
-                0,
-                1,
-                0,
+                hNortheast > 0.0f ? 0.0f : 0.5f,
+                hNortheast,
+                hNortheast > 0.0f ? 0.0f : 0.5f,
                 uvCalc.getU2(CubicGroup.Face.TOP, voxel, wx, wy, wz),
                 uvCalc.getV(CubicGroup.Face.TOP, voxel, wx, wy, wz)
         );
 
+        float hSouthEast = getHeightInDirection(SOUTHEAST, attributes);
         vertices.addVertex8f(
                 wx + 1,
-                wy + getHeightInDirection(SOUTHEAST, attributes),
+                wy + hSouthEast,
                 wz + 1,
-                0,
-                1,
-                0,
+                hSouthEast > 0.0f ? 0.0f : 0.5f,
+                hSouthEast,
+                hSouthEast > 0.0f ? 0.0f : 0.5f,
                 uvCalc.getU2(CubicGroup.Face.TOP, voxel, wx, wy, wz),
                 uvCalc.getV2(CubicGroup.Face.TOP, voxel, wx, wy, wz)
         );
 
+        float hSouthwest = getHeightInDirection(SOUTHWEST, attributes);
         vertices.addVertex8f(
                 wx,
-                wy + getHeightInDirection(SOUTHWEST, attributes),
+                wy + hSouthwest,
                 wz + 1,
-                0,
-                1,
-                0,
+                hSouthwest > 0.0f ? 0.0f : 0.5f,
+                hSouthwest,
+                hSouthwest > 0.0f ? 0.0f : 0.5f,
                 uvCalc.getU(CubicGroup.Face.TOP, voxel, wx, wy, wz),
                 uvCalc.getV2(CubicGroup.Face.TOP, voxel, wx, wy, wz)
         );
