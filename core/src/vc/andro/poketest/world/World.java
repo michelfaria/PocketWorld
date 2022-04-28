@@ -260,7 +260,7 @@ public class World {
         }
         VoxelSpec spec = VoxelSpecs.VOXEL_TYPES[voxel];
         assert spec != null : "Voxel spec not found";
-        if (spec.transparent) {
+        if (spec.isTransparent()) {
             return true;
         }
         VoxelAttributes attrs = chunk.getVoxelAttrsAt_LP(lx, y, lz);

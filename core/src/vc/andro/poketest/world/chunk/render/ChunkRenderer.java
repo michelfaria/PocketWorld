@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.RenderableProvider;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
@@ -26,7 +27,7 @@ import static vc.andro.poketest.world.World.LzWz;
 import static vc.andro.poketest.world.chunk.Chunk.CHUNK_DEPTH;
 import static vc.andro.poketest.world.chunk.Chunk.CHUNK_SIZE;
 
-public class ChunkRenderingStrategy implements RenderableProvider {
+public class ChunkRenderer implements RenderableProvider {
 
     public static final int VOXELS_PER_CHUNK       = CHUNK_SIZE * CHUNK_DEPTH * CHUNK_SIZE;
     public static final int FACES_IN_A_CUBE        = 6;
@@ -42,7 +43,7 @@ public class ChunkRenderingStrategy implements RenderableProvider {
     private final Mesh        mesh;
     private final Material    material;
 
-    public ChunkRenderingStrategy(Chunk chunk) {
+    public ChunkRenderer(Chunk chunk) {
         this.chunk = chunk;
         vertexArray8f = new VertexArray();
         indicesArray = new IndexArray();
@@ -57,7 +58,8 @@ public class ChunkRenderingStrategy implements RenderableProvider {
                 new TextureAttribute(
                         TextureAttribute.Diffuse,
                         PocketWorld.assetManager.get(Assets.tileAtlas).getTextures().first()),
-                new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
+                new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA),
+                new FloatAttribute(FloatAttribute.AlphaTest, 0.0f));
     }
 
 
@@ -75,7 +77,7 @@ public class ChunkRenderingStrategy implements RenderableProvider {
                         int wx = LxWx(chunk.getCx(), lx);
                         int wz = LzWz(chunk.getCz(), lz);
                         VoxelSpec spec = VoxelSpecs.getSpecForVoxel(voxel);
-                        VoxelRenderingStrategy renderStrat = spec.voxelRenderingStrategy;
+                        VoxelRenderer renderStrat = spec.getVoxelRenderer();
                         if (renderStrat != null) {
                             VoxelAttributes attrs = chunk.getVoxelAttrsAt_LP(lx, ly, lz);
                             renderStrat.render(chunk, voxel, lx, ly, lz, wx, wz, vertexArray8f, indicesArray, attrs);

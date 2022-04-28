@@ -1,38 +1,22 @@
 package vc.andro.poketest.voxel.rendering.faces;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.Direction;
 import vc.andro.poketest.util.CubicGroup;
 import vc.andro.poketest.util.IndexArray;
 import vc.andro.poketest.util.VertexArray;
 import vc.andro.poketest.voxel.VoxelAttributes;
-import vc.andro.poketest.voxel.rendering.uv.UVCalculationStrategy;
+import vc.andro.poketest.voxel.rendering.uv.UVCalculator;
 
 import static vc.andro.poketest.Direction.*;
-import static vc.andro.poketest.voxel.VoxelSpecs.VOXEL_TYPES;
 
-public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
+public class NeoFaceGenerator implements FaceGenerator {
 
-    private static volatile NeoFaceGenerationStrategy sInstance;
+    private final @NotNull CubicGroup<UVCalculator> uvCalculators;
 
-    private NeoFaceGenerationStrategy() {
-        if (sInstance != null) {
-            throw new AssertionError(
-                    "Another instance of "
-                            + NeoFaceGenerationStrategy.class.getName()
-                            + " class already exists - can't create a new instance.");
-        }
-    }
-
-    public static NeoFaceGenerationStrategy getInstance() {
-        if (sInstance == null) {
-            synchronized (NeoFaceGenerationStrategy.class) {
-                if (sInstance == null) {
-                    sInstance = new NeoFaceGenerationStrategy();
-                }
-            }
-        }
-        return sInstance;
+    public NeoFaceGenerator(@NotNull CubicGroup<UVCalculator> uvCalculators) {
+        this.uvCalculators = uvCalculators;
     }
 
     @SuppressWarnings("DuplicatedCode")
@@ -223,7 +207,7 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
     @Override
     public void createTopVertices(VertexArray vertices, IndexArray indices, byte voxel, @Nullable
             VoxelAttributes attributes, int wx, int wy, int wz) {
-        UVCalculationStrategy strat = VOXEL_TYPES[voxel].uvCalculationStrategies.getFace(CubicGroup.Face.TOP);
+        UVCalculator uvCalc = uvCalculators.getFace(CubicGroup.Face.TOP);
         vertices.addVertex8f(
                 wx,
                 wy + getHeightInDirection(NORTHWEST, attributes),
@@ -231,8 +215,8 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
                 0,
                 1,
                 0,
-                strat.getU(CubicGroup.Face.TOP, voxel, wx, wy, wz),
-                strat.getV(CubicGroup.Face.TOP, voxel, wx, wy, wz)
+                uvCalc.getU(CubicGroup.Face.TOP, voxel, wx, wy, wz),
+                uvCalc.getV(CubicGroup.Face.TOP, voxel, wx, wy, wz)
         );
 
         vertices.addVertex8f(
@@ -242,8 +226,8 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
                 0,
                 1,
                 0,
-                strat.getU2(CubicGroup.Face.TOP, voxel, wx, wy, wz),
-                strat.getV(CubicGroup.Face.TOP, voxel, wx, wy, wz)
+                uvCalc.getU2(CubicGroup.Face.TOP, voxel, wx, wy, wz),
+                uvCalc.getV(CubicGroup.Face.TOP, voxel, wx, wy, wz)
         );
 
         vertices.addVertex8f(
@@ -253,8 +237,8 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
                 0,
                 1,
                 0,
-                strat.getU2(CubicGroup.Face.TOP, voxel, wx, wy, wz),
-                strat.getV2(CubicGroup.Face.TOP, voxel, wx, wy, wz)
+                uvCalc.getU2(CubicGroup.Face.TOP, voxel, wx, wy, wz),
+                uvCalc.getV2(CubicGroup.Face.TOP, voxel, wx, wy, wz)
         );
 
         vertices.addVertex8f(
@@ -264,8 +248,8 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
                 0,
                 1,
                 0,
-                strat.getU(CubicGroup.Face.TOP, voxel, wx, wy, wz),
-                strat.getV2(CubicGroup.Face.TOP, voxel, wx, wy, wz)
+                uvCalc.getU(CubicGroup.Face.TOP, voxel, wx, wy, wz),
+                uvCalc.getV2(CubicGroup.Face.TOP, voxel, wx, wy, wz)
         );
 
         indices.addSquare();
@@ -274,7 +258,7 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
     @Override
     public void createEastVertices(VertexArray vertices, IndexArray indices, byte voxel,
                                    @Nullable VoxelAttributes attributes, int wx, int wy, int wz) {
-        UVCalculationStrategy strat = VOXEL_TYPES[voxel].uvCalculationStrategies.getFace(CubicGroup.Face.EAST);
+        UVCalculator uvCalc = uvCalculators.getFace(CubicGroup.Face.EAST);
         vertices.addVertex8f(
                 wx + 1,
                 wy,
@@ -282,8 +266,8 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
                 1,
                 0,
                 0,
-                strat.getU(CubicGroup.Face.EAST, voxel, wx, wy, wz),
-                strat.getV(CubicGroup.Face.EAST, voxel, wx, wy, wz));
+                uvCalc.getU(CubicGroup.Face.EAST, voxel, wx, wy, wz),
+                uvCalc.getV(CubicGroup.Face.EAST, voxel, wx, wy, wz));
         vertices.addVertex8f(
                 wx + 1,
                 wy,
@@ -291,8 +275,8 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
                 1,
                 0,
                 0,
-                strat.getU2(CubicGroup.Face.EAST, voxel, wx, wy, wz),
-                strat.getV(CubicGroup.Face.EAST, voxel, wx, wy, wz));
+                uvCalc.getU2(CubicGroup.Face.EAST, voxel, wx, wy, wz),
+                uvCalc.getV(CubicGroup.Face.EAST, voxel, wx, wy, wz));
         vertices.addVertex8f(
                 wx + 1,
                 wy + getHeightInDirection(SOUTHEAST, attributes),
@@ -300,8 +284,8 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
                 1,
                 0,
                 0,
-                strat.getU2(CubicGroup.Face.EAST, voxel, wx, wy, wz),
-                strat.getV2(CubicGroup.Face.EAST, voxel, wx, wy, wz));
+                uvCalc.getU2(CubicGroup.Face.EAST, voxel, wx, wy, wz),
+                uvCalc.getV2(CubicGroup.Face.EAST, voxel, wx, wy, wz));
         vertices.addVertex8f(
                 wx + 1,
                 wy + getHeightInDirection(NORTHEAST, attributes),
@@ -309,8 +293,8 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
                 1,
                 0,
                 0,
-                strat.getU(CubicGroup.Face.EAST, voxel, wx, wy, wz),
-                strat.getV2(CubicGroup.Face.EAST, voxel, wx, wy, wz));
+                uvCalc.getU(CubicGroup.Face.EAST, voxel, wx, wy, wz),
+                uvCalc.getV2(CubicGroup.Face.EAST, voxel, wx, wy, wz));
 
         indices.addSquare();
     }
@@ -318,7 +302,7 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
     @Override
     public void createNorthVertices(VertexArray vertices, IndexArray indices, byte voxel,
                                     @Nullable VoxelAttributes attributes, int wx, int wy, int wz) {
-        UVCalculationStrategy strat = VOXEL_TYPES[voxel].uvCalculationStrategies.getFace(CubicGroup.Face.NORTH);
+        UVCalculator uvCalc = uvCalculators.getFace(CubicGroup.Face.NORTH);
         vertices.addVertex8f(
                 wx,
                 wy,
@@ -326,8 +310,8 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
                 0,
                 0,
                 1,
-                strat.getU(CubicGroup.Face.NORTH, voxel, wx, wy, wz),
-                strat.getV(CubicGroup.Face.NORTH, voxel, wx, wy, wz));
+                uvCalc.getU(CubicGroup.Face.NORTH, voxel, wx, wy, wz),
+                uvCalc.getV(CubicGroup.Face.NORTH, voxel, wx, wy, wz));
         vertices.addVertex8f(
                 wx + 1,
                 wy,
@@ -335,8 +319,8 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
                 0,
                 0,
                 1,
-                strat.getU2(CubicGroup.Face.NORTH, voxel, wx, wy, wz),
-                strat.getV(CubicGroup.Face.NORTH, voxel, wx, wy, wz));
+                uvCalc.getU2(CubicGroup.Face.NORTH, voxel, wx, wy, wz),
+                uvCalc.getV(CubicGroup.Face.NORTH, voxel, wx, wy, wz));
         vertices.addVertex8f(
                 wx + 1,
                 wy + getHeightInDirection(NORTHEAST, attributes),
@@ -344,8 +328,8 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
                 0,
                 0,
                 1,
-                strat.getU2(CubicGroup.Face.NORTH, voxel, wx, wy, wz),
-                strat.getV2(CubicGroup.Face.NORTH, voxel, wx, wy, wz));
+                uvCalc.getU2(CubicGroup.Face.NORTH, voxel, wx, wy, wz),
+                uvCalc.getV2(CubicGroup.Face.NORTH, voxel, wx, wy, wz));
         vertices.addVertex8f(
                 wx,
                 wy + getHeightInDirection(NORTHWEST, attributes),
@@ -353,8 +337,8 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
                 0,
                 0,
                 1,
-                strat.getU(CubicGroup.Face.NORTH, voxel, wx, wy, wz),
-                strat.getV2(CubicGroup.Face.NORTH, voxel, wx, wy, wz));
+                uvCalc.getU(CubicGroup.Face.NORTH, voxel, wx, wy, wz),
+                uvCalc.getV2(CubicGroup.Face.NORTH, voxel, wx, wy, wz));
 
         indices.addSquare();
     }
@@ -362,7 +346,7 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
     @Override
     public void createSouthVertices(VertexArray vertices, IndexArray indices, byte voxel,
                                     @Nullable VoxelAttributes attributes, int wx, int wy, int wz) {
-        UVCalculationStrategy strat = VOXEL_TYPES[voxel].uvCalculationStrategies.getFace(CubicGroup.Face.SOUTH);
+        UVCalculator uvCalc = uvCalculators.getFace(CubicGroup.Face.SOUTH);
         vertices.addVertex8f(
                 wx,
                 wy,
@@ -370,8 +354,8 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
                 0,
                 0,
                 -1,
-                strat.getU(CubicGroup.Face.SOUTH, voxel, wx, wy, wz),
-                strat.getV(CubicGroup.Face.SOUTH, voxel, wx, wy, wz));
+                uvCalc.getU(CubicGroup.Face.SOUTH, voxel, wx, wy, wz),
+                uvCalc.getV(CubicGroup.Face.SOUTH, voxel, wx, wy, wz));
         vertices.addVertex8f(
                 wx,
                 wy + getHeightInDirection(SOUTHWEST, attributes),
@@ -379,8 +363,8 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
                 0,
                 0,
                 -1,
-                strat.getU(CubicGroup.Face.SOUTH, voxel, wx, wy, wz),
-                strat.getV2(CubicGroup.Face.SOUTH, voxel, wx, wy, wz));
+                uvCalc.getU(CubicGroup.Face.SOUTH, voxel, wx, wy, wz),
+                uvCalc.getV2(CubicGroup.Face.SOUTH, voxel, wx, wy, wz));
         vertices.addVertex8f(
                 wx + 1,
                 wy + getHeightInDirection(SOUTHEAST, attributes),
@@ -388,8 +372,8 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
                 0,
                 0,
                 -1,
-                strat.getU2(CubicGroup.Face.SOUTH, voxel, wx, wy, wz),
-                strat.getV2(CubicGroup.Face.SOUTH, voxel, wx, wy, wz));
+                uvCalc.getU2(CubicGroup.Face.SOUTH, voxel, wx, wy, wz),
+                uvCalc.getV2(CubicGroup.Face.SOUTH, voxel, wx, wy, wz));
         vertices.addVertex8f(
                 wx + 1,
                 wy,
@@ -397,8 +381,8 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
                 0,
                 0,
                 -1,
-                strat.getU2(CubicGroup.Face.SOUTH, voxel, wx, wy, wz),
-                strat.getV(CubicGroup.Face.SOUTH, voxel, wx, wy, wz));
+                uvCalc.getU2(CubicGroup.Face.SOUTH, voxel, wx, wy, wz),
+                uvCalc.getV(CubicGroup.Face.SOUTH, voxel, wx, wy, wz));
 
         indices.addSquare();
     }
@@ -406,7 +390,7 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
     @Override
     public void createWestVertices(VertexArray vertices, IndexArray indices, byte voxel,
                                    @Nullable VoxelAttributes attributes, int wx, int wy, int wz) {
-        UVCalculationStrategy strat = VOXEL_TYPES[voxel].uvCalculationStrategies.getFace(CubicGroup.Face.WEST);
+        UVCalculator uvCalc = uvCalculators.getFace(CubicGroup.Face.WEST);
         vertices.addVertex8f(
                 wx,
                 wy,
@@ -414,8 +398,8 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
                 -1,
                 0,
                 0,
-                strat.getU(CubicGroup.Face.WEST, voxel, wx, wy, wz),
-                strat.getV(CubicGroup.Face.WEST, voxel, wx, wy, wz));
+                uvCalc.getU(CubicGroup.Face.WEST, voxel, wx, wy, wz),
+                uvCalc.getV(CubicGroup.Face.WEST, voxel, wx, wy, wz));
         vertices.addVertex8f(
                 wx,
                 wy + getHeightInDirection(NORTHWEST, attributes),
@@ -423,8 +407,8 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
                 -1,
                 0,
                 0,
-                strat.getU(CubicGroup.Face.WEST, voxel, wx, wy, wz),
-                strat.getV2(CubicGroup.Face.WEST, voxel, wx, wy, wz));
+                uvCalc.getU(CubicGroup.Face.WEST, voxel, wx, wy, wz),
+                uvCalc.getV2(CubicGroup.Face.WEST, voxel, wx, wy, wz));
         vertices.addVertex8f(
                 wx,
                 wy + getHeightInDirection(SOUTHWEST, attributes),
@@ -432,8 +416,8 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
                 -1,
                 0,
                 0,
-                strat.getU2(CubicGroup.Face.WEST, voxel, wx, wy, wz),
-                strat.getV2(CubicGroup.Face.WEST, voxel, wx, wy, wz));
+                uvCalc.getU2(CubicGroup.Face.WEST, voxel, wx, wy, wz),
+                uvCalc.getV2(CubicGroup.Face.WEST, voxel, wx, wy, wz));
 
         vertices.addVertex8f(
                 wx,
@@ -442,8 +426,8 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
                 -1,
                 0,
                 0,
-                strat.getU2(CubicGroup.Face.WEST, voxel, wx, wy, wz),
-                strat.getV(CubicGroup.Face.WEST, voxel, wx, wy, wz));
+                uvCalc.getU2(CubicGroup.Face.WEST, voxel, wx, wy, wz),
+                uvCalc.getV(CubicGroup.Face.WEST, voxel, wx, wy, wz));
 
         indices.addSquare();
     }
@@ -451,6 +435,7 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
     @Override
     public void createBottomVertices(VertexArray vertices, IndexArray indices, byte voxel,
                                      @Nullable VoxelAttributes attributes, int wx, int wy, int wz) {
+        UVCalculator uvCalc = uvCalculators.getFace(CubicGroup.Face.BOTTOM);
         vertices.addVertex8f(
                 wx,
                 wy,
@@ -458,8 +443,8 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
                 0,
                 -1,
                 0,
-                VOXEL_TYPES[voxel].uvCalculationStrategies.bottom.getU(CubicGroup.Face.BOTTOM, voxel, wx, wy, wz),
-                VOXEL_TYPES[voxel].uvCalculationStrategies.bottom.getV(CubicGroup.Face.BOTTOM, voxel, wx, wy, wz));
+                uvCalc.getU(CubicGroup.Face.BOTTOM, voxel, wx, wy, wz),
+                uvCalc.getV(CubicGroup.Face.BOTTOM, voxel, wx, wy, wz));
         vertices.addVertex8f(
                 wx,
                 wy,
@@ -467,8 +452,8 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
                 0,
                 -1,
                 0,
-                VOXEL_TYPES[voxel].uvCalculationStrategies.bottom.getU(CubicGroup.Face.BOTTOM, voxel, wx, wy, wz),
-                VOXEL_TYPES[voxel].uvCalculationStrategies.bottom.getV2(CubicGroup.Face.BOTTOM, voxel, wx, wy, wz));
+                uvCalc.getU(CubicGroup.Face.BOTTOM, voxel, wx, wy, wz),
+                uvCalc.getV2(CubicGroup.Face.BOTTOM, voxel, wx, wy, wz));
         vertices.addVertex8f(
                 wx + 1,
                 wy,
@@ -476,8 +461,8 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
                 0,
                 -1,
                 0,
-                VOXEL_TYPES[voxel].uvCalculationStrategies.bottom.getU2(CubicGroup.Face.BOTTOM, voxel, wx, wy, wz),
-                VOXEL_TYPES[voxel].uvCalculationStrategies.bottom.getV2(CubicGroup.Face.BOTTOM, voxel, wx, wy, wz));
+                uvCalc.getU2(CubicGroup.Face.BOTTOM, voxel, wx, wy, wz),
+                uvCalc.getV2(CubicGroup.Face.BOTTOM, voxel, wx, wy, wz));
         vertices.addVertex8f(
                 wx + 1,
                 wy,
@@ -485,8 +470,8 @@ public class NeoFaceGenerationStrategy implements FaceGenerationStrategy {
                 0,
                 -1,
                 0,
-                VOXEL_TYPES[voxel].uvCalculationStrategies.bottom.getU2(CubicGroup.Face.BOTTOM, voxel, wx, wy, wz),
-                VOXEL_TYPES[voxel].uvCalculationStrategies.bottom.getV(CubicGroup.Face.BOTTOM, voxel, wx, wy, wz));
+                uvCalc.getU2(CubicGroup.Face.BOTTOM, voxel, wx, wy, wz),
+                uvCalc.getV(CubicGroup.Face.BOTTOM, voxel, wx, wy, wz));
 
         indices.addSquare();
     }

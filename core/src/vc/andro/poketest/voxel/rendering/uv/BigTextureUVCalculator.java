@@ -6,24 +6,24 @@ import vc.andro.poketest.util.CubicGroup;
 import static vc.andro.poketest.PocketWorld.PPU;
 import static vc.andro.poketest.voxel.VoxelSpecs.VOXEL_TYPES;
 
-public class BigTextureUVCalculationStrategy implements UVCalculationStrategy {
+public class BigTextureUVCalculator implements UVCalculator {
 
-    private static volatile BigTextureUVCalculationStrategy sInstance = null;
+    private static volatile BigTextureUVCalculator sInstance = null;
 
-    private BigTextureUVCalculationStrategy() {
+    private BigTextureUVCalculator() {
         if (sInstance != null) {
             throw new AssertionError(
                     "Another instance of "
-                            + BigTextureUVCalculationStrategy.class.getName()
+                            + BigTextureUVCalculator.class.getName()
                             + " class already exists - can't create a new instance.");
         }
     }
 
-    public static BigTextureUVCalculationStrategy getInstance() {
+    public static BigTextureUVCalculator getInstance() {
         if (sInstance == null) {
-            synchronized (BigTextureUVCalculationStrategy.class) {
+            synchronized (BigTextureUVCalculator.class) {
                 if (sInstance == null) {
-                    sInstance = new BigTextureUVCalculationStrategy();
+                    sInstance = new BigTextureUVCalculator();
                 }
             }
         }
@@ -36,7 +36,7 @@ public class BigTextureUVCalculationStrategy implements UVCalculationStrategy {
     private float v2;
 
     public synchronized void calculateUVs(CubicGroup.Face face, byte voxel, int wx, int wy, int wz) {
-        TextureRegion txReg = VOXEL_TYPES[voxel].textureRegions.getFace(face);
+        TextureRegion txReg = VOXEL_TYPES[voxel].getTextureRegions().getFace(face);
         int regW = txReg.getRegionWidth();
         int regH = txReg.getRegionHeight();
         float regV = txReg.getV();

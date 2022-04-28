@@ -5,7 +5,7 @@ import vc.andro.poketest.util.IndexArray;
 import vc.andro.poketest.util.VertexArray;
 import vc.andro.poketest.voxel.VoxelAttributes;
 
-public interface FaceGenerationStrategy {
+public interface FaceGenerator {
     void createTopVertices(VertexArray vertices, IndexArray indices, byte voxel,
                            @Nullable VoxelAttributes attributes, int wx, int wy, int wz);
 

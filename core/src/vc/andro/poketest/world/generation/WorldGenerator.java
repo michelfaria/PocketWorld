@@ -8,9 +8,9 @@ import vc.andro.poketest.util.BlueNoise;
 import vc.andro.poketest.util.FastNoise;
 import vc.andro.poketest.util.Pair;
 import vc.andro.poketest.voxel.VoxelSpecs;
-import vc.andro.poketest.world.chunk.Chunk;
 import vc.andro.poketest.world.World;
 import vc.andro.poketest.world.WorldCreationParams;
+import vc.andro.poketest.world.chunk.Chunk;
 import vc.andro.poketest.world.generation.entity.SimpleEntitySpawner;
 import vc.andro.poketest.world.generation.entity.SimpleVegetationSpawnProspector;
 import vc.andro.poketest.world.generation.entity.SimpleVoxelSpawner;
@@ -23,14 +23,14 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-import static vc.andro.poketest.world.chunk.Chunk.CHUNK_SIZE;
 import static vc.andro.poketest.world.World.LxWx;
 import static vc.andro.poketest.world.World.LzWz;
+import static vc.andro.poketest.world.chunk.Chunk.CHUNK_SIZE;
 
 public class WorldGenerator {
 
-    private final          WorldCreationParams      params;
-    private final          Random                   random;
+    private final          WorldCreationParams  params;
+    private final          Random               random;
     private final          AltitudeMapGenerator altitudeMapGenerator;
     private final          WorldGenSpawner<?>   treeSpawner;
     private final          WorldGenSpawner<?>   flowerSpawner;
@@ -78,7 +78,7 @@ public class WorldGenerator {
     }
 
     /**
-     * Queues a chunk at the specified chunk coordinates to be generated. This method is thread safe.
+     * Queues a chunk at the specified chunk coordinates to be generated.
      *
      * @param cx Chunk X
      * @param cz Chunk Z
@@ -110,9 +110,9 @@ public class WorldGenerator {
 
             chunk.slopifyVoxels(true);
 
-            treeSpawner.spawnEntitiesInChunk(chunk);
-            flowerSpawner.spawnEntitiesInChunk(chunk);
-            tallGrassSpawner.spawnEntitiesInChunk(chunk);
+            treeSpawner.spawnInChunk(chunk);
+            flowerSpawner.spawnInChunk(chunk);
+            tallGrassSpawner.spawnInChunk(chunk);
 
             world.updateChunk(cx, cz);
 

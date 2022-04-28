@@ -2,7 +2,7 @@ package vc.andro.poketest.voxel.rendering.uv;
 
 import vc.andro.poketest.util.CubicGroup;
 
-public interface UVCalculationStrategy {
+public interface UVCalculator {
 
     float getU(CubicGroup.Face face, byte voxel, int wx, int wy, int wz);
 

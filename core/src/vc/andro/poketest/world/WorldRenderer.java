@@ -14,11 +14,11 @@ import vc.andro.poketest.world.chunk.Chunk;
 import static vc.andro.poketest.world.World.WxCx;
 import static vc.andro.poketest.world.World.WzCz;
 
-public class WorldRenderingStrategy implements RenderableProvider {
+public class WorldRenderer implements RenderableProvider {
     private final PocketCamera cam;
     private final World        world;
 
-    public WorldRenderingStrategy(PocketCamera cam, World world) {
+    public WorldRenderer(PocketCamera cam, World world) {
         this.cam = cam;
         this.world = world;
     }

@@ -11,7 +11,7 @@ import vc.andro.poketest.voxel.VoxelAttributes;
 import vc.andro.poketest.voxel.VoxelSpec;
 import vc.andro.poketest.voxel.VoxelSpecs;
 import vc.andro.poketest.world.World;
-import vc.andro.poketest.world.chunk.render.ChunkRenderingStrategy;
+import vc.andro.poketest.world.chunk.render.ChunkRenderer;
 
 import java.util.Arrays;
 
@@ -29,9 +29,9 @@ public class Chunk implements Pool.Poolable {
     private       int                     cz;
     private final byte[]                  voxels;
     private final IntMap<VoxelAttributes> voxelAttributesMap;
-    private int                    voxelCount; // Amount of voxels that exist in this chunk
-    private ChunkRenderingStrategy chunkRenderingStrategy;
-    private boolean                initialized;
+    private       int                     voxelCount; // Amount of voxels that exist in this chunk
+    private       ChunkRenderer           chunkRenderer;
+    private       boolean                 initialized;
     private       boolean                 graphicsInitialized;
     private       boolean                 needsRenderingUpdate;
 
@@ -49,7 +49,7 @@ public class Chunk implements Pool.Poolable {
     }
 
     public void fullyInitialize() {
-        chunkRenderingStrategy = new ChunkRenderingStrategy(this);
+        chunkRenderer = new ChunkRenderer(this);
         graphicsInitialized = true;
     }
 
@@ -66,7 +66,7 @@ public class Chunk implements Pool.Poolable {
             voxelAttributesMap.clear();
         }
         voxelCount = 0;
-        chunkRenderingStrategy = null;
+        chunkRenderer = null;
         initialized = false;
         graphicsInitialized = false;
         needsRenderingUpdate = false;
@@ -85,20 +85,23 @@ public class Chunk implements Pool.Poolable {
     }
 
     /**
-     * Gets the voxel at (lx,ly,lz). This method is thread safe.
+     * Gets the voxel at (lx,ly,lz). 
+     * 
+     * TODO: Replace this with an alternative that returns a VoxelSpec instead of a byte voxel
      *
      * @param lx Local chunk x
      * @param ly Local chunk y
      * @param lz Local chunk z
      * @return Voxel
      */
+    @Deprecated
     public byte getVoxelAt_LP(int lx, int ly, int lz) {
         throwIfUninitialized();
         return voxels[calcVoxelArrayPosition_LP(lx, ly, lz)];
     }
 
     /**
-     * Gets the VoxelAttributes for a voxel at (lx,ly,lz). This method is thread safe.
+     * Gets the VoxelAttributes for a voxel at (lx,ly,lz). 
      *
      * @param lx Local chunk x
      * @param ly Local chunk y
@@ -113,7 +116,7 @@ public class Chunk implements Pool.Poolable {
 
     /**
      * Gets the VoxelAttributes for a voxel at (lx,ly,lz) or create a new one and return it.
-     * This method is thread safe.
+     * 
      *
      * @param lx Local chunk x
      * @param ly Local chunk y
@@ -132,7 +135,7 @@ public class Chunk implements Pool.Poolable {
 
     /**
      * Puts a VoxelAttribute for a voxel at the given (lx,ly,lz) position. If a VoxelAttribute already exists there,
-     * it is replaced. This method is thread safe.
+     * it is replaced. 
      *
      * @param lx              Local chunk x
      * @param ly              Local chunk y
@@ -150,7 +153,7 @@ public class Chunk implements Pool.Poolable {
 
     /**
      * Deletes a voxel attribute associated with a voxel at (lx, ly, lz).
-     * This method is thread safe.
+     * 
      *
      * @param lx Local chunk X
      * @param ly Local chunk Y
@@ -164,7 +167,7 @@ public class Chunk implements Pool.Poolable {
 
     /**
      * Delete the voxel attributes for a voxel at (lx, ly, lz)
-     * This method is thread safe.
+     * 
      *
      * @param lx                Local chunk X
      * @param ly                Local chunk Y
@@ -177,15 +180,17 @@ public class Chunk implements Pool.Poolable {
         throwIfUninitialized();
         int pos = calcVoxelArrayPosition_LP(lx, ly, lz);
         VoxelAttributes removedValue = voxelAttributesMap.remove(pos);
-        if (removedValue == null) {
+        if (removedValue == null && !ignoreNonexisting) {
             throw new IllegalStateException("No attribute for voxel (%d, %d, %d)".formatted(lx, ly, lz));
         }
-        VoxelAttributes.POOL.free(removedValue);
+        if (removedValue != null) {
+            VoxelAttributes.POOL.free(removedValue);
+        }
     }
 
     /**
      * Calculates the access index of a CHUNK_SIZE^2 * CHUNK_DEPTH array for a given (lx,ly,lz) position.
-     * This method is thread safe.
+     * 
      *
      * @param lx Local chunk x
      * @param ly Local chunk y
@@ -199,13 +204,16 @@ public class Chunk implements Pool.Poolable {
 
     /**
      * Puts a voxel at the given (lx,ly,lz). If a voxel already exists in that position, it will be replaced.
-     * This method is thread safe.
+     * 
      *
+     * TODO: Replace this with an alternative that takes a VoxelSpec instead of a byte voxel
+     * 
      * @param lx    Local chunk x
      * @param ly    Local chunk y
      * @param lz    Local chunk z
      * @param voxel Voxel to put
      */
+    @Deprecated
     public void putVoxelAt_LP(int lx, int ly, int lz, byte voxel) {
         throwIfUninitialized();
         putVoxelAt_LP(lx, ly, lz, voxel, false);
@@ -213,7 +221,9 @@ public class Chunk implements Pool.Poolable {
 
     /**
      * Puts a voxel at the given (lx,ly,lz). If a voxel already exists in that position, it will be replaced.
-     * This method is thread safe.
+     * 
+     * 
+     * TODO: Replace this with an alternative that takes a VoxelSpec instead of a byte voxel
      *
      * @param lx             Local chunk x
      * @param ly             Local chunk y
@@ -221,6 +231,7 @@ public class Chunk implements Pool.Poolable {
      * @param voxel          Voxel to put
      * @param keepAttributes If set to true, the attributes of the previous voxel won't be deleted.
      */
+    @Deprecated
     public void putVoxelAt_LP(int lx, int ly, int lz, byte voxel, boolean keepAttributes) {
         throwIfUninitialized();
         byte prevVoxel = getVoxelAt_LP(lx, ly, lz);
@@ -237,7 +248,7 @@ public class Chunk implements Pool.Poolable {
     }
 
     /**
-     * Updates all voxels in this chunk. This method is thread safe.
+     * Updates all voxels in this chunk. 
      */
     public void updateVoxels() {
         throwIfUninitialized();
@@ -257,7 +268,7 @@ public class Chunk implements Pool.Poolable {
 
     /**
      * Gets the top-most non-null voxel in this chunk at the specified (lx,lz) column.
-     * This method is thread safe.
+     * 
      *
      * @param lx Local chunk x
      * @param lz Local chunk z
@@ -276,7 +287,7 @@ public class Chunk implements Pool.Poolable {
 
     /**
      * Slopifies every voxel in this chunk if they need to become slopes.
-     * This method is thread safe.
+     * 
      */
     public void slopifyVoxels(boolean propagateToSurroundingChunks) {
         throwIfUninitialized();
@@ -291,7 +302,7 @@ public class Chunk implements Pool.Poolable {
 
     /**
      * Turns a voxel at (lx, y, lz) into a slope if it meets the conditions to be a slope.
-     * This method is thread safe.
+     * 
      *
      * @param lx                           Chunk local x
      * @param y                            y
@@ -305,16 +316,19 @@ public class Chunk implements Pool.Poolable {
             return;
         }
         VoxelSpec voxelSpec = VoxelSpecs.VOXEL_TYPES[voxel];
-        if (!voxelSpec.canBeSloped) {
+        if (!voxelSpec.isCanBeSloped()) {
             return;
         }
 
         int wx = LxWx(cx, lx);
         int wz = LzWz(cz, lz);
 
-        boolean isVoxelAbove = y < CHUNK_DEPTH - 1 && getWorld().getVoxelAt_WP(wx, y + 1, wz) != 0;
-        if (isVoxelAbove) {
-            return;
+        if (y < CHUNK_DEPTH - 1) {
+            VoxelSpec voxelAbove = getWorld().getVoxelSpecAt_WP(wx, y + 1, wz);
+            assert voxelAbove != null;
+            if (voxelAbove != VoxelSpecs.AIR && !voxelAbove.isDestroyedBySloping()) {
+                return;
+            }
         }
 
         boolean isVoxelBelow = y > 0 && getWorld().getVoxelAt_WP(wx, y - 1, wz) != 0;
@@ -463,9 +477,18 @@ public class Chunk implements Pool.Poolable {
         throwIfUninitialized();
         VoxelAttributes attrs = getVoxelAttrsAt_G_LP(lx, y, lz);
         attrs.configureSlope(slopeDirection, isInnerCorner);
+
         byte voxel = getVoxelAt_LP(lx, y, lz);
         if (VoxelSpecs.VOXEL_TYPES[voxel] == VoxelSpecs.GRASS) {
             putVoxelAt_LP(lx, y, lz, VoxelSpecs.getVoxelId(VoxelSpecs.DIRT), true);
+        }
+
+        if (y < CHUNK_DEPTH - 1) {
+            byte above = getVoxelAt_LP(lx, y + 1, lz);
+            VoxelSpec aboveSpec = VoxelSpecs.getSpecForVoxel(above);
+            if (aboveSpec != null && aboveSpec.isDestroyedBySloping()) {
+                putVoxelAt_LP(lx, y + 1, lz, (byte)0, false);
+            }
         }
     }
 
@@ -498,9 +521,9 @@ public class Chunk implements Pool.Poolable {
         return cz;
     }
 
-    public ChunkRenderingStrategy getChunkRenderingStrategy() {
+    public ChunkRenderer getChunkRenderingStrategy() {
         throwIfNotFullyInitialized();
-        return chunkRenderingStrategy;
+        return chunkRenderer;
     }
 
     public boolean isInitialized() {

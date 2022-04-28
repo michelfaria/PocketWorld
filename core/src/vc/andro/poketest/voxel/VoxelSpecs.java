@@ -2,11 +2,20 @@ package vc.andro.poketest.voxel;
 
 import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.util.CubicGroup;
-import vc.andro.poketest.world.chunk.render.DefaultVoxelRenderingStrategy;
+import vc.andro.poketest.voxel.rendering.faces.NeoFaceGenerator;
+import vc.andro.poketest.voxel.rendering.uv.BigTextureUVCalculator;
+import vc.andro.poketest.voxel.rendering.uv.DefaultUVCalculator;
+import vc.andro.poketest.world.chunk.render.DefaultVoxelRenderer;
+import vc.andro.poketest.world.chunk.render.TallGrassVoxelRenderer;
 
 public class VoxelSpecs {
 
-    public static final VoxelSpec AIR = new VoxelSpec(null, null, true, false, DefaultVoxelRenderingStrategy.getInstance());
+    public static final VoxelSpec AIR = new VoxelSpec(
+            null,
+            null,
+            true,
+            false,
+            false);
 
     public static final VoxelSpec GRASS = new VoxelSpec(
             new CubicGroup<>(
@@ -16,33 +25,53 @@ public class VoxelSpecs {
                     "tile/bwwall",
                     "tile/bwwall",
                     "tile/bwwall"),
-            null,
+            new DefaultVoxelRenderer(new NeoFaceGenerator(new CubicGroup<>(
+                    BigTextureUVCalculator.getInstance(),
+                    DefaultUVCalculator.getInstance(),
+                    DefaultUVCalculator.getInstance(),
+                    DefaultUVCalculator.getInstance(),
+                    DefaultUVCalculator.getInstance(),
+                    DefaultUVCalculator.getInstance()
+            ))),
             false,
-            true, DefaultVoxelRenderingStrategy.getInstance());
+            true,
+            false);
 
     public static final VoxelSpec WATER = new VoxelSpec(
             CubicGroup.newAllSameFaces("tile/water"),
-            null,
+            new DefaultVoxelRenderer(new NeoFaceGenerator(
+                    CubicGroup.newAllSameFaces(DefaultUVCalculator.getInstance()))),
             false,
-            false, DefaultVoxelRenderingStrategy.getInstance());
+            false,
+            false);
 
     public static final VoxelSpec SAND = new VoxelSpec(
             CubicGroup.newAllSameFaces("tile/sand"),
-            null,
+            new DefaultVoxelRenderer(new NeoFaceGenerator(
+                    CubicGroup.newAllSameFaces(DefaultUVCalculator.getInstance()))),
             false,
-            true, DefaultVoxelRenderingStrategy.getInstance());
+            true,
+            false);
 
     public static final VoxelSpec DIRT = new VoxelSpec(
             CubicGroup.newAllSameFaces("tile/bwwall"),
-            null,
+            new DefaultVoxelRenderer(new NeoFaceGenerator(
+                    CubicGroup.newAllSameFaces(DefaultUVCalculator.getInstance()))),
             false,
-            true, DefaultVoxelRenderingStrategy.getInstance());
+            true,
+            false);
 
     public static final VoxelSpec TALL_GRASS = new VoxelSpec(
-            CubicGroup.newOnlyTop("tile/tall_grass/tgrass00"),
-            null,
-            true,
-            false, DefaultVoxelRenderingStrategy.getInstance());
+            new CubicGroup<>(
+                    "tile/tall_grass/tgrass01",
+                    "tile/tall_grass/tgrass00",
+                    null,
+                    null,
+                    null,
+                    null),
+            TallGrassVoxelRenderer.getInstance(), true,
+            false,
+            true);
 
     public static final VoxelSpec[] VOXEL_TYPES = new VoxelSpec[]{
             /*   0 */ AIR,
@@ -191,7 +220,7 @@ public class VoxelSpecs {
     }
 
     public static boolean canVoxelConnectWithSlopes(@Nullable VoxelSpec voxelSpec) {
-        return voxelSpec == null || voxelSpec.canBeSloped;
+        return voxelSpec == null || voxelSpec.isCanBeSloped();
     }
 
     public static VoxelSpec getSpecForVoxel(byte voxel) {

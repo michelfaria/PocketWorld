@@ -7,7 +7,7 @@ import vc.andro.poketest.util.VertexArray;
 import vc.andro.poketest.voxel.VoxelAttributes;
 import vc.andro.poketest.world.chunk.Chunk;
 
-public interface VoxelRenderingStrategy {
+public interface VoxelRenderer {
     void render(@NotNull Chunk chunk, byte voxel, int lx, int y, int lz, int wx, int wz, @NotNull VertexArray vertexArray8f,
                 @NotNull IndexArray indices, @Nullable VoxelAttributes attrs);
 }

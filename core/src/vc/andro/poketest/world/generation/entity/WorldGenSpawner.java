@@ -10,14 +10,14 @@ import static vc.andro.poketest.world.World.LzWz;
 public class WorldGenSpawner<T extends ProspectorResult> {
 
     private final SpawnProspector<T> spawnProspector;
-    private final Spawner<T>         entitySpawner;
+    private final Spawner<T>         spawner;
 
-    public WorldGenSpawner(SpawnProspector<T> spawnProspector, Spawner<T> entitySpawner) {
+    public WorldGenSpawner(SpawnProspector<T> spawnProspector, Spawner<T> spawner) {
         this.spawnProspector = spawnProspector;
-        this.entitySpawner = entitySpawner;
+        this.spawner = spawner;
     }
 
-    public void spawnEntitiesInChunk(@NotNull Chunk chunk) {
+    public void spawnInChunk(@NotNull Chunk chunk) {
         for (int lx = 0; lx < CHUNK_SIZE; lx++) {
             for (int lz = 0; lz < CHUNK_SIZE; lz++) {
                 int wx = LxWx(chunk.getCx(), lx);
@@ -25,7 +25,7 @@ public class WorldGenSpawner<T extends ProspectorResult> {
                 T result = spawnProspector.prospect(chunk, wx, wz, chunk.getCx(), chunk.getCz(), lx, lz);
                 if (result.shouldSpawn) {
                     assert result.spawnY != null : "Prospector should have determined Y position";
-                    entitySpawner.spawn(result, chunk, wx, result.spawnY, wz, chunk.getCx(), chunk.getCz(), lx, lz);
+                    spawner.spawn(result, chunk, wx, result.spawnY, wz, chunk.getCx(), chunk.getCz(), lx, lz);
                 }
             }
         }

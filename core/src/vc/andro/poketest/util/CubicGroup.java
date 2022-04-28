@@ -12,12 +12,12 @@ public class CubicGroup<T> {
         TOP, BOTTOM, WEST, EAST, NORTH, SOUTH
     }
 
-    public T top;
-    public T bottom;
-    public T west;
-    public T east;
-    public T north;
-    public T south;
+    private final T top;
+    private final T bottom;
+    private final T west;
+    private final T east;
+    private final T north;
+    private final T south;
 
     public CubicGroup(T top, T bottom, T west, T east, T north, T south) {
         this.top = top;
@@ -90,5 +90,29 @@ public class CubicGroup<T> {
             }
             default -> throw new AssertionError();
         }
+    }
+
+    public T getTop() {
+        return top;
+    }
+
+    public T getBottom() {
+        return bottom;
+    }
+
+    public T getWest() {
+        return west;
+    }
+
+    public T getEast() {
+        return east;
+    }
+
+    public T getNorth() {
+        return north;
+    }
+
+    public T getSouth() {
+        return south;
     }
 }
