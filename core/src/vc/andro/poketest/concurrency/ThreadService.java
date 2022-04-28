@@ -7,7 +7,7 @@ import java.util.concurrent.*;
 public final class ThreadService {
 
     private static final ThreadFactory threadFactory = new ExceptionThreadFactory();
-    private static final ExecutorService executorService = Executors.newCachedThreadPool(threadFactory);
+    private static final ExecutorService executorService = Executors.newSingleThreadExecutor(threadFactory);
 
     public static <T> Future<T> submit(@NotNull Callable<T> task) {
         return executorService.submit(task);

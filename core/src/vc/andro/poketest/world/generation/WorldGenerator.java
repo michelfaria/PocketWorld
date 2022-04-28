@@ -19,9 +19,9 @@ import vc.andro.poketest.world.generation.map.AltitudeMapGenerator;
 import vc.andro.poketest.world.generation.map.GrassPatchMapGenerator;
 import vc.andro.poketest.world.generation.map.VegetationMapGenerator;
 
+import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 import static vc.andro.poketest.world.Chunk.CHUNK_SIZE;
 import static vc.andro.poketest.world.World.LxWx;
@@ -38,7 +38,7 @@ public class WorldGenerator {
     private final @NotNull World                    world;
 
     // Chunks queued for generation
-    private final Set<Pair<Integer, Integer>> chunksQueued = new CopyOnWriteArraySet<>();
+    private final Set<Pair<Integer, Integer>> chunksQueued = new HashSet<>();
 
     public WorldGenerator(WorldCreationParams params) {
         this.params = params;
@@ -84,37 +84,42 @@ public class WorldGenerator {
      * @param cz Chunk Z
      */
     public void queueChunkForGeneration(int cx, int cz) {
-        chunksQueued.add(new Pair<>(cx, cz));
+        synchronized (chunksQueued) {
+            chunksQueued.add(new Pair<>(cx, cz));
+        }
     }
 
-    public synchronized void generateQueuedChunks() {
-     //   ThreadService.submit(() -> {
-      //      synchronized (chunksQueued) {
-                for (Pair<Integer, Integer> queuedChunk : chunksQueued) {
-                    int cx = queuedChunk.left;
-                    int cz = queuedChunk.right;
+    public void generateQueuedChunks() {
+        if (chunksQueued.isEmpty()) {
+            return;
+        }
 
-                    log("Generating chunk: " + cx + ", " + cz);
-                    Chunk chunk = world.putEmptyChunkAt_CP(cx, cz);
+        for (Pair<Integer, Integer> queuedChunk : chunksQueued) {
+            int cx = queuedChunk.left;
+            int cz = queuedChunk.right;
 
+            log("Generating chunk (%d, %d)".formatted(cx, cz));
 
-                    for (int lx = 0; lx < CHUNK_SIZE; lx++) {
-                        for (int lz = 0; lz < CHUNK_SIZE; lz++) {
-                            generateColumn(chunk, lx, lz);
-                        }
-                    }
+            Chunk chunk = world.putEmptyChunkAt_CP(cx, cz);
 
-                    chunk.slopifyVoxels(true);
-
-                    treeSpawner.spawnEntitiesInChunk(chunk);
-                    flowerSpawner.spawnEntitiesInChunk(chunk);
-                    tallGrassSpawner.spawnEntitiesInChunk(chunk);
-
-                    world.updateChunk(cx, cz);
+            for (int lx = 0; lx < CHUNK_SIZE; lx++) {
+                for (int lz = 0; lz < CHUNK_SIZE; lz++) {
+                    generateColumn(chunk, lx, lz);
                 }
-                chunksQueued.clear();
-     //       }
-     //   });
+            }
+
+            chunk.slopifyVoxels(true);
+
+            treeSpawner.spawnEntitiesInChunk(chunk);
+            flowerSpawner.spawnEntitiesInChunk(chunk);
+            tallGrassSpawner.spawnEntitiesInChunk(chunk);
+
+            world.updateChunk(cx, cz);
+
+            log("Generated chunk (%d, %d)".formatted(cx, cz));
+        }
+
+        chunksQueued.clear();
     }
 
     private void generateColumn(Chunk chunk, int lx, int lz) {

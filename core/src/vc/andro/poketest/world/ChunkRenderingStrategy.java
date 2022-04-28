@@ -60,7 +60,7 @@ public class ChunkRenderingStrategy implements RenderableProvider {
     }
 
 
-    private synchronized void rerenderIfNeeded() {
+    private void rerenderIfNeeded() {
         if (chunk.needsRenderingUpdate()) {
             vertexArray8f.clear();
             indicesArray.clear();
@@ -116,7 +116,7 @@ public class ChunkRenderingStrategy implements RenderableProvider {
     }
 
     @Override
-    public synchronized void getRenderables(Array<Renderable> renderables, Pool<Renderable> pool) {
+    public void getRenderables(Array<Renderable> renderables, Pool<Renderable> pool) {
         rerenderIfNeeded();
         if (vertexArray8f.getAmountVertices() == 0) {
             return;
