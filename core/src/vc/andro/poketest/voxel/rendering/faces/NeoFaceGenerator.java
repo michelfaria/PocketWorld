@@ -205,11 +205,14 @@ public class NeoFaceGenerator implements FaceGenerator {
         }
     }
 
-    private Vector3 calculateNormals(Vector3 vert0, Vector3 vert1, Vector3 vert2) {
-        Vector3 vp = vert1.cpy().sub(vert0);
-        Vector3 vq = vert1.cpy().sub(vert2);
-        Vector3 vp_cross_vq = vp.cpy().crs(vq);
-        return vp_cross_vq.nor();
+    private final Vector3 vP = new Vector3();
+    private final Vector3 vQ = new Vector3();
+
+    private synchronized Vector3 calculateNormals(Vector3 v0, Vector3 v1, Vector3 v2) {
+        vP.set(v1).sub(v0);
+        vQ.set(v1).sub(v2);
+        vP.crs(vQ);
+        return vP.nor();
     }
 
     @Override
@@ -223,7 +226,7 @@ public class NeoFaceGenerator implements FaceGenerator {
         float hSouthwest = getHeightInDirection(SOUTHWEST, attributes);
         Vector3 nwVert = new Vector3(wx, wy + hNorthwest, wz);
         Vector3 neVert = new Vector3(wx + 1, wy + hNortheast, wz);
-        Vector3 swVert = new Vector3(wx + 1, wy + hSouthEast, wz + 1);
+        // Vector3 swVert = new Vector3(wx + 1, wy + hSouthEast, wz + 1);
         Vector3 seVert = new Vector3(wx, wy + hSouthEast, wz + 1);
 
         Vector3 normals = calculateNormals(nwVert, neVert, seVert);

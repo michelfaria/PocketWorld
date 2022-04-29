@@ -32,7 +32,7 @@ public class MainRenderSystem implements Disposable {
         this.cam = cam;
         env = new Environment();
         env.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 0.8f));
-        env.add(new DirectionalLight().set(1.0f, 1.0f, 1.0f, 0.7f, -0.7f, 0.7f));
+        env.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, 0.0f, -1.0f, 0.0f));
         cameraGroupStrategy = new MyCameraGroupStrategy(cam.getUnderlying());
         decalBatch = new DecalBatch(cameraGroupStrategy);
         modelBatch = new ModelBatch(Gdx.files.internal("vertex.glsl"), Gdx.files.internal("fragment.glsl"));
