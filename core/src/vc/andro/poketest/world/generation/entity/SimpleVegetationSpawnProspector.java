@@ -1,7 +1,7 @@
 package vc.andro.poketest.world.generation.entity;
 
-import vc.andro.poketest.voxel.VoxelSpec;
-import vc.andro.poketest.voxel.VoxelSpecs;
+import vc.andro.poketest.voxel.Voxel;
+import vc.andro.poketest.voxel.Voxels;
 import vc.andro.poketest.world.chunk.Chunk;
 import vc.andro.poketest.world.generation.IntNoiseGenerator;
 
@@ -44,12 +44,12 @@ public class SimpleVegetationSpawnProspector implements SpawnProspector<Prospect
 
         for (int ix = 0; ix < entityCollisionWidth; ix++) {
             for (int iz = 0; iz < entityCollisionHeight; iz++) {
-                VoxelSpec voxel = chunk.getWorld().getVoxelSpecAt_WP(wx + ix, y, wz + iz);
-                if (voxel != VoxelSpecs.AIR) {
+                Voxel voxel = chunk.getWorld().getVoxelAt_WP(wx + ix, y, wz + iz);
+                if (voxel != Voxels.AIR) {
                     return result;
                 }
-                VoxelSpec under = chunk.getWorld().getVoxelSpecAt_WP(wx + ix, y - 1, wz + iz);
-                if (under != VoxelSpecs.GRASS) {
+                Voxel under = chunk.getWorld().getVoxelAt_WP(wx + ix, y - 1, wz + iz);
+                if (under != Voxels.GRASS) {
                     return result;
                 }
             }

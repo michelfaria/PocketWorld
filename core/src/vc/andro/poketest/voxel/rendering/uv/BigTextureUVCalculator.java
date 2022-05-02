@@ -2,9 +2,9 @@ package vc.andro.poketest.voxel.rendering.uv;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import vc.andro.poketest.util.CubicGroup;
+import vc.andro.poketest.voxel.Voxel;
 
 import static vc.andro.poketest.PocketWorld.PPU;
-import static vc.andro.poketest.voxel.VoxelSpecs.VOXEL_TYPES;
 
 public class BigTextureUVCalculator implements UVCalculator {
 
@@ -35,8 +35,9 @@ public class BigTextureUVCalculator implements UVCalculator {
     private float v;
     private float v2;
 
-    public synchronized void calculateUVs(CubicGroup.Face face, byte voxel, int wx, int wy, int wz) {
-        TextureRegion txReg = VOXEL_TYPES[voxel].getTextureRegions().getFace(face);
+    public synchronized void calculateUVs(CubicGroup.Face face, Voxel voxel, int wx, int wy, int wz) {
+        assert voxel.getTextureRegions() != null;
+        TextureRegion txReg = voxel.getTextureRegions().getFace(face);
         int regW = txReg.getRegionWidth();
         int regH = txReg.getRegionHeight();
         float regV = txReg.getV();
@@ -60,25 +61,25 @@ public class BigTextureUVCalculator implements UVCalculator {
 
 
     @Override
-    public float getU(CubicGroup.Face face, byte voxel, int wx, int wy, int wz) {
+    public float getU(CubicGroup.Face face, Voxel voxel, int wx, int wy, int wz) {
         calculateUVs(face, voxel, wx, wy, wz);
         return u;
     }
 
     @Override
-    public float getV(CubicGroup.Face face, byte voxel, int wx, int wy, int wz) {
+    public float getV(CubicGroup.Face face, Voxel voxel, int wx, int wy, int wz) {
         calculateUVs(face, voxel, wx, wy, wz);
         return v;
     }
 
     @Override
-    public float getU2(CubicGroup.Face face, byte voxel, int wx, int wy, int wz) {
+    public float getU2(CubicGroup.Face face, Voxel voxel, int wx, int wy, int wz) {
         calculateUVs(face, voxel, wx, wy, wz);
         return u2;
     }
 
     @Override
-    public float getV2(CubicGroup.Face face, byte voxel, int wx, int wy, int wz) {
+    public float getV2(CubicGroup.Face face, Voxel voxel, int wx, int wy, int wz) {
         calculateUVs(face, voxel, wx, wy, wz);
         return v2;
     }

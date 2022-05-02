@@ -9,7 +9,7 @@ import vc.andro.poketest.util.AtlasUtil;
 import vc.andro.poketest.util.CubicGroup;
 import vc.andro.poketest.world.chunk.render.VoxelRenderer;
 
-public class VoxelSpec {
+public class Voxel {
 
     private final @Nullable CubicGroup<String>        textureRegionIds;
     private final @Nullable CubicGroup<TextureRegion> textureRegions;
@@ -18,7 +18,7 @@ public class VoxelSpec {
     private final @Nullable VoxelRenderer             voxelRenderer;
     private final           boolean                   destroyedBySloping;
 
-    public VoxelSpec(
+    public Voxel(
             @Nullable CubicGroup<String> textureRegionIds,
             @Nullable VoxelRenderer voxelRenderer, boolean transparent, boolean canBeSloped,
             boolean destroyedBySloping) {

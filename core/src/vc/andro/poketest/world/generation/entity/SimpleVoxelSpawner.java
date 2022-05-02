@@ -1,12 +1,13 @@
 package vc.andro.poketest.world.generation.entity;
 
+import vc.andro.poketest.voxel.Voxel;
 import vc.andro.poketest.world.chunk.Chunk;
 
 public class SimpleVoxelSpawner implements Spawner<ProspectorResult> {
 
-    private final byte voxel;
+    private final Voxel voxel;
 
-    public SimpleVoxelSpawner(byte voxel) {
+    public SimpleVoxelSpawner(Voxel voxel) {
         this.voxel = voxel;
     }
 

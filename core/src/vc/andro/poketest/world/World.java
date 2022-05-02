@@ -7,9 +7,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.entity.Entity;
 import vc.andro.poketest.registry.RenderSettingsRegistry;
+import vc.andro.poketest.voxel.Voxel;
 import vc.andro.poketest.voxel.VoxelAttributes;
-import vc.andro.poketest.voxel.VoxelSpec;
-import vc.andro.poketest.voxel.VoxelSpecs;
 import vc.andro.poketest.world.chunk.Chunk;
 import vc.andro.poketest.world.chunk.ChunkMatrix;
 import vc.andro.poketest.world.generation.WorldGenerator;
@@ -85,29 +84,13 @@ public class World {
      * @param wz World Z
      * @return The voxel, or -1 if it doesn't exist.
      */
-    public byte getVoxelAt_WP(int wx, int y, int wz) {
+    @Nullable
+    public Voxel getVoxelAt_WP(int wx, int y, int wz) {
         Chunk chunk = getChunkAt_CP(WxCx(wx), WzCz(wz));
         if (chunk == null) {
-            return -1;
-        }
-        return chunk.getVoxelAt_LP(WxLx(wx), y, WzLz(wz));
-    }
-
-    /**
-     * Gets a voxel at a world coordinate.
-     *
-     * @param wx World X
-     * @param y  World Y
-     * @param wz World Z
-     * @return The voxel spec or null if it doesn't exist.
-     */
-    @Nullable
-    public VoxelSpec getVoxelSpecAt_WP(int wx, int y, int wz) {
-        byte voxel = getVoxelAt_WP(wx, y, wz);
-        if (voxel < 0) {
             return null;
         }
-        return VoxelSpecs.VOXEL_TYPES[voxel];
+        return chunk.getVoxelAt_LP(WxLx(wx), y, WzLz(wz));
     }
 
     /**
@@ -253,13 +236,8 @@ public class World {
         }
         int lx = WxLx(wx);
         int lz = WzLz(wz);
-        byte voxel = chunk.getVoxelAt_LP(lx, y, lz);
-        if (voxel <= 0) {
-            return true;
-        }
-        VoxelSpec spec = VoxelSpecs.VOXEL_TYPES[voxel];
-        assert spec != null : "Voxel spec not found";
-        if (spec.isTransparent()) {
+        Voxel voxel = chunk.getVoxelAt_LP(lx, y, lz);
+        if (voxel == null || voxel.isTransparent()) {
             return true;
         }
         VoxelAttributes attrs = chunk.getVoxelAttrsAt_LP(lx, y, lz);

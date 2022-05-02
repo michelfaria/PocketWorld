@@ -18,8 +18,8 @@ import vc.andro.poketest.PocketWorld;
 import vc.andro.poketest.util.IndexArray;
 import vc.andro.poketest.util.VertexArray;
 import vc.andro.poketest.voxel.VoxelAttributes;
-import vc.andro.poketest.voxel.VoxelSpec;
-import vc.andro.poketest.voxel.VoxelSpecs;
+import vc.andro.poketest.voxel.Voxel;
+import vc.andro.poketest.voxel.Voxels;
 import vc.andro.poketest.world.chunk.Chunk;
 
 import java.util.function.Consumer;
@@ -69,14 +69,13 @@ public class ChunkRenderer implements RenderableProvider, Disposable {
             for (int ly = 0; ly < CHUNK_DEPTH; ly++) {
                 for (int lz = 0; lz < CHUNK_SIZE; lz++) {
                     for (int lx = 0; lx < CHUNK_SIZE; lx++) {
-                        byte voxel = chunk.getVoxelAt_LP(lx, ly, lz);
-                        if (voxel == 0) {
+                        Voxel voxel = chunk.getVoxelAt_LP(lx, ly, lz);
+                        if (voxel == Voxels.AIR) {
                             continue;
                         }
                         int wx = LxWx(chunk.getCx(), lx);
                         int wz = LzWz(chunk.getCz(), lz);
-                        VoxelSpec spec = VoxelSpecs.getSpecForVoxel(voxel);
-                        VoxelRenderer renderStrat = spec.getVoxelRenderer();
+                        VoxelRenderer renderStrat = voxel.getVoxelRenderer();
                         if (renderStrat != null) {
                             VoxelAttributes attrs = chunk.getVoxelAttrsAt_LP(lx, ly, lz);
                             renderStrat.render(chunk, voxel, lx, ly, lz, wx, wz, vertexArray8f, indicesArray, attrs);

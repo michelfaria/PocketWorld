@@ -7,7 +7,7 @@ import vc.andro.poketest.entity.TreeEntity;
 import vc.andro.poketest.util.BlueNoise;
 import vc.andro.poketest.util.FastNoise;
 import vc.andro.poketest.util.Pair;
-import vc.andro.poketest.voxel.VoxelSpecs;
+import vc.andro.poketest.voxel.Voxels;
 import vc.andro.poketest.world.World;
 import vc.andro.poketest.world.WorldCreationParams;
 import vc.andro.poketest.world.chunk.Chunk;
@@ -68,7 +68,7 @@ public class WorldGenerator {
         tallGrassSpawner = new WorldGenSpawner<>(
                 new SimpleVegetationSpawnProspector(
                         new GrassPatchMapGenerator(new FastNoise(params.seed + 1, FastNoise.NoiseType.Perlin))),
-                new SimpleVoxelSpawner(VoxelSpecs.getVoxelId(VoxelSpecs.TALL_GRASS)));
+                new SimpleVoxelSpawner(Voxels.TALL_GRASS));
 
         world = new World(this);
     }
@@ -144,13 +144,13 @@ public class WorldGenerator {
 
         if (y <= params.waterLevel) {
             // Is water tile
-            chunk.putVoxelAt_LP(lx, params.waterLevel, lz, VoxelSpecs.getVoxelId(VoxelSpecs.WATER));
+            chunk.putVoxelAt_LP(lx, params.waterLevel, lz, Voxels.WATER);
         } else if (y <= params.beachAltitude) {
             // Is sand tile
-            chunk.putVoxelAt_LP(lx, y, lz, VoxelSpecs.getVoxelId(VoxelSpecs.SAND));
+            chunk.putVoxelAt_LP(lx, y, lz, Voxels.SAND);
         } else {
             // Spawn grass
-            chunk.putVoxelAt_LP(lx, y, lz, VoxelSpecs.getVoxelId(VoxelSpecs.GRASS));
+            chunk.putVoxelAt_LP(lx, y, lz, Voxels.GRASS);
         }
 
         if (y > 0) {

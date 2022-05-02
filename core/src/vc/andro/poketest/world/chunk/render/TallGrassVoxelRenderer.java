@@ -6,9 +6,8 @@ import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.util.CubicGroup;
 import vc.andro.poketest.util.IndexArray;
 import vc.andro.poketest.util.VertexArray;
+import vc.andro.poketest.voxel.Voxel;
 import vc.andro.poketest.voxel.VoxelAttributes;
-import vc.andro.poketest.voxel.VoxelSpec;
-import vc.andro.poketest.voxel.VoxelSpecs;
 import vc.andro.poketest.voxel.rendering.uv.DefaultUVCalculator;
 import vc.andro.poketest.voxel.rendering.uv.UVCalculator;
 import vc.andro.poketest.world.chunk.Chunk;
@@ -39,11 +38,9 @@ public class TallGrassVoxelRenderer implements VoxelRenderer {
 
     @Override
     public void render(
-            @NotNull Chunk chunk, byte voxel, int lx, int y, int lz, int wx, int wz,
+            @NotNull Chunk chunk, Voxel voxel, int lx, int y, int lz, int wx, int wz,
             @NotNull VertexArray vertexArray8f, @NotNull IndexArray indices, @Nullable VoxelAttributes attrs) {
-        VoxelSpec spec = VoxelSpecs.getSpecForVoxel(voxel);
-
-        CubicGroup<TextureRegion> textureRegions = spec.getTextureRegions();
+        CubicGroup<TextureRegion> textureRegions = voxel.getTextureRegions();
         assert textureRegions != null : "Missing grass textures";
         TextureRegion grassTop = textureRegions.getTop();
         assert grassTop != null : "Missing grass top texture";

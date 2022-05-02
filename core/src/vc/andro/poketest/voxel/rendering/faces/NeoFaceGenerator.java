@@ -7,6 +7,7 @@ import vc.andro.poketest.Direction;
 import vc.andro.poketest.util.CubicGroup;
 import vc.andro.poketest.util.IndexArray;
 import vc.andro.poketest.util.VertexArray;
+import vc.andro.poketest.voxel.Voxel;
 import vc.andro.poketest.voxel.VoxelAttributes;
 import vc.andro.poketest.voxel.rendering.uv.UVCalculator;
 
@@ -216,7 +217,7 @@ public class NeoFaceGenerator implements FaceGenerator {
     }
 
     @Override
-    public synchronized void createTopVertices(VertexArray vertices, IndexArray indices, byte voxel,
+    public synchronized void createTopVertices(VertexArray vertices, IndexArray indices, Voxel voxel,
                                                @Nullable VoxelAttributes attributes, int wx, int wy, int wz) {
         UVCalculator uvCalc = uvCalculators.getFace(CubicGroup.Face.TOP);
 
@@ -279,7 +280,7 @@ public class NeoFaceGenerator implements FaceGenerator {
     }
 
     @Override
-    public void createEastVertices(VertexArray vertices, IndexArray indices, byte voxel,
+    public void createEastVertices(VertexArray vertices, IndexArray indices, Voxel voxel,
                                    @Nullable VoxelAttributes attributes, int wx, int wy, int wz) {
         UVCalculator uvCalc = uvCalculators.getFace(CubicGroup.Face.EAST);
         vertices.addVertex8f(
@@ -323,7 +324,7 @@ public class NeoFaceGenerator implements FaceGenerator {
     }
 
     @Override
-    public void createNorthVertices(VertexArray vertices, IndexArray indices, byte voxel,
+    public void createNorthVertices(VertexArray vertices, IndexArray indices, Voxel voxel,
                                     @Nullable VoxelAttributes attributes, int wx, int wy, int wz) {
         UVCalculator uvCalc = uvCalculators.getFace(CubicGroup.Face.NORTH);
         vertices.addVertex8f(
@@ -367,7 +368,7 @@ public class NeoFaceGenerator implements FaceGenerator {
     }
 
     @Override
-    public void createSouthVertices(VertexArray vertices, IndexArray indices, byte voxel,
+    public void createSouthVertices(VertexArray vertices, IndexArray indices, Voxel voxel,
                                     @Nullable VoxelAttributes attributes, int wx, int wy, int wz) {
         UVCalculator uvCalc = uvCalculators.getFace(CubicGroup.Face.SOUTH);
         vertices.addVertex8f(
@@ -411,7 +412,7 @@ public class NeoFaceGenerator implements FaceGenerator {
     }
 
     @Override
-    public void createWestVertices(VertexArray vertices, IndexArray indices, byte voxel,
+    public void createWestVertices(VertexArray vertices, IndexArray indices, Voxel voxel,
                                    @Nullable VoxelAttributes attributes, int wx, int wy, int wz) {
         UVCalculator uvCalc = uvCalculators.getFace(CubicGroup.Face.WEST);
         vertices.addVertex8f(
@@ -456,7 +457,7 @@ public class NeoFaceGenerator implements FaceGenerator {
     }
 
     @Override
-    public void createBottomVertices(VertexArray vertices, IndexArray indices, byte voxel,
+    public void createBottomVertices(VertexArray vertices, IndexArray indices, Voxel voxel,
                                      @Nullable VoxelAttributes attributes, int wx, int wy, int wz) {
         UVCalculator uvCalc = uvCalculators.getFace(CubicGroup.Face.BOTTOM);
         vertices.addVertex8f(

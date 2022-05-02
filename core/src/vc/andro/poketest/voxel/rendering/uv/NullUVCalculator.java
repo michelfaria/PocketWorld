@@ -1,6 +1,7 @@
 package vc.andro.poketest.voxel.rendering.uv;
 
 import vc.andro.poketest.util.CubicGroup;
+import vc.andro.poketest.voxel.Voxel;
 
 public final class NullUVCalculator implements UVCalculator {
 
@@ -27,22 +28,22 @@ public final class NullUVCalculator implements UVCalculator {
     }
 
     @Override
-    public float getU(CubicGroup.Face face, byte voxel, int wx, int wy, int wz) {
+    public float getU(CubicGroup.Face face, Voxel voxel, int wx, int wy, int wz) {
         return 0;
     }
 
     @Override
-    public float getV(CubicGroup.Face face, byte voxel, int wx, int wy, int wz) {
+    public float getV(CubicGroup.Face face, Voxel voxel, int wx, int wy, int wz) {
         return 0;
     }
 
     @Override
-    public float getU2(CubicGroup.Face face, byte voxel, int wx, int wy, int wz) {
+    public float getU2(CubicGroup.Face face, Voxel voxel, int wx, int wy, int wz) {
         return 0;
     }
 
     @Override
-    public float getV2(CubicGroup.Face face, byte voxel, int wx, int wy, int wz) {
+    public float getV2(CubicGroup.Face face, Voxel voxel, int wx, int wy, int wz) {
         return 0;
     }
 }

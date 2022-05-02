@@ -7,8 +7,8 @@ import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.Direction;
 import vc.andro.poketest.util.ArrayUtil;
 import vc.andro.poketest.voxel.VoxelAttributes;
-import vc.andro.poketest.voxel.VoxelSpec;
-import vc.andro.poketest.voxel.VoxelSpecs;
+import vc.andro.poketest.voxel.Voxel;
+import vc.andro.poketest.voxel.Voxels;
 import vc.andro.poketest.world.World;
 import vc.andro.poketest.world.chunk.render.ChunkRenderer;
 
@@ -57,9 +57,8 @@ public class Chunk implements Disposable {
      * @param lz Local chunk z
      * @return Voxel
      */
-    @Deprecated
-    public byte getVoxelAt_LP(int lx, int ly, int lz) {
-        return voxels[calcVoxelArrayPosition_LP(lx, ly, lz)];
+    public Voxel getVoxelAt_LP(int lx, int ly, int lz) {
+        return Voxels.getSpecForVoxel(voxels[calcVoxelArrayPosition_LP(lx, ly, lz)]);
     }
 
     /**
@@ -150,25 +149,18 @@ public class Chunk implements Disposable {
 
     /**
      * Puts a voxel at the given (lx,ly,lz). If a voxel already exists in that position, it will be replaced.
-     * <p>
-     * <p>
-     * TODO: Replace this with an alternative that takes a VoxelSpec instead of a byte voxel
      *
      * @param lx    Local chunk x
      * @param ly    Local chunk y
      * @param lz    Local chunk z
      * @param voxel Voxel to put
      */
-    @Deprecated
-    public void putVoxelAt_LP(int lx, int ly, int lz, byte voxel) {
+    public void putVoxelAt_LP(int lx, int ly, int lz, Voxel voxel) {
         putVoxelAt_LP(lx, ly, lz, voxel, false);
     }
 
     /**
      * Puts a voxel at the given (lx,ly,lz). If a voxel already exists in that position, it will be replaced.
-     * <p>
-     * <p>
-     * TODO: Replace this with an alternative that takes a VoxelSpec instead of a byte voxel
      *
      * @param lx             Local chunk x
      * @param ly             Local chunk y
@@ -176,18 +168,17 @@ public class Chunk implements Disposable {
      * @param voxel          Voxel to put
      * @param keepAttributes If set to true, the attributes of the previous voxel won't be deleted.
      */
-    @Deprecated
-    public void putVoxelAt_LP(int lx, int ly, int lz, byte voxel, boolean keepAttributes) {
-        byte prevVoxel = getVoxelAt_LP(lx, ly, lz);
-        if (prevVoxel == 0 && voxel != 0) {
+    public void putVoxelAt_LP(int lx, int ly, int lz, Voxel voxel, boolean keepAttributes) {
+        Voxel prevVoxel = getVoxelAt_LP(lx, ly, lz);
+        if (prevVoxel != null && prevVoxel != Voxels.AIR) {
             voxelCount++;
-        } else if (prevVoxel != 0 && voxel == 0) {
+        } else if (prevVoxel != Voxels.AIR && voxel == Voxels.AIR) {
             voxelCount--;
             if (!keepAttributes) {
                 delVoxelAttrsAt_LP(lx, ly, lz, true);
             }
         }
-        voxels[calcVoxelArrayPosition_LP(lx, ly, lz)] = voxel;
+        voxels[calcVoxelArrayPosition_LP(lx, ly, lz)] = Voxels.getVoxelId(voxel);
         needsRenderingUpdate = true;
     }
 
@@ -198,8 +189,8 @@ public class Chunk implements Disposable {
         for (int lx = 0; lx < CHUNK_SIZE; lx++) {
             for (int wy = 0; wy < CHUNK_DEPTH; wy++) {
                 for (int lz = 0; lz < CHUNK_SIZE; lz++) {
-                    byte v = getVoxelAt_LP(lx, wy, lz);
-                    if (v == 0) {
+                    Voxel v = getVoxelAt_LP(lx, wy, lz);
+                    if (v == null || v == Voxels.AIR) {
                         continue;
                     }
                     // FIXME
@@ -218,8 +209,8 @@ public class Chunk implements Disposable {
      */
     public int getSurfaceVoxelWy_LP(int lx, int lz) {
         for (int wy = CHUNK_DEPTH - 1; wy >= 0; wy--) {
-            byte v = getVoxelAt_LP(lx, wy, lz);
-            if (v != 0) {
+            Voxel v = getVoxelAt_LP(lx, wy, lz);
+            if (v != null && v != Voxels.AIR) {
                 return wy;
             }
         }
@@ -248,12 +239,8 @@ public class Chunk implements Disposable {
      * @param propagateToSurroundingChunks If set to true, sloping will propagate to adjacent voxels that are outside the specified chunk
      */
     private void slopifyVoxel_LP(int lx, int y, int lz, boolean propagateToSurroundingChunks) {
-        byte voxel = getVoxelAt_LP(lx, y, lz);
-        if (voxel == 0) {
-            return;
-        }
-        VoxelSpec voxelSpec = VoxelSpecs.VOXEL_TYPES[voxel];
-        if (!voxelSpec.isCanBeSloped()) {
+        Voxel voxel = getVoxelAt_LP(lx, y, lz);
+        if (Voxels.isAirOrNull(voxel) || !voxel.isCanBeSloped()) {
             return;
         }
 
@@ -261,35 +248,35 @@ public class Chunk implements Disposable {
         int wz = LzWz(cz, lz);
 
         if (y < CHUNK_DEPTH - 1) {
-            VoxelSpec voxelAbove = getWorld().getVoxelSpecAt_WP(wx, y + 1, wz);
+            Voxel voxelAbove = getWorld().getVoxelAt_WP(wx, y + 1, wz);
             assert voxelAbove != null;
-            if (voxelAbove != VoxelSpecs.AIR && !voxelAbove.isDestroyedBySloping()) {
+            if (voxelAbove != Voxels.AIR && !voxelAbove.isDestroyedBySloping()) {
                 return;
             }
         }
 
-        boolean isVoxelBelow = y > 0 && getWorld().getVoxelAt_WP(wx, y - 1, wz) != 0;
+        boolean isVoxelBelow = y > 0 && getWorld().getVoxelAt_WP(wx, y - 1, wz) != Voxels.AIR;
         if (!isVoxelBelow) {
             return;
         }
 
-        @Nullable VoxelSpec voxelWest = world.getVoxelSpecAt_WP(wx - 1, y, wz);
-        @Nullable VoxelSpec voxelEast = world.getVoxelSpecAt_WP(wx + 1, y, wz);
-        @Nullable VoxelSpec voxelSouth = world.getVoxelSpecAt_WP(wx, y, wz + 1);
-        @Nullable VoxelSpec voxelNorth = world.getVoxelSpecAt_WP(wx, y, wz - 1);
-        @Nullable VoxelSpec voxelNorthwest = world.getVoxelSpecAt_WP(wx - 1, y, wz - 1);
-        @Nullable VoxelSpec voxelNortheast = world.getVoxelSpecAt_WP(wx + 1, y, wz - 1);
-        @Nullable VoxelSpec voxelSouthwest = world.getVoxelSpecAt_WP(wx - 1, y, wz + 1);
-        @Nullable VoxelSpec voxelSoutheast = world.getVoxelSpecAt_WP(wx + 1, y, wz + 1);
+        @Nullable Voxel voxelWest = world.getVoxelAt_WP(wx - 1, y, wz);
+        @Nullable Voxel voxelEast = world.getVoxelAt_WP(wx + 1, y, wz);
+        @Nullable Voxel voxelSouth = world.getVoxelAt_WP(wx, y, wz + 1);
+        @Nullable Voxel voxelNorth = world.getVoxelAt_WP(wx, y, wz - 1);
+        @Nullable Voxel voxelNorthwest = world.getVoxelAt_WP(wx - 1, y, wz - 1);
+        @Nullable Voxel voxelNortheast = world.getVoxelAt_WP(wx + 1, y, wz - 1);
+        @Nullable Voxel voxelSouthwest = world.getVoxelAt_WP(wx - 1, y, wz + 1);
+        @Nullable Voxel voxelSoutheast = world.getVoxelAt_WP(wx + 1, y, wz + 1);
         
         /*
           Southwest-facing corner
           ▢ ▢
           ▢ ◢
          */
-        if (!VoxelSpecs.canVoxelConnectWithSlopes(voxelNorthwest)
-                && !VoxelSpecs.canVoxelConnectWithSlopes(voxelWest)
-                && !VoxelSpecs.canVoxelConnectWithSlopes(voxelNorth)) {
+        if (!Voxels.canVoxelConnectWithSlopes(voxelNorthwest)
+                && !Voxels.canVoxelConnectWithSlopes(voxelWest)
+                && !Voxels.canVoxelConnectWithSlopes(voxelNorth)) {
             slopifyVoxel(lx, y, lz, Direction.NORTHWEST, false);
         }
         /*
@@ -297,9 +284,9 @@ public class Chunk implements Disposable {
           ▢ ▢
           ◣ ▢
          */
-        else if (!VoxelSpecs.canVoxelConnectWithSlopes(voxelNorth)
-                && !VoxelSpecs.canVoxelConnectWithSlopes(voxelNortheast)
-                && !VoxelSpecs.canVoxelConnectWithSlopes(voxelEast)) {
+        else if (!Voxels.canVoxelConnectWithSlopes(voxelNorth)
+                && !Voxels.canVoxelConnectWithSlopes(voxelNortheast)
+                && !Voxels.canVoxelConnectWithSlopes(voxelEast)) {
             slopifyVoxel(lx, y, lz, Direction.NORTHEAST, false);
         }
         /*
@@ -307,9 +294,9 @@ public class Chunk implements Disposable {
           ▢ ◥
           ▢ ▢
          */
-        else if (!VoxelSpecs.canVoxelConnectWithSlopes(voxelSouthwest)
-                && !VoxelSpecs.canVoxelConnectWithSlopes(voxelWest)
-                && !VoxelSpecs.canVoxelConnectWithSlopes(voxelSouth)) {
+        else if (!Voxels.canVoxelConnectWithSlopes(voxelSouthwest)
+                && !Voxels.canVoxelConnectWithSlopes(voxelWest)
+                && !Voxels.canVoxelConnectWithSlopes(voxelSouth)) {
             slopifyVoxel(lx, y, lz, Direction.SOUTHWEST, false);
         }
         /*
@@ -317,9 +304,9 @@ public class Chunk implements Disposable {
           ◤ ▢
           ▢ ▢
          */
-        else if (!VoxelSpecs.canVoxelConnectWithSlopes(voxelSoutheast)
-                && !VoxelSpecs.canVoxelConnectWithSlopes(voxelEast)
-                && !VoxelSpecs.canVoxelConnectWithSlopes(voxelSouth)) {
+        else if (!Voxels.canVoxelConnectWithSlopes(voxelSoutheast)
+                && !Voxels.canVoxelConnectWithSlopes(voxelEast)
+                && !Voxels.canVoxelConnectWithSlopes(voxelSouth)) {
             slopifyVoxel(lx, y, lz, Direction.SOUTHEAST, false);
         }
         /*
@@ -327,9 +314,9 @@ public class Chunk implements Disposable {
           ▢ |
           _ 」←
          */
-        else if (!VoxelSpecs.canVoxelConnectWithSlopes(voxelNorthwest)
-                && VoxelSpecs.canVoxelConnectWithSlopes(voxelWest)
-                && VoxelSpecs.canVoxelConnectWithSlopes(voxelNorth)) {
+        else if (!Voxels.canVoxelConnectWithSlopes(voxelNorthwest)
+                && Voxels.canVoxelConnectWithSlopes(voxelWest)
+                && Voxels.canVoxelConnectWithSlopes(voxelNorth)) {
             slopifyVoxel(lx, y, lz, Direction.NORTHWEST, true);
         }
         /*
@@ -337,9 +324,9 @@ public class Chunk implements Disposable {
            | ▢
          → ⌞ _
          */
-        else if (!VoxelSpecs.canVoxelConnectWithSlopes(voxelNortheast)
-                && VoxelSpecs.canVoxelConnectWithSlopes(voxelEast)
-                && VoxelSpecs.canVoxelConnectWithSlopes(voxelNorth)) {
+        else if (!Voxels.canVoxelConnectWithSlopes(voxelNortheast)
+                && Voxels.canVoxelConnectWithSlopes(voxelEast)
+                && Voxels.canVoxelConnectWithSlopes(voxelNorth)) {
             slopifyVoxel(lx, y, lz, Direction.NORTHEAST, true);
         }
         /*
@@ -347,9 +334,9 @@ public class Chunk implements Disposable {
             ̅ ⌝ ←
            ▢ |
          */
-        else if (!VoxelSpecs.canVoxelConnectWithSlopes(voxelSouthwest)
-                && VoxelSpecs.canVoxelConnectWithSlopes(voxelWest)
-                && VoxelSpecs.canVoxelConnectWithSlopes(voxelSouth)) {
+        else if (!Voxels.canVoxelConnectWithSlopes(voxelSouthwest)
+                && Voxels.canVoxelConnectWithSlopes(voxelWest)
+                && Voxels.canVoxelConnectWithSlopes(voxelSouth)) {
             slopifyVoxel(lx, y, lz, Direction.SOUTHWEST, true);
         }
         /*
@@ -357,25 +344,25 @@ public class Chunk implements Disposable {
           → ⌜  ̅
             | ▢
          */
-        else if (!VoxelSpecs.canVoxelConnectWithSlopes(voxelSoutheast)
-                && VoxelSpecs.canVoxelConnectWithSlopes(voxelEast)
-                && VoxelSpecs.canVoxelConnectWithSlopes(voxelSouth)) {
+        else if (!Voxels.canVoxelConnectWithSlopes(voxelSoutheast)
+                && Voxels.canVoxelConnectWithSlopes(voxelEast)
+                && Voxels.canVoxelConnectWithSlopes(voxelSouth)) {
             slopifyVoxel(lx, y, lz, Direction.SOUTHEAST, true);
         }
         /*  West edge */
-        else if (!VoxelSpecs.canVoxelConnectWithSlopes(voxelWest)) {
+        else if (!Voxels.canVoxelConnectWithSlopes(voxelWest)) {
             slopifyVoxel(lx, y, lz, Direction.WEST, false);
         }
         /* East edge */
-        else if (!VoxelSpecs.canVoxelConnectWithSlopes(voxelEast)) {
+        else if (!Voxels.canVoxelConnectWithSlopes(voxelEast)) {
             slopifyVoxel(lx, y, lz, Direction.EAST, false);
         }
         /* South edge */
-        else if (!VoxelSpecs.canVoxelConnectWithSlopes(voxelSouth)) {
+        else if (!Voxels.canVoxelConnectWithSlopes(voxelSouth)) {
             slopifyVoxel(lx, y, lz, Direction.SOUTH, false);
         }
         /* North edge */
-        else if (!VoxelSpecs.canVoxelConnectWithSlopes(voxelNorth)) {
+        else if (!Voxels.canVoxelConnectWithSlopes(voxelNorth)) {
             slopifyVoxel(lx, y, lz, Direction.NORTH, false);
         }
 
@@ -414,16 +401,15 @@ public class Chunk implements Disposable {
         VoxelAttributes attrs = getVoxelAttrsAt_G_LP(lx, y, lz);
         attrs.configureSlope(slopeDirection, isInnerCorner);
 
-        byte voxel = getVoxelAt_LP(lx, y, lz);
-        if (VoxelSpecs.VOXEL_TYPES[voxel] == VoxelSpecs.GRASS) {
-            putVoxelAt_LP(lx, y, lz, VoxelSpecs.getVoxelId(VoxelSpecs.DIRT), true);
+        Voxel voxel = getVoxelAt_LP(lx, y, lz);
+        if (voxel == Voxels.GRASS) {
+            putVoxelAt_LP(lx, y, lz, Voxels.DIRT, true);
         }
 
         if (y < CHUNK_DEPTH - 1) {
-            byte above = getVoxelAt_LP(lx, y + 1, lz);
-            VoxelSpec aboveSpec = VoxelSpecs.getSpecForVoxel(above);
-            if (aboveSpec != null && aboveSpec.isDestroyedBySloping()) {
-                putVoxelAt_LP(lx, y + 1, lz, (byte) 0, false);
+            Voxel above = getVoxelAt_LP(lx, y + 1, lz);
+            if (above != null && above.isDestroyedBySloping()) {
+                putVoxelAt_LP(lx, y + 1, lz, Voxels.AIR, false);
             }
         }
     }
