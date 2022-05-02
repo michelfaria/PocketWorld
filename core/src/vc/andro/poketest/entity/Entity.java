@@ -26,10 +26,7 @@ public class Entity {
 
     protected void addDecal(EntityDecal eDecal) {
         TextureRegion txReg = eDecal.getTextureRegion();
-        eDecal.decal.setDimensions(
-                txReg.getRegionWidth() / PPU,
-                txReg.getRegionHeight() / PPU
-        );
+        eDecal.decal.setDimensions(txReg.getRegionWidth() / PPU, txReg.getRegionHeight() / PPU);
         eDecal.decal.setRotation(eDecal.yaw, eDecal.pitch, eDecal.roll);
         decals.add(eDecal);
     }
@@ -61,8 +58,7 @@ public class Entity {
             eDecal.decal.setPosition(
                     wx + eDecal.offsetWx + dimensions.x / 2.0f,
                     wy + eDecal.offsetWy,
-                    wz + eDecal.offsetWz + dimensions.y / 2.0f
-            );
+                    wz + eDecal.offsetWz + dimensions.y / 2.0f);
         }
     }
 

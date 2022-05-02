@@ -99,7 +99,7 @@ public class World {
      * @param wx World X
      * @param y  World Y
      * @param wz World Z
-     * @return The voxel spec, or -1 if it doesn't exist.
+     * @return The voxel spec or null if it doesn't exist.
      */
     @Nullable
     public VoxelSpec getVoxelSpecAt_WP(int wx, int y, int wz) {
@@ -182,10 +182,10 @@ public class World {
      * @param wz World Z
      * @return Y coordinate of the top-most voxel at the specified (X, Z) position
      */
-    public int getSurfaceVoxelWy_WP(int wx, int wz) {
+    public int getSurfaceVoxelWy_WP(int wx, int wz) throws NoChunkException {
         Chunk chunk = getChunkAt_CP(WxCx(wx), WzCz(wz));
         if (chunk == null) {
-            return -1;
+            throw new NoChunkException();
         }
         return chunk.getSurfaceVoxelWy_LP(WxLx(wx), WzLz(wz));
     }

@@ -1,12 +1,18 @@
 package vc.andro.poketest.util;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pool;
 
-public class EventEmitter<T> {
+public class EventEmitter<T>  implements Pool.Poolable {
     private final Array<EventListener<T>> listeners;
 
     public EventEmitter() {
         listeners = new Array<>();
+    }
+
+    @Override
+    public void reset() {
+        listeners.clear();
     }
 
     public void addListener(EventListener<T> eventListener) {

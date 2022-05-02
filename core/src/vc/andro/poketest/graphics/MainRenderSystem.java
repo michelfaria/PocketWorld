@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader;
 import com.badlogic.gdx.utils.Disposable;
 import vc.andro.poketest.PocketCamera;
+import vc.andro.poketest.world.NoChunkException;
 import vc.andro.poketest.world.World;
 import vc.andro.poketest.world.WorldRenderer;
 
@@ -39,9 +40,9 @@ public class MainRenderSystem implements Disposable {
         DefaultShader.defaultCullFace = GL20.GL_FRONT;
         worldRenderer = new WorldRenderer(cam, world);
 
-        int surfaceWy = world.getSurfaceVoxelWy_WP(0, 0);
-        if (surfaceWy != -1) {
-            cam.getPosition().set(0, surfaceWy + 10, 0);
+        try {
+            cam.getPosition().set(0, world.getSurfaceVoxelWy_WP(0, 0) + 10, 0);
+        } catch (NoChunkException ignore) {
         }
     }
 

@@ -20,24 +20,21 @@ import static vc.andro.poketest.world.World.LzWz;
 
 public class Chunk implements Pool.Poolable {
 
-    public static final Pool<Chunk> POOL        = Pools.get(Chunk.class);
-    public static final int         CHUNK_SIZE  = 16; // in tiles
-    public static final int         CHUNK_DEPTH = 128;
-
-    private       World                   world;
-    private       int                     cx;
-    private       int                     cz;
-    private final byte[]                  voxels;
-    private final IntMap<VoxelAttributes> voxelAttributesMap;
-    private       int                     voxelCount; // Amount of voxels that exist in this chunk
-    private       ChunkRenderer           chunkRenderer;
-    private       boolean                 initialized;
-    private       boolean                 graphicsInitialized;
-    private       boolean                 needsRenderingUpdate;
+    public static final Pool<Chunk>             POOL                                = Pools.get(Chunk.class);
+    public static final int                     CHUNK_SIZE                          = 16;
+    public static final int                     CHUNK_DEPTH                         = 128;
+    private             World                   world                               = null;
+    private             int                     cx                                  = 0;
+    private             int                     cz                                  = 0;
+    private final       byte[]                  voxels                              = new byte[CHUNK_SIZE * CHUNK_DEPTH * CHUNK_SIZE];
+    private final       IntMap<VoxelAttributes> voxelAttributesMap                  = new IntMap<>();
+    private             int                     voxelCount                          = 0;
+    private             ChunkRenderer           chunkRenderer                       = null;
+    private             boolean                 initialized                         = false;
+    private             boolean                 graphicsInitialized                 = false;
+    private             boolean                 needsRenderingUpdate                = false;
 
     private Chunk() {
-        voxels = new byte[CHUNK_SIZE * CHUNK_DEPTH * CHUNK_SIZE];
-        voxelAttributesMap = new IntMap<>();
     }
 
     public void init(@NotNull World world, int cx, int cz) {
@@ -85,8 +82,8 @@ public class Chunk implements Pool.Poolable {
     }
 
     /**
-     * Gets the voxel at (lx,ly,lz). 
-     * 
+     * Gets the voxel at (lx,ly,lz).
+     * <p>
      * TODO: Replace this with an alternative that returns a VoxelSpec instead of a byte voxel
      *
      * @param lx Local chunk x
@@ -101,7 +98,7 @@ public class Chunk implements Pool.Poolable {
     }
 
     /**
-     * Gets the VoxelAttributes for a voxel at (lx,ly,lz). 
+     * Gets the VoxelAttributes for a voxel at (lx,ly,lz).
      *
      * @param lx Local chunk x
      * @param ly Local chunk y
@@ -116,7 +113,6 @@ public class Chunk implements Pool.Poolable {
 
     /**
      * Gets the VoxelAttributes for a voxel at (lx,ly,lz) or create a new one and return it.
-     * 
      *
      * @param lx Local chunk x
      * @param ly Local chunk y
@@ -135,7 +131,7 @@ public class Chunk implements Pool.Poolable {
 
     /**
      * Puts a VoxelAttribute for a voxel at the given (lx,ly,lz) position. If a VoxelAttribute already exists there,
-     * it is replaced. 
+     * it is replaced.
      *
      * @param lx              Local chunk x
      * @param ly              Local chunk y
@@ -153,7 +149,6 @@ public class Chunk implements Pool.Poolable {
 
     /**
      * Deletes a voxel attribute associated with a voxel at (lx, ly, lz).
-     * 
      *
      * @param lx Local chunk X
      * @param ly Local chunk Y
@@ -167,7 +162,6 @@ public class Chunk implements Pool.Poolable {
 
     /**
      * Delete the voxel attributes for a voxel at (lx, ly, lz)
-     * 
      *
      * @param lx                Local chunk X
      * @param ly                Local chunk Y
@@ -190,7 +184,6 @@ public class Chunk implements Pool.Poolable {
 
     /**
      * Calculates the access index of a CHUNK_SIZE^2 * CHUNK_DEPTH array for a given (lx,ly,lz) position.
-     * 
      *
      * @param lx Local chunk x
      * @param ly Local chunk y
@@ -204,10 +197,10 @@ public class Chunk implements Pool.Poolable {
 
     /**
      * Puts a voxel at the given (lx,ly,lz). If a voxel already exists in that position, it will be replaced.
-     * 
-     *
+     * <p>
+     * <p>
      * TODO: Replace this with an alternative that takes a VoxelSpec instead of a byte voxel
-     * 
+     *
      * @param lx    Local chunk x
      * @param ly    Local chunk y
      * @param lz    Local chunk z
@@ -221,8 +214,8 @@ public class Chunk implements Pool.Poolable {
 
     /**
      * Puts a voxel at the given (lx,ly,lz). If a voxel already exists in that position, it will be replaced.
-     * 
-     * 
+     * <p>
+     * <p>
      * TODO: Replace this with an alternative that takes a VoxelSpec instead of a byte voxel
      *
      * @param lx             Local chunk x
@@ -248,7 +241,7 @@ public class Chunk implements Pool.Poolable {
     }
 
     /**
-     * Updates all voxels in this chunk. 
+     * Updates all voxels in this chunk.
      */
     public void updateVoxels() {
         throwIfUninitialized();
@@ -268,7 +261,6 @@ public class Chunk implements Pool.Poolable {
 
     /**
      * Gets the top-most non-null voxel in this chunk at the specified (lx,lz) column.
-     * 
      *
      * @param lx Local chunk x
      * @param lz Local chunk z
@@ -287,7 +279,6 @@ public class Chunk implements Pool.Poolable {
 
     /**
      * Slopifies every voxel in this chunk if they need to become slopes.
-     * 
      */
     public void slopifyVoxels(boolean propagateToSurroundingChunks) {
         throwIfUninitialized();
@@ -302,7 +293,6 @@ public class Chunk implements Pool.Poolable {
 
     /**
      * Turns a voxel at (lx, y, lz) into a slope if it meets the conditions to be a slope.
-     * 
      *
      * @param lx                           Chunk local x
      * @param y                            y
@@ -487,7 +477,7 @@ public class Chunk implements Pool.Poolable {
             byte above = getVoxelAt_LP(lx, y + 1, lz);
             VoxelSpec aboveSpec = VoxelSpecs.getSpecForVoxel(above);
             if (aboveSpec != null && aboveSpec.isDestroyedBySloping()) {
-                putVoxelAt_LP(lx, y + 1, lz, (byte)0, false);
+                putVoxelAt_LP(lx, y + 1, lz, (byte) 0, false);
             }
         }
     }
