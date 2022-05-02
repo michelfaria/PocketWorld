@@ -13,24 +13,13 @@ public class VertexArray {
         vertices = new FloatArray();
     }
 
-    public void addVertex6f(float x,
-                           float y,
-                           float z,
-                           float u,
-                           float v) {
+    public void addVertex6f(float x, float y, float z, float u, float v) {
         vertices.add(x, y, z, u);
         vertices.add(v);
         amount++;
     }
 
-    public void addVertex8f(float x,
-                            float y,
-                            float z,
-                            float normalX,
-                            float normalY,
-                            float normalZ,
-                            float u,
-                            float v) {
+    public void addVertex8f(float x, float y, float z, float normalX, float normalY, float normalZ, float u, float v) {
         vertices.add(x, y, z, normalX);
         vertices.add(normalY, normalZ, u, v);
         amount++;

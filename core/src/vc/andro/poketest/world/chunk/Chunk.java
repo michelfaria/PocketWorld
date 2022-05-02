@@ -1,8 +1,7 @@
 package vc.andro.poketest.world.chunk;
 
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.Pool;
-import com.badlogic.gdx.utils.Pools;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.Direction;
@@ -13,66 +12,33 @@ import vc.andro.poketest.voxel.VoxelSpecs;
 import vc.andro.poketest.world.World;
 import vc.andro.poketest.world.chunk.render.ChunkRenderer;
 
-import java.util.Arrays;
-
 import static vc.andro.poketest.world.World.LxWx;
 import static vc.andro.poketest.world.World.LzWz;
 
-public class Chunk implements Pool.Poolable {
+public class Chunk implements Disposable {
 
-    public static final Pool<Chunk>             POOL                                = Pools.get(Chunk.class);
-    public static final int                     CHUNK_SIZE                          = 16;
-    public static final int                     CHUNK_DEPTH                         = 128;
-    private             World                   world                               = null;
-    private             int                     cx                                  = 0;
-    private             int                     cz                                  = 0;
-    private final       byte[]                  voxels                              = new byte[CHUNK_SIZE * CHUNK_DEPTH * CHUNK_SIZE];
-    private final       IntMap<VoxelAttributes> voxelAttributesMap                  = new IntMap<>();
-    private             int                     voxelCount                          = 0;
-    private             ChunkRenderer           chunkRenderer                       = null;
-    private             boolean                 initialized                         = false;
-    private             boolean                 graphicsInitialized                 = false;
-    private             boolean                 needsRenderingUpdate                = false;
+    public static final int                     CHUNK_SIZE           = 16;
+    public static final int                     CHUNK_DEPTH          = 128;
+    public static final int                     TOTAL_VOXELS         = CHUNK_SIZE * CHUNK_DEPTH * CHUNK_SIZE;
+    private             World                   world;
+    private             int                     cx;
+    private             int                     cz;
+    private             byte[]                  voxels               = new byte[TOTAL_VOXELS];
+    private final       IntMap<VoxelAttributes> voxelAttributesMap   = new IntMap<>();
+    private             int                     voxelCount           = 0;
+    private             ChunkRenderer           chunkRenderer        = null;
+    private             boolean                 graphicsInitialized  = false;
+    private             boolean                 needsRenderingUpdate = false;
 
-    private Chunk() {
-    }
-
-    public void init(@NotNull World world, int cx, int cz) {
+    public Chunk(@NotNull World world, int cx, int cz) {
         this.world = world;
         this.cx = cx;
         this.cz = cz;
-        initialized = true;
-        needsRenderingUpdate = true;
     }
 
     public void fullyInitialize() {
         chunkRenderer = new ChunkRenderer(this);
         graphicsInitialized = true;
-    }
-
-    @Override
-    public void reset() {
-        world = null;
-        cx = 0;
-        cz = 0;
-        Arrays.fill(voxels, (byte) 0);
-        { // reset: voxelAttributesMap
-            for (VoxelAttributes a : voxelAttributesMap.values()) {
-                VoxelAttributes.POOL.free(a);
-            }
-            voxelAttributesMap.clear();
-        }
-        voxelCount = 0;
-        chunkRenderer = null;
-        initialized = false;
-        graphicsInitialized = false;
-        needsRenderingUpdate = false;
-    }
-
-    private void throwIfUninitialized() {
-        if (!isInitialized()) {
-            throw new IllegalStateException("Chunk needs to be initialized for this operation");
-        }
     }
 
     private void throwIfNotFullyInitialized() {
@@ -93,7 +59,6 @@ public class Chunk implements Pool.Poolable {
      */
     @Deprecated
     public byte getVoxelAt_LP(int lx, int ly, int lz) {
-        throwIfUninitialized();
         return voxels[calcVoxelArrayPosition_LP(lx, ly, lz)];
     }
 
@@ -107,7 +72,6 @@ public class Chunk implements Pool.Poolable {
      */
     @Nullable
     public VoxelAttributes getVoxelAttrsAt_LP(int lx, int ly, int lz) {
-        throwIfUninitialized();
         return voxelAttributesMap.get(calcVoxelArrayPosition_LP(lx, ly, lz));
     }
 
@@ -120,10 +84,9 @@ public class Chunk implements Pool.Poolable {
      * @return VoxelAttributes or null
      */
     public VoxelAttributes getVoxelAttrsAt_G_LP(int lx, int ly, int lz) {
-        throwIfUninitialized();
         VoxelAttributes attrs = getVoxelAttrsAt_LP(lx, ly, lz);
         if (attrs == null) {
-            attrs = VoxelAttributes.POOL.obtain();
+            attrs = new VoxelAttributes();
             putVoxelAttrsAt_LP(lx, ly, lz, attrs);
         }
         return attrs;
@@ -139,12 +102,8 @@ public class Chunk implements Pool.Poolable {
      * @param voxelAttributes
      */
     public void putVoxelAttrsAt_LP(int lx, int ly, int lz, @NotNull VoxelAttributes voxelAttributes) {
-        throwIfUninitialized();
         int pos = calcVoxelArrayPosition_LP(lx, ly, lz);
-        VoxelAttributes oldValue = voxelAttributesMap.put(pos, voxelAttributes);
-        if (oldValue != null) {
-            VoxelAttributes.POOL.free(oldValue);
-        }
+        voxelAttributesMap.put(pos, voxelAttributes);
     }
 
     /**
@@ -156,7 +115,6 @@ public class Chunk implements Pool.Poolable {
      * @throws IllegalStateException If there is no voxel attribute associated with the voxel at position (lx, ly, lz).
      */
     public void delVoxelAttrsAt_LP(int lx, int ly, int lz) {
-        throwIfUninitialized();
         delVoxelAttrsAt_LP(lx, ly, lz, false);
     }
 
@@ -171,14 +129,10 @@ public class Chunk implements Pool.Poolable {
      *                               attribute associated with the voxel at position (lx, ly, lz).
      */
     public void delVoxelAttrsAt_LP(int lx, int ly, int lz, boolean ignoreNonexisting) {
-        throwIfUninitialized();
         int pos = calcVoxelArrayPosition_LP(lx, ly, lz);
         VoxelAttributes removedValue = voxelAttributesMap.remove(pos);
         if (removedValue == null && !ignoreNonexisting) {
             throw new IllegalStateException("No attribute for voxel (%d, %d, %d)".formatted(lx, ly, lz));
-        }
-        if (removedValue != null) {
-            VoxelAttributes.POOL.free(removedValue);
         }
     }
 
@@ -191,7 +145,6 @@ public class Chunk implements Pool.Poolable {
      * @return
      */
     private int calcVoxelArrayPosition_LP(int lx, int ly, int lz) {
-        throwIfUninitialized();
         return ArrayUtil.xyzToI(CHUNK_SIZE, CHUNK_DEPTH, lx, ly, lz);
     }
 
@@ -208,7 +161,6 @@ public class Chunk implements Pool.Poolable {
      */
     @Deprecated
     public void putVoxelAt_LP(int lx, int ly, int lz, byte voxel) {
-        throwIfUninitialized();
         putVoxelAt_LP(lx, ly, lz, voxel, false);
     }
 
@@ -226,7 +178,6 @@ public class Chunk implements Pool.Poolable {
      */
     @Deprecated
     public void putVoxelAt_LP(int lx, int ly, int lz, byte voxel, boolean keepAttributes) {
-        throwIfUninitialized();
         byte prevVoxel = getVoxelAt_LP(lx, ly, lz);
         if (prevVoxel == 0 && voxel != 0) {
             voxelCount++;
@@ -244,7 +195,6 @@ public class Chunk implements Pool.Poolable {
      * Updates all voxels in this chunk.
      */
     public void updateVoxels() {
-        throwIfUninitialized();
         for (int lx = 0; lx < CHUNK_SIZE; lx++) {
             for (int wy = 0; wy < CHUNK_DEPTH; wy++) {
                 for (int lz = 0; lz < CHUNK_SIZE; lz++) {
@@ -267,7 +217,6 @@ public class Chunk implements Pool.Poolable {
      * @return The voxel or invalid value (-1)
      */
     public int getSurfaceVoxelWy_LP(int lx, int lz) {
-        throwIfUninitialized();
         for (int wy = CHUNK_DEPTH - 1; wy >= 0; wy--) {
             byte v = getVoxelAt_LP(lx, wy, lz);
             if (v != 0) {
@@ -281,7 +230,6 @@ public class Chunk implements Pool.Poolable {
      * Slopifies every voxel in this chunk if they need to become slopes.
      */
     public void slopifyVoxels(boolean propagateToSurroundingChunks) {
-        throwIfUninitialized();
         for (int lx = 0; lx < CHUNK_SIZE; lx++) {
             for (int y = 0; y < CHUNK_DEPTH; y++) {
                 for (int lz = 0; lz < CHUNK_SIZE; lz++) {
@@ -300,7 +248,6 @@ public class Chunk implements Pool.Poolable {
      * @param propagateToSurroundingChunks If set to true, sloping will propagate to adjacent voxels that are outside the specified chunk
      */
     private void slopifyVoxel_LP(int lx, int y, int lz, boolean propagateToSurroundingChunks) {
-        throwIfUninitialized();
         byte voxel = getVoxelAt_LP(lx, y, lz);
         if (voxel == 0) {
             return;
@@ -464,7 +411,6 @@ public class Chunk implements Pool.Poolable {
      * @param isInnerCorner
      */
     private void slopifyVoxel(int lx, int y, int lz, byte slopeDirection, boolean isInnerCorner) {
-        throwIfUninitialized();
         VoxelAttributes attrs = getVoxelAttrsAt_G_LP(lx, y, lz);
         attrs.configureSlope(slopeDirection, isInnerCorner);
 
@@ -497,17 +443,14 @@ public class Chunk implements Pool.Poolable {
     }
 
     public World getWorld() {
-        throwIfUninitialized();
         return world;
     }
 
     public int getCx() {
-        throwIfUninitialized();
         return cx;
     }
 
     public int getCz() {
-        throwIfUninitialized();
         return cz;
     }
 
@@ -516,12 +459,8 @@ public class Chunk implements Pool.Poolable {
         return chunkRenderer;
     }
 
-    public boolean isInitialized() {
-        return initialized;
-    }
-
     public boolean isFullyInitialized() {
-        return initialized && graphicsInitialized;
+        return graphicsInitialized;
     }
 
     public boolean needsRenderingUpdate() {
@@ -530,5 +469,12 @@ public class Chunk implements Pool.Poolable {
 
     public void setNeedsRenderingUpdate(boolean needsRenderingUpdate) {
         this.needsRenderingUpdate = needsRenderingUpdate;
+    }
+
+    @Override
+    public void dispose() {
+        if (chunkRenderer != null) {
+            chunkRenderer.dispose();
+        }
     }
 }

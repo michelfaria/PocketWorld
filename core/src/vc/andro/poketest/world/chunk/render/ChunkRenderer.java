@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Pool;
 import vc.andro.poketest.Assets;
 import vc.andro.poketest.PocketWorld;
@@ -21,13 +22,15 @@ import vc.andro.poketest.voxel.VoxelSpec;
 import vc.andro.poketest.voxel.VoxelSpecs;
 import vc.andro.poketest.world.chunk.Chunk;
 
+import java.util.function.Consumer;
+
 import static vc.andro.poketest.util.VertexArray.VERTEX_SIZE;
 import static vc.andro.poketest.world.World.LxWx;
 import static vc.andro.poketest.world.World.LzWz;
 import static vc.andro.poketest.world.chunk.Chunk.CHUNK_DEPTH;
 import static vc.andro.poketest.world.chunk.Chunk.CHUNK_SIZE;
 
-public class ChunkRenderer implements RenderableProvider {
+public class ChunkRenderer implements RenderableProvider, Disposable {
 
     public static final int VOXELS_PER_CHUNK       = CHUNK_SIZE * CHUNK_DEPTH * CHUNK_SIZE;
     public static final int FACES_IN_A_CUBE        = 6;
@@ -38,15 +41,12 @@ public class ChunkRenderer implements RenderableProvider {
 
     private final Chunk chunk;
 
-    private final VertexArray vertexArray8f;
-    private final IndexArray  indicesArray;
-    private final Mesh        mesh;
-    private final Material    material;
+    private final Mesh     mesh;
+    private final Material material;
+    private       int      cachedVertexCount;
 
     public ChunkRenderer(Chunk chunk) {
         this.chunk = chunk;
-        vertexArray8f = new VertexArray();
-        indicesArray = new IndexArray();
         mesh = new Mesh(
                 true,
                 MAX_VERTICES_PER_CHUNK,
@@ -62,11 +62,10 @@ public class ChunkRenderer implements RenderableProvider {
                 new FloatAttribute(FloatAttribute.AlphaTest, 0.0f));
     }
 
-
-    private void rerenderIfNeeded() {
+    private void rerenderIfNeeded(Consumer<Integer> consumer) {
         if (chunk.needsRenderingUpdate()) {
-            vertexArray8f.clear();
-            indicesArray.clear();
+            var vertexArray8f = new VertexArray();
+            var indicesArray = new IndexArray();
             for (int ly = 0; ly < CHUNK_DEPTH; ly++) {
                 for (int lz = 0; lz < CHUNK_SIZE; lz++) {
                     for (int lx = 0; lx < CHUNK_SIZE; lx++) {
@@ -85,27 +84,36 @@ public class ChunkRenderer implements RenderableProvider {
                     }
                 }
             }
-            mesh.setVertices(vertexArray8f.getItems(), 0, vertexArray8f.getItems().length);
-            mesh.setIndices(indicesArray.getItems(), 0, indicesArray.getItems().length);
-            chunk.setNeedsRenderingUpdate(false);
-            Gdx.app.log("Chunk",
-                    "Amount vertices: " + vertexArray8f.getAmountVertices()
-                            + ", amount attributes: " + vertexArray8f.getItems().length);
+            this.mesh.setVertices(vertexArray8f.getItems(), 0, vertexArray8f.getItems().length);
+            this.mesh.setIndices(indicesArray.getItems(), 0, indicesArray.getItems().length);
+            this.chunk.setNeedsRenderingUpdate(false);
+            Gdx.app.log("Chunk", "Amount vertices: " + vertexArray8f.getAmountVertices()
+                    + ", amount attributes: " + vertexArray8f.getItems().length);
+
+            this.cachedVertexCount = vertexArray8f.getItems().length;
         }
+
+        consumer.accept(cachedVertexCount);
     }
 
     @Override
     public void getRenderables(Array<Renderable> renderables, Pool<Renderable> pool) {
-        rerenderIfNeeded();
-        if (vertexArray8f.getAmountVertices() == 0) {
-            return;
-        }
-        Renderable r = pool.obtain();
-        r.material = material;
-        r.meshPart.mesh = mesh;
-        r.meshPart.offset = 0;
-        r.meshPart.size = vertexArray8f.getItems().length / VERTEX_SIZE / POINTS_IN_A_SQUARE * FACES_IN_A_CUBE;
-        r.meshPart.primitiveType = GL20.GL_TRIANGLES;
-        renderables.add(r);
+        rerenderIfNeeded((vertexCount) -> {
+            if (vertexCount == 0) {
+                return;
+            }
+            Renderable r = pool.obtain();
+            r.material = material;
+            r.meshPart.mesh = mesh;
+            r.meshPart.offset = 0;
+            r.meshPart.size = vertexCount / VERTEX_SIZE / POINTS_IN_A_SQUARE * FACES_IN_A_CUBE;
+            r.meshPart.primitiveType = GL20.GL_TRIANGLES;
+            renderables.add(r);
+        });
+    }
+
+    @Override
+    public void dispose() {
+        mesh.dispose();
     }
 }

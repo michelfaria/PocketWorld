@@ -18,9 +18,9 @@ import static vc.andro.poketest.world.chunk.Chunk.CHUNK_SIZE;
 
 public class World {
     private final WorldGenerator     worldGenerator;
-    private final ChunkMatrix<Chunk> chunks   = new ChunkMatrix<>();
-    private final Array<Entity>      entities = new Array<>(Entity.class);
-    private final Vector3         viewpointWp = new Vector3();
+    private final ChunkMatrix<Chunk> chunks      = new ChunkMatrix<>();
+    private final Array<Entity>      entities    = new Array<>(Entity.class);
+    private final Vector3            viewpointWp = new Vector3();
 
     private final Array<WorldUpdateStep> updateSteps = new Array<>(WorldUpdateStep.class);
 
@@ -122,8 +122,7 @@ public class World {
         if (getChunkAt_CP(cx, cz) != null) {
             throw new IllegalArgumentException("A chunk already exists at %d,%d".formatted(cx, cz));
         }
-        Chunk chunk = Chunk.POOL.obtain();
-        chunk.init(this, cx, cz);
+        Chunk chunk = new Chunk(this, cx, cz);
         chunks.set(cx, cz, chunk);
         return chunk;
     }
@@ -235,8 +234,8 @@ public class World {
         if (chunks.remove(chunk.getCx(), chunk.getCz()) == null) {
             throw new IllegalStateException("failed to remove chunk from chunk map");
         }
+        chunk.dispose();
         Gdx.app.log("World", "Unloaded chunk at (" + chunk.getCx() + ", " + chunk.getCz() + ")!");
-        Chunk.POOL.free(chunk);
     }
 
     /**

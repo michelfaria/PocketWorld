@@ -3,16 +3,13 @@ package vc.andro.poketest;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import vc.andro.poketest.entity.Player;
 import vc.andro.poketest.graphics.DebugRenderSystem;
 import vc.andro.poketest.graphics.MainRenderSystem;
 import vc.andro.poketest.registry.GeneralSettingsRegistry;
-import vc.andro.poketest.world.chunk.Chunk;
 import vc.andro.poketest.world.World;
 import vc.andro.poketest.world.WorldCreationParams;
+import vc.andro.poketest.world.chunk.Chunk;
 import vc.andro.poketest.world.generation.WorldGenerator;
-
-import static vc.andro.poketest.world.chunk.Chunk.CHUNK_DEPTH;
 
 public class PlayScreen implements Screen {
 
@@ -29,10 +26,10 @@ public class PlayScreen implements Screen {
         mainRenderSystem = new MainRenderSystem(world, cam);
         debugRenderSystem = new DebugRenderSystem(world, cam);
 
-        int playerY = Math.max(world.getSurfaceVoxelWy_WP(0, 0) + 1, CHUNK_DEPTH);
-        Player player = new Player();
-        player.setPosition(0, playerY, 0);
-        world.addEntity(player);
+//        int playerY = Math.max(world.getSurfaceVoxelWy_WP(0, 0) + 1, CHUNK_DEPTH);
+//        Player player = new Player();
+//        player.setPosition(0, playerY, 0);
+//        world.addEntity(player);
     }
 
     @Override

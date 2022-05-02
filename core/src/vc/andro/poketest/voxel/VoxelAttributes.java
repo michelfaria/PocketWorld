@@ -1,12 +1,8 @@
 package vc.andro.poketest.voxel;
 
-import com.badlogic.gdx.utils.Pool;
-import com.badlogic.gdx.utils.Pools;
 import vc.andro.poketest.Direction;
 
-public class VoxelAttributes implements Pool.Poolable {
-
-    public static final Pool<VoxelAttributes> POOL = Pools.get(VoxelAttributes.class);
+public class VoxelAttributes {
 
     public static final int BYTE_SLOPE_FACING_DIRECTION = 0;
     public static final int BOOL_IS_INNER_CORNER_SLOPE = 0;
@@ -14,15 +10,11 @@ public class VoxelAttributes implements Pool.Poolable {
     private final boolean[] bools;
     private final byte[] bytes;
 
-    private VoxelAttributes() {
+    @SuppressWarnings("ConstantConditions")
+    public VoxelAttributes() {
         bools = new boolean[1];
         bytes = new byte[1];
 
-        reset();
-    }
-
-    @Override
-    public void reset() {
         bools[BOOL_IS_INNER_CORNER_SLOPE] = false;
         bytes[BYTE_SLOPE_FACING_DIRECTION] = Direction.NA;
     }
