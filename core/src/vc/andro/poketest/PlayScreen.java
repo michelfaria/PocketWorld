@@ -6,6 +6,8 @@ import com.badlogic.gdx.Screen;
 import vc.andro.poketest.entity.Player;
 import vc.andro.poketest.graphics.DebugRenderSystem;
 import vc.andro.poketest.graphics.MainRenderSystem;
+import vc.andro.poketest.graphics.camera.PlayerCameraStrategy;
+import vc.andro.poketest.graphics.camera.PocketCamera;
 import vc.andro.poketest.registry.GeneralSettingsRegistry;
 import vc.andro.poketest.world.World;
 import vc.andro.poketest.world.WorldCreationParams;
@@ -16,25 +18,26 @@ import static vc.andro.poketest.world.chunk.Chunk.CHUNK_DEPTH;
 
 public class PlayScreen implements Screen {
 
-    private final PocketCamera cam;
-    private final World world;
-    private final MainRenderSystem mainRenderSystem;
+    private final PocketCamera      cam;
+    private final World             world;
+    private final MainRenderSystem  mainRenderSystem;
     private final DebugRenderSystem debugRenderSystem;
 
     private float timeSinceLastTick;
 
     public PlayScreen(WorldCreationParams worldCreationParams) {
         world = new WorldGenerator(worldCreationParams).getWorld();
-        cam = new PocketCamera(world);
+        cam = new PocketCamera(world, new PlayerCameraStrategy(null));
         mainRenderSystem = new MainRenderSystem(world, cam);
         debugRenderSystem = new DebugRenderSystem(world, cam);
 
         world.chunkGenerationFinished.addOneTimeListener(chunk -> {
             if (chunk.getCx() == 0 && chunk.getCz() == 0) {
                 int playerY = Math.min(chunk.getSurfaceVoxelWy_LP(0, 0) + 1, CHUNK_DEPTH);
-                Player player = new Player();
-                player.setPosition(0, playerY, 0);
+                Player player = new Player(world, cam);
+                player.setPositionWp(0, playerY, 0);
                 world.addEntity(player);
+                cam.setFollowPlayer(player);
                 return true;
             }
             return false;

@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g3d.RenderableProvider;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
-import vc.andro.poketest.PocketCamera;
+import vc.andro.poketest.graphics.camera.PocketCamera;
 import vc.andro.poketest.entity.Entity;
 import vc.andro.poketest.registry.DebugInfoRegistry;
 import vc.andro.poketest.registry.RenderSettingsRegistry;

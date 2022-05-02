@@ -12,7 +12,7 @@ public class TallGrassEntity extends Entity {
     public TallGrassEntity() {
         int variation = 0;
 
-        TextureAtlas atlas = PocketWorld.assetManager.get(Assets.entityAtlas);
+        TextureAtlas atlas = PocketWorld.getAssetManager().get(Assets.entityAtlas);
         for (int i = 0; i <= 1; i++) {
             var decal = new EntityDecal(Decal.newDecal(
                     AtlasUtil.findRegion(atlas, "entity/tall_grass/tgrass%d%d".formatted(variation, i)),

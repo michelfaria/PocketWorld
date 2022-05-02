@@ -13,7 +13,7 @@ public class TreeEntity extends Entity {
 
     public TreeEntity() {
         super(new Vector3(2.0f, 4.0f, 2.0f));
-        TextureAtlas atlas = PocketWorld.assetManager.get(Assets.entityAtlas);
+        TextureAtlas atlas = PocketWorld.getAssetManager().get(Assets.entityAtlas);
         {
             var mainDecal = new EntityDecal(Decal.newDecal(
                     AtlasUtil.findRegion(atlas, "entity/tree/tree_main"),

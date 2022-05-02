@@ -15,7 +15,7 @@ public class SimpleEntitySpawner<T extends Entity> implements Spawner<Prospector
     public void spawn(ProspectorResult prospectorResult, Chunk chunk, int wx, int y, int wz, int cx, int cz, int lx, int lz) {
         try {
             T entity = entityClass.getDeclaredConstructor().newInstance();
-            entity.setPosition(wx, y, wz);
+            entity.setPositionWp(wx, y, wz);
             chunk.getWorld().addEntity(entity);
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -28,7 +28,7 @@ public class Voxel {
         this.voxelRenderer = voxelRenderer;
         this.destroyedBySloping = destroyedBySloping;
 
-        TextureAtlas atlas = PocketWorld.assetManager.get(Assets.tileAtlas);
+        TextureAtlas atlas = PocketWorld.getAssetManager().get(Assets.tileAtlas);
 
         if (textureRegionIds != null) {
             textureRegions = textureRegionIds.map((id, $) -> {

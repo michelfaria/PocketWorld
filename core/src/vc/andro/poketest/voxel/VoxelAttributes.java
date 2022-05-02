@@ -2,6 +2,8 @@ package vc.andro.poketest.voxel;
 
 import vc.andro.poketest.Direction;
 
+import static vc.andro.poketest.Direction.*;
+
 public class VoxelAttributes {
 
     public static final int BYTE_SLOPE_FACING_DIRECTION = 0;
@@ -67,5 +69,189 @@ public class VoxelAttributes {
 
     public boolean isSlope() {
         return bytes[BYTE_SLOPE_FACING_DIRECTION] != Direction.NA;
+    }
+    @SuppressWarnings("DuplicatedCode")
+    public float getHeightInDirection(byte direction) {
+        if (getSlopeFacingDirection() == Direction.NA) {
+            return 1.0f;
+        }
+
+        boolean isInnerCorner = getIsInnerCornerSlope();
+
+        switch (getSlopeFacingDirection()) {
+            case NORTHWEST -> {
+                if (isInnerCorner) {
+                    switch (direction) {
+                        case NORTHWEST -> {
+                            return 0;
+                        }
+                        case NORTH, SOUTH, EAST, WEST -> {
+                            return 0.5f;
+                        }
+                        case NORTHEAST, SOUTHEAST, SOUTHWEST -> {
+                            return 1;
+                        }
+                        default -> throw new AssertionError();
+                    }
+                } else {
+                    switch (direction) {
+                        case NORTHWEST, NORTHEAST, SOUTHWEST -> {
+                            return 0;
+                        }
+                        case WEST, NORTH, EAST, SOUTH -> {
+                            return 0.5f;
+                        }
+                        case SOUTHEAST -> {
+                            return 1;
+                        }
+                        default -> throw new AssertionError();
+                    }
+                }
+            }
+            case NORTHEAST -> {
+                if (isInnerCorner) {
+                    switch (direction) {
+                        case NORTHEAST -> {
+                            return 0;
+                        }
+                        case NORTH, SOUTH, EAST, WEST -> {
+                            return 0.5f;
+                        }
+                        case NORTHWEST, SOUTHWEST, SOUTHEAST -> {
+                            return 1;
+                        }
+                        default -> throw new AssertionError();
+                    }
+                } else {
+                    switch (direction) {
+                        case NORTHEAST, NORTHWEST, SOUTHEAST -> {
+                            return 0;
+                        }
+                        case WEST, NORTH, EAST, SOUTH -> {
+                            return 0.5f;
+                        }
+                        case SOUTHWEST -> {
+                            return 1;
+                        }
+                        default -> throw new AssertionError();
+                    }
+                }
+            }
+            case SOUTHWEST -> {
+                if (isInnerCorner) {
+                    switch (direction) {
+                        case SOUTHWEST -> {
+                            return 0;
+                        }
+                        case NORTH, SOUTH, EAST, WEST -> {
+                            return 0.5f;
+                        }
+                        case SOUTHEAST, NORTHEAST, NORTHWEST -> {
+                            return 1;
+                        }
+                        default -> throw new AssertionError();
+                    }
+                } else {
+                    switch (direction) {
+                        case SOUTHWEST, SOUTHEAST, NORTHWEST -> {
+                            return 0;
+                        }
+                        case WEST, NORTH, EAST, SOUTH -> {
+                            return 0.5f;
+                        }
+                        case NORTHEAST -> {
+                            return 1;
+                        }
+                        default -> throw new AssertionError();
+                    }
+                }
+            }
+            case SOUTHEAST -> {
+                if (isInnerCorner) {
+                    switch (direction) {
+                        case SOUTHEAST -> {
+                            return 0;
+                        }
+                        case NORTH, SOUTH, EAST, WEST -> {
+                            return 0.5f;
+                        }
+                        case SOUTHWEST, NORTHWEST, NORTHEAST -> {
+                            return 1;
+                        }
+                        default -> throw new AssertionError();
+                    }
+                } else {
+                    switch (direction) {
+                        case SOUTHEAST, SOUTHWEST, NORTHEAST -> {
+                            return 0;
+                        }
+                        case WEST, NORTH, EAST, SOUTH -> {
+                            return 0.5f;
+                        }
+                        case NORTHWEST -> {
+                            return 1;
+                        }
+                        default -> throw new AssertionError();
+                    }
+                }
+            }
+            case NORTH -> {
+                switch (direction) {
+                    case NORTHWEST, NORTH, NORTHEAST -> {
+                        return 0;
+                    }
+                    case WEST, EAST -> {
+                        return 0.5f;
+                    }
+                    case SOUTHWEST, SOUTH, SOUTHEAST -> {
+                        return 1;
+                    }
+                    default -> throw new AssertionError();
+                }
+            }
+            case SOUTH -> {
+                switch (direction) {
+                    case SOUTHWEST, SOUTH, SOUTHEAST -> {
+                        return 0;
+                    }
+                    case WEST, EAST -> {
+                        return 0.5f;
+                    }
+                    case NORTHWEST, NORTH, NORTHEAST -> {
+                        return 1;
+                    }
+                    default -> throw new AssertionError();
+                }
+            }
+            case WEST -> {
+                switch (direction) {
+                    case NORTHWEST, WEST, SOUTHWEST -> {
+                        return 0;
+                    }
+                    case NORTH, SOUTH -> {
+                        return 0.5f;
+                    }
+                    case NORTHEAST, EAST, SOUTHEAST -> {
+                        return 1;
+                    }
+                    default -> throw new AssertionError();
+                }
+            }
+            case EAST -> {
+                switch (direction) {
+                    case NORTHEAST, EAST, SOUTHEAST -> {
+                        return 0;
+                    }
+                    case NORTH, SOUTH -> {
+                        return 0.5f;
+                    }
+                    case NORTHWEST, WEST, SOUTHWEST -> {
+                        return 1;
+                    }
+                    default -> throw new AssertionError();
+                }
+            }
+            default -> throw new AssertionError();
+        }
     }
 }

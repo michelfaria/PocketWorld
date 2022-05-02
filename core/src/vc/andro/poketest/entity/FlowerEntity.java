@@ -12,7 +12,7 @@ public class FlowerEntity extends Entity {
     public FlowerEntity() {
         super();
 
-        TextureAtlas atlas = PocketWorld.assetManager.get(Assets.entityAtlas);
+        TextureAtlas atlas = PocketWorld.getAssetManager().get(Assets.entityAtlas);
         {
             var mainDecal = new EntityDecal(Decal.newDecal(
                     AtlasUtil.findRegion(atlas, "entity/flower"),

@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Disposable;
 import vc.andro.poketest.Assets;
-import vc.andro.poketest.PocketCamera;
+import vc.andro.poketest.graphics.camera.PocketCamera;
 import vc.andro.poketest.PocketWorld;
 import vc.andro.poketest.registry.DebugInfoRegistry;
 import vc.andro.poketest.world.World;
@@ -24,7 +24,7 @@ public class DebugRenderSystem implements Disposable {
         this.cam = cam;
         this.world = world;
         spriteBatch = new SpriteBatch();
-        font = PocketWorld.assetManager.get(Assets.hackFont8pt);
+        font = PocketWorld.getAssetManager().get(Assets.hackFont8pt);
     }
 
     public void render() {

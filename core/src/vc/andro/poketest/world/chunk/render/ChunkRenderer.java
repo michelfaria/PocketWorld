@@ -57,7 +57,7 @@ public class ChunkRenderer implements RenderableProvider, Disposable {
         material = new Material(
                 new TextureAttribute(
                         TextureAttribute.Diffuse,
-                        PocketWorld.assetManager.get(Assets.tileAtlas).getTextures().first()),
+                        PocketWorld.getAssetManager().get(Assets.tileAtlas).getTextures().first()),
                 new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA),
                 new FloatAttribute(FloatAttribute.AlphaTest, 0.0f));
     }

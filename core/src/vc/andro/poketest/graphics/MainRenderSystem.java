@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader;
 import com.badlogic.gdx.utils.Disposable;
-import vc.andro.poketest.PocketCamera;
+import vc.andro.poketest.graphics.camera.PocketCamera;
 import vc.andro.poketest.world.NoChunkException;
 import vc.andro.poketest.world.World;
 import vc.andro.poketest.world.WorldRenderer;
@@ -34,7 +34,7 @@ public class MainRenderSystem implements Disposable {
         env = new Environment();
         env.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 0.8f));
         env.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, 0.0f, -1.0f, 0.0f));
-        cameraGroupStrategy = new MyCameraGroupStrategy(cam.getUnderlying());
+        cameraGroupStrategy = cam.createCameraGroupStrategy();
         decalBatch = new DecalBatch(cameraGroupStrategy);
         modelBatch = new ModelBatch(Gdx.files.internal("vertex.glsl"), Gdx.files.internal("fragment.glsl"));
         DefaultShader.defaultCullFace = GL20.GL_FRONT;
@@ -52,7 +52,7 @@ public class MainRenderSystem implements Disposable {
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glEnable(GL20.GL_CULL_FACE);
 
-        modelBatch.begin(cam.getUnderlying());
+        cam.beginModelBatch(modelBatch);
         modelBatch.render(worldRenderer, env);
         modelBatch.end();
 

@@ -5,28 +5,6 @@ import vc.andro.poketest.world.chunk.Chunk;
 
 public class UnloadChunksWorldUpdateStep implements WorldUpdateStep {
 
-    private static volatile UnloadChunksWorldUpdateStep sInstance = null;
-
-    private UnloadChunksWorldUpdateStep() {
-        if (sInstance != null) {
-            throw new AssertionError(
-                    "Another instance of "
-                            + UnloadChunksWorldUpdateStep.class.getName()
-                            + " class already exists - can't create a new instance.");
-        }
-    }
-
-    public static UnloadChunksWorldUpdateStep getInstance() {
-        if (sInstance == null) {
-            synchronized (UnloadChunksWorldUpdateStep.class) {
-                if (sInstance == null) {
-                    sInstance = new UnloadChunksWorldUpdateStep();
-                }
-            }
-        }
-        return sInstance;
-    }
-
     private final Array<Chunk> aux = new Array<>(Chunk.class);
 
     @Override

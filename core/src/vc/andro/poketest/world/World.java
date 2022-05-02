@@ -24,9 +24,10 @@ public class World {
     private final Array<WorldUpdateStep> updateSteps = new Array<>(WorldUpdateStep.class);
 
     {
-        updateSteps.add(GenerateChunksInRenderDistanceWorldUpdateStep.getInstance());
-        updateSteps.add(UnloadChunksWorldUpdateStep.getInstance());
-        updateSteps.add(UnloadEntitiesWorldUpdateStep.getInstance());
+        updateSteps.add(new GenerateChunksInRenderDistanceWorldUpdateStep());
+        updateSteps.add(new UnloadChunksWorldUpdateStep());
+        updateSteps.add(new UnloadEntitiesWorldUpdateStep());
+        updateSteps.add(new UpdateEntitiesInWorldUpdateStep());
     }
 
     public final EventEmitter<Chunk> chunkGenerationFinished = new EventEmitter<>();
@@ -248,6 +249,10 @@ public class World {
             return true;
         }
         return false;
+    }
+
+    public void setViewpoint(Vector3 wp) {
+        setViewpoint(wp.x, wp.y, wp.z);
     }
 
     public void setViewpoint(float wx, float wy, float wz) {
