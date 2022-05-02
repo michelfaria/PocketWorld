@@ -19,12 +19,12 @@ public class Chunk implements Disposable {
 
     public static final int                     CHUNK_SIZE           = 16;
     public static final int                     CHUNK_DEPTH          = 128;
-    public static final int                     TOTAL_VOXELS         = CHUNK_SIZE * CHUNK_DEPTH * CHUNK_SIZE;
-    private             World                   world;
-    private             int                     cx;
-    private             int                     cz;
-    private             byte[]                  voxels               = new byte[TOTAL_VOXELS];
-    private final       IntMap<VoxelAttributes> voxelAttributesMap   = new IntMap<>();
+    public static final int                     TOTAL_VOXELS       = CHUNK_SIZE * CHUNK_DEPTH * CHUNK_SIZE;
+    private final       World                   world;
+    private final       int                     cx;
+    private final       int                     cz;
+    private final       byte[]                  voxels             = new byte[TOTAL_VOXELS];
+    private final       IntMap<VoxelAttributes> voxelAttributesMap = new IntMap<>();
     private             int                     voxelCount           = 0;
     private             ChunkRenderer           chunkRenderer        = null;
     private             boolean                 graphicsInitialized  = false;
@@ -42,7 +42,7 @@ public class Chunk implements Disposable {
     }
 
     private void throwIfNotFullyInitialized() {
-        if (!isFullyInitialized()) {
+        if (isNotFullyInitialized()) {
             throw new IllegalStateException("Chunk needs to be fully initialized for this operation");
         }
     }
@@ -445,8 +445,8 @@ public class Chunk implements Disposable {
         return chunkRenderer;
     }
 
-    public boolean isFullyInitialized() {
-        return graphicsInitialized;
+    public boolean isNotFullyInitialized() {
+        return !graphicsInitialized;
     }
 
     public boolean needsRenderingUpdate() {

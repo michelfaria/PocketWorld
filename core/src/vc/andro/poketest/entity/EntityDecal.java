@@ -5,8 +5,7 @@ import com.badlogic.gdx.graphics.g3d.decals.Decal;
 import org.jetbrains.annotations.NotNull;
 
 class EntityDecal {
-    @NotNull
-    Decal decal;
+    @NotNull final Decal decal;
 
     float yaw;
     float pitch;

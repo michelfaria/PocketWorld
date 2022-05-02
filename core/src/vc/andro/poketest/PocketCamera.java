@@ -23,7 +23,7 @@ public class PocketCamera extends InputAdapter {
     private final World world;
     private final Vector3 tmp;
 
-    private float rotateSpeed = 1.0f;
+    private final float rotateSpeed = 1.0f;
 
     public PocketCamera(World world) {
         this.world = world;

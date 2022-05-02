@@ -37,7 +37,7 @@ public class WorldRenderer implements RenderableProvider {
                 if (chunk == null) {
                     continue;
                 }
-                if (!chunk.isFullyInitialized()) {
+                if (chunk.isNotFullyInitialized()) {
                     chunk.fullyInitialize();
                 }
                 chunk.getChunkRenderingStrategy().getRenderables(renderables, pool);

@@ -16,10 +16,10 @@ import vc.andro.poketest.world.WorldRenderer;
 
 public class MainRenderSystem implements Disposable {
 
-    private float clearColorR = 0.08235294f + 0.2f;
-    private float clearColorG = 0.5411765f + 0.2f;
-    private float clearColorB = 0.7411765f + 0.2f;
-    private float clearColorA = 1.0f;
+    private final float clearColorR = 0.08235294f + 0.2f;
+    private final float clearColorG = 0.5411765f + 0.2f;
+    private final float clearColorB = 0.7411765f + 0.2f;
+    private final float clearColorA = 1.0f;
 
     private final PocketCamera cam;
     private final Environment env;

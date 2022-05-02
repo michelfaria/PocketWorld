@@ -12,8 +12,8 @@ public class Entity {
     private float wy;
     private float wz;
 
-    public final Vector3 dimensions;
-    protected Array<EntityDecal> decals;
+    public final    Vector3            dimensions;
+    protected final Array<EntityDecal> decals;
 
     public Entity() {
         this(new Vector3(1.0f, 1.0f, 1.0f));
@@ -44,9 +44,11 @@ public class Entity {
     }
 
     public void tick() {
+        // TODO
     }
 
     public void update(float delta) {
+        // TODO
     }
 
     public void setPosition(float wx, float wy, float wz) {

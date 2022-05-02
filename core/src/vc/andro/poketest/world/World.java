@@ -241,6 +241,7 @@ public class World {
             return true;
         }
         VoxelAttributes attrs = chunk.getVoxelAttrsAt_LP(lx, y, lz);
+        //noinspection RedundantIfStatement
         if (attrs != null && attrs.isSlope()) {
             return true;
         }

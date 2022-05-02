@@ -28,6 +28,7 @@ public class ChunkMatrix<T> {
     /**
      * Sets an entry at (x, y). Returns a T if it replaced something.
      */
+    @SuppressWarnings("UnusedReturnValue")
     @Nullable
     public synchronized T set(int x, int y, T val) {
         IntMap<T> ym = map.get(x);
