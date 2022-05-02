@@ -117,6 +117,7 @@ public class WorldGenerator {
             world.updateChunk(cx, cz);
 
             log("Generated chunk (%d, %d)".formatted(cx, cz));
+            world.chunkGenerationFinished.emit(chunk);
         }
 
         chunksQueued.clear();

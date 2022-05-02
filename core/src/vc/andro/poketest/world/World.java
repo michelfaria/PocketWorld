@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.entity.Entity;
 import vc.andro.poketest.registry.RenderSettingsRegistry;
+import vc.andro.poketest.util.EventEmitter;
 import vc.andro.poketest.voxel.Voxel;
 import vc.andro.poketest.voxel.VoxelAttributes;
 import vc.andro.poketest.world.chunk.Chunk;
@@ -16,11 +17,10 @@ import vc.andro.poketest.world.generation.WorldGenerator;
 import static vc.andro.poketest.world.chunk.Chunk.CHUNK_SIZE;
 
 public class World {
-    private final WorldGenerator     worldGenerator;
-    private final ChunkMatrix<Chunk> chunks      = new ChunkMatrix<>();
-    private final Array<Entity>      entities    = new Array<>(Entity.class);
-    private final Vector3            viewpointWp = new Vector3();
-
+    private final WorldGenerator         worldGenerator;
+    private final ChunkMatrix<Chunk>     chunks      = new ChunkMatrix<>();
+    private final Array<Entity>          entities    = new Array<>(Entity.class);
+    private final Vector3                viewpointWp = new Vector3();
     private final Array<WorldUpdateStep> updateSteps = new Array<>(WorldUpdateStep.class);
 
     {
@@ -28,6 +28,8 @@ public class World {
         updateSteps.add(UnloadChunksWorldUpdateStep.getInstance());
         updateSteps.add(UnloadEntitiesWorldUpdateStep.getInstance());
     }
+
+    public final EventEmitter<Chunk> chunkGenerationFinished = new EventEmitter<>();
 
     public World(WorldGenerator worldGenerator) {
         this.worldGenerator = worldGenerator;

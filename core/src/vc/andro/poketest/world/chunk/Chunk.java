@@ -210,7 +210,7 @@ public class Chunk implements Disposable {
     public int getSurfaceVoxelWy_LP(int lx, int lz) {
         for (int wy = CHUNK_DEPTH - 1; wy >= 0; wy--) {
             Voxel v = getVoxelAt_LP(lx, wy, lz);
-            if (v != null && v != Voxels.AIR) {
+            if (!Voxels.isAirOrNull(v)) {
                 return wy;
             }
         }
