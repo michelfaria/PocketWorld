@@ -11,14 +11,15 @@ import vc.andro.poketest.util.EventEmitter;
 import vc.andro.poketest.voxel.Voxel;
 import vc.andro.poketest.voxel.VoxelAttributes;
 import vc.andro.poketest.world.chunk.Chunk;
-import vc.andro.poketest.world.chunk.ChunkMatrix;
+import vc.andro.poketest.world.chunk.CoordinateMatrix;
 import vc.andro.poketest.world.generation.WorldGenerator;
 
 import static vc.andro.poketest.world.chunk.Chunk.CHUNK_SIZE;
 
 public class World {
+    private final CoordinateMatrix<Chunk> chunks = new CoordinateMatrix<>();
+
     private final WorldGenerator         worldGenerator;
-    private final ChunkMatrix<Chunk>     chunks      = new ChunkMatrix<>();
     private final Array<Entity>          entities    = new Array<>(Entity.class);
     private final Vector3                viewpointWp = new Vector3();
     private final Array<WorldUpdateStep> updateSteps = new Array<>(WorldUpdateStep.class);
@@ -319,7 +320,7 @@ public class World {
      *
      * @return
      */
-    ChunkMatrix<Chunk> getChunks() {
+    CoordinateMatrix<Chunk> getChunks() {
         return chunks;
     }
 

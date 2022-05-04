@@ -5,11 +5,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-public class ChunkMatrix<T> {
+public class CoordinateMatrix<T> {
 
     public final IntMap<IntMap<T>> map; // (x -> y -> value)
 
-    public ChunkMatrix() {
+    public CoordinateMatrix() {
         map = new IntMap<>();
     }
 

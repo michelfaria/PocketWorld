@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.Array;
 import static vc.andro.poketest.PocketWorld.PPU;
 
 public class Entity {
-    private final Vector3            positionWp = new Vector3();
+    private final   Vector3            positionWp = new Vector3();
     public final    Vector3            dimensions;
     protected final Array<EntityDecal> decals;
 
@@ -67,6 +67,10 @@ public class Entity {
         setPositionWp(positionWp.x, positionWp.y, positionWp.z);
     }
 
+    public void translate(Vector3 translation) {
+        setPositionWp(positionWp.x + translation.x, positionWp.y + translation.y, positionWp.z + translation.z);
+    }
+
     public float getWx() {
         return positionWp.x;
     }
@@ -79,7 +83,7 @@ public class Entity {
         return positionWp.z;
     }
 
-    public void getPositionWp_out(Vector3 out) {
-        out.set(this.positionWp);
+    public Vector3 getPositionWpCopy() {
+        return positionWp.cpy();
     }
 }

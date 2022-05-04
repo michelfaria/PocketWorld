@@ -6,8 +6,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import vc.andro.poketest.Direction;
 import vc.andro.poketest.util.ArrayUtil;
-import vc.andro.poketest.voxel.VoxelAttributes;
 import vc.andro.poketest.voxel.Voxel;
+import vc.andro.poketest.voxel.VoxelAttributes;
 import vc.andro.poketest.voxel.Voxels;
 import vc.andro.poketest.world.World;
 import vc.andro.poketest.world.chunk.render.ChunkRenderer;
@@ -17,18 +17,20 @@ import static vc.andro.poketest.world.World.LzWz;
 
 public class Chunk implements Disposable {
 
-    public static final int                     CHUNK_SIZE           = 16;
-    public static final int                     CHUNK_DEPTH          = 128;
-    public static final int                     TOTAL_VOXELS       = CHUNK_SIZE * CHUNK_DEPTH * CHUNK_SIZE;
-    private final       World                   world;
-    private final       int                     cx;
-    private final       int                     cz;
-    private final       byte[]                  voxels             = new byte[TOTAL_VOXELS];
-    private final       IntMap<VoxelAttributes> voxelAttributesMap = new IntMap<>();
-    private             int                     voxelCount           = 0;
-    private             ChunkRenderer           chunkRenderer        = null;
-    private             boolean                 graphicsInitialized  = false;
-    private             boolean                 needsRenderingUpdate = false;
+    public static final int CHUNK_SIZE   = 16;
+    public static final int CHUNK_DEPTH  = 128;
+    public static final int TOTAL_VOXELS = CHUNK_SIZE * CHUNK_DEPTH * CHUNK_SIZE;
+
+    private final byte[] voxels = new byte[TOTAL_VOXELS];
+
+    private final World                   world;
+    private final int                     cx;
+    private final int                     cz;
+    private final IntMap<VoxelAttributes> voxelAttributesMap   = new IntMap<>();
+    private       int                     voxelCount           = 0;
+    private       ChunkRenderer           chunkRenderer        = null;
+    private       boolean                 graphicsInitialized  = false;
+    private       boolean                 needsRenderingUpdate = false;
 
     public Chunk(@NotNull World world, int cx, int cz) {
         this.world = world;
@@ -135,17 +137,17 @@ public class Chunk implements Disposable {
         }
     }
 
-    /**
-     * Calculates the access index of a CHUNK_SIZE^2 * CHUNK_DEPTH array for a given (lx,ly,lz) position.
-     *
-     * @param lx Local chunk x
-     * @param ly Local chunk y
-     * @param lz Local chunk z
-     * @return
-     */
-    private int calcVoxelArrayPosition_LP(int lx, int ly, int lz) {
-        return ArrayUtil.xyzToI(CHUNK_SIZE, CHUNK_DEPTH, lx, ly, lz);
-    }
+/**
+ * Calculates the access index of a CHUNK_SIZE^2 * CHUNK_DEPTH array for a given (lx,ly,lz) position.
+ *
+ * @param lx Local chunk x
+ * @param ly Local chunk y
+ * @param lz Local chunk z
+ * @return
+ */
+private int calcVoxelArrayPosition_LP(int lx, int ly, int lz) {
+    return ArrayUtil.xyzToI(CHUNK_SIZE, CHUNK_DEPTH, lx, ly, lz);
+}
 
     /**
      * Puts a voxel at the given (lx,ly,lz). If a voxel already exists in that position, it will be replaced.
